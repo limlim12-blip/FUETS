@@ -1,4 +1,4 @@
-import { DocumentsTableRedux } from "./documents-table-redux"
+import { DocumentManagementContainer } from "./course-documents-table"
 import { UserSummaryCard } from "./user-summary-card"
 import { useUserStore } from "@/stores/users-store"
 import { Plus } from "lucide-react"
@@ -16,7 +16,7 @@ export function DashboardContent() {
                     <div className="h-full">
                         <div className="hidden xl:grid xl:grid-cols-5 xl:gap-8 h-full">
                             <div className="flex flex-col h-full min-h-0 xl:col-span-4">
-                                <DocumentsTableRedux />
+                                <DocumentManagementContainer />
                             </div>
 
                             <div className="flex flex-col h-full min-h-0 xl:col-span-1">
@@ -37,10 +37,10 @@ export function DashboardContent() {
                     <div className="h-full">
                         <div className="hidden xl:grid xl:grid-cols-5 xl:gap-8 h-full">
                             <div className="flex flex-col h-full min-h-0 xl:col-span-4">
-                                <DocumentsTableRedux />
+                                <DocumentManagementContainer />
                             </div>
                             <div className="flex flex-col h-full min-h-0 xl:col-span-1">
-                                <div className="flex-none h-fit">
+                                <div clasnname="flex-none h-fit">
                                     <UserSummaryCard />
                                 </div>
                             </div>

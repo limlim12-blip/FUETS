@@ -1,14 +1,11 @@
 "use client"
 import SettingsPopover from "@/components/SettingsPopover"
 
-
 import Link from "next/link"
 import { useState, useEffect } from "react"
 import { LoadingScreen } from "@/components/loading-screen"
 import { DashboardContent } from "@/components/dashboard-content"
-import { SettingsContent } from "@/components/settings-content"
-import { ThemeProvider } from "@/contexts/theme-context"
-import { BarChart3, FileText, Bell, Settings, AngryIcon } from "lucide-react"
+import { BarChart3, FileText, Settings, AngryIcon } from "lucide-react"
 import { useUserStore } from "@/stores/users-store"
 
 const getViewInfo = (activeTab: string) => {
@@ -17,8 +14,6 @@ const getViewInfo = (activeTab: string) => {
             return { title: "Dashboard", icon: BarChart3 }
         case "documents":
             return { title: "Documents", icon: FileText }
-        case "settings":
-            return { title: "Settings", icon: Settings }
         default:
             return { title: "Dashboard", icon: BarChart3 }
     }
@@ -103,6 +98,7 @@ function AdminDashboardContent() {
                 </header>
                 <main className="flex-1 overflow-hidden">
                     {activeTab === "dashboard" && <DashboardContent />}
+                    {activeTab === "documents" && <DashboardContent />}
                     {activeTab === "settings" && <SettingsContent />}
                 </main>
             </div>
@@ -112,8 +108,6 @@ function AdminDashboardContent() {
 
 export default function AdminDashboard() {
     return (
-        <ThemeProvider>
-            <AdminDashboardContent />
-        </ThemeProvider>
+        <AdminDashboardContent />
     )
 }

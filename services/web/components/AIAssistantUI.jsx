@@ -1,5 +1,6 @@
 "use client"
 
+
 import React, { useEffect, useMemo, useRef, useState } from "react"
 import { Calendar, LayoutGrid, MoreHorizontal, FileText } from "lucide-react"
 import { LoadingScreen } from "@/components/loading-screen"
@@ -8,55 +9,46 @@ import Header from "@/components/Header"
 import ChatPane from "@/components/ChatPane"
 import GhostIconButton from "@/components/GhostIconButton"
 import { INITIAL_CONVERSATIONS, } from "@/components/mockData"
+import { UseChatStore } from "@/stores/chat-store"
 
 export default function AIAssistantUI() {
-    const [isLoading, setIsLoading] = useState(true)
-    const [sidebarOpen, setSidebarOpen] = useState(false)
-    const [conversations, setConversations] = useState(INITIAL_CONVERSATIONS)
-    const [selectedId, setSelectedId] = useState(null)
+    // Store
+    const {
+        sidebarOpen,
+        setSidebarOpen,
+        conversations,
+        selectedId,
+        setSelectedId,
+        collapsedComponent,
+        setCollapsedComponent,
+        sidebarCollapsed,
+        setSidebarCollapsed,
+        isThinking,
+        thinkingConvId,
+        createNewChat,
+        sendMessage,
+        resendMessage,
+        pauseThinking,
+        togglePin
+    } = UseChatStore()
+    //  Local State
+    const [isMounted, setIsMounted] = useState(false)
     const [query, setQuery] = useState("")
     const searchRef = useRef(null)
-    const [isThinking, setIsThinking] = useState(false)
-    const [thinkingConvId, setThinkingConvId] = useState(null)
-    const [collapsed, setCollapsed] = useState(() => {
-        try {
-            const raw = localStorage.getItem("sidebar-collapsed")
-            return raw ? JSON.parse(raw) : { pinned: true, recent: false }
-        } catch {
-            return { pinned: true, recent: false, }
-        }
-    })
+    const composerRef = useRef(null)
 
-    // reload page -> create a new chat
+    // Effect
     useEffect(() => {
-        if (!selectedId) {
-            createNewChat()
-        }
+        setIsMounted(true)
     }, [])
 
-    // maybe set default sidebar to collapse?
+    const hasInitialized = useRef(false)
     useEffect(() => {
-        try {
-            localStorage.setItem("sidebar-collapsed", JSON.stringify(collapsed))
-        } catch { }
-    }, [collapsed])
-
-    const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
-        try {
-            const saved = localStorage.getItem("sidebar-collapsed-state")
-            return saved ? JSON.parse(saved) : false
-        } catch {
-            return false
+        if (isMounted && !hasInitialized.current && !selectedId && conversations.length === 0) {
+            hasInitialized.current = true;
+            createNewChat();
         }
-    })
-
-    useEffect(() => {
-        try {
-            localStorage.setItem("sidebar-collapsed-state", JSON.stringify(sidebarCollapsed))
-        } catch { }
-    }, [sidebarCollapsed])
-
-
+    }, [isMounted, createNewChat])
     useEffect(() => {
         const onKey = (e) => {
             if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "n") {
@@ -74,148 +66,29 @@ export default function AIAssistantUI() {
         }
         window.addEventListener("keydown", onKey)
         return () => window.removeEventListener("keydown", onKey)
-    }, [sidebarOpen, conversations])
+    }, [sidebarOpen, createNewChat, setSidebarOpen])
 
-    useEffect(() => {
-        if (!selectedId && conversations.length > 0) {
-            createNewChat()
-        }
-    }, [])
-
+    // fileter
+    // TODO: What a mess
     const filtered = useMemo(() => {
         if (!query.trim()) return conversations
         const q = query.toLowerCase()
-        return conversations.filter((c) => c.title.toLowerCase().includes(q) || c.preview.toLowerCase().includes(q))
+        return conversations.filter((c) =>
+            c.title.toLowerCase().includes(q) || c.preview.toLowerCase().includes(q)
+        )
     }, [conversations, query])
 
-
-
-
     const pinned = filtered.filter((c) => c.pinned).sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1))
-
     const recent = filtered
         .filter((c) => !c.pinned)
         .sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1))
         .slice(0, 10)
 
-
-    function togglePin(id) {
-        setConversations((prev) => prev.map((c) => (c.id === id ? { ...c, pinned: !c.pinned } : c)))
-    }
-
-    function createNewChat() {
-        const id = Math.random().toString(36).slice(2)
-        const item = {
-            id,
-            title: "New Chat",
-            updatedAt: new Date().toISOString(),
-            messageCount: 0,
-            preview: "Say hello to start...",
-            pinned: false,
-            messages: [], // Ensure messages array is empty for new chats
-        }
-        setConversations((prev) => [item, ...prev])
-        setSelectedId(id)
-        setSidebarOpen(false)
-    }
-
-
-    function sendMessage(convId, content) {
-        if (!content.trim()) return
-        const now = new Date().toISOString()
-        const userMsg = { id: Math.random().toString(36).slice(2), role: "user", content, createdAt: now }
-
-        setConversations((prev) =>
-            prev.map((c) => {
-                if (c.id !== convId) return c
-                const msgs = [...(c.messages || []), userMsg]
-                return {
-                    ...c,
-                    messages: msgs,
-                    updatedAt: now,
-                    messageCount: msgs.length,
-                    preview: content.slice(0, 80),
-                }
-            }),
-        )
-
-        setIsThinking(true)
-        setThinkingConvId(convId)
-
-        const currentConvId = convId
-        setTimeout(() => {
-            // Always clear thinking state and generate response for this specific conversation
-            setIsThinking(false)
-            setThinkingConvId(null)
-            setConversations((prev) =>
-                prev.map((c) => {
-                    if (c.id !== currentConvId) return c
-                    const ack = `Got it — I'll help with that.`
-                    const asstMsg = {
-                        id: Math.random().toString(36).slice(2),
-                        role: "assistant",
-                        content: ack,
-                        createdAt: new Date().toISOString(),
-                    }
-                    const msgs = [...(c.messages || []), asstMsg]
-                    return {
-                        ...c,
-                        messages: msgs,
-                        updatedAt: new Date().toISOString(),
-                        messageCount: msgs.length,
-                        preview: asstMsg.content.slice(0, 80),
-                    }
-                }),
-            )
-        }, 2000)
-    }
-
-    function editMessage(convId, messageId, newContent) {
-        const now = new Date().toISOString()
-        setConversations((prev) =>
-            prev.map((c) => {
-                if (c.id !== convId) return c
-                const msgs = (c.messages || []).map((m) =>
-                    m.id === messageId ? { ...m, content: newContent, editedAt: now } : m,
-                )
-                return {
-                    ...c,
-                    messages: msgs,
-                    preview: msgs[msgs.length - 1]?.content?.slice(0, 80) || c.preview,
-                }
-            }),
-        )
-    }
-
-    function resendMessage(convId, messageId) {
-        const conv = conversations.find((c) => c.id === convId)
-        const msg = conv?.messages?.find((m) => m.id === messageId)
-        if (!msg) return
-        sendMessage(convId, msg.content)
-    }
-
-    function pauseThinking() {
-        setIsThinking(false)
-        setThinkingConvId(null)
-    }
-
-
-    const composerRef = useRef(null)
     const selected = conversations.find((c) => c.id === selectedId) || null
 
-    // Loading screen
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setIsLoading(false)
-        }, 10)
-
-        return () => clearTimeout(timer)
-    }, [])
-
-    if (isLoading) {
+    if (!isMounted) {
         return <LoadingScreen />
     }
-
 
     return (
         <div className="h-screen w-full bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
@@ -240,8 +113,8 @@ export default function AIAssistantUI() {
                 <Sidebar
                     open={sidebarOpen}
                     onClose={() => setSidebarOpen(false)}
-                    collapsed={collapsed}
-                    setCollapsed={setCollapsed}
+                    collapsed={collapsedComponent}
+                    setCollapsed={setCollapsedComponent}
                     sidebarCollapsed={sidebarCollapsed}
                     setSidebarCollapsed={setSidebarCollapsed}
                     conversations={conversations}

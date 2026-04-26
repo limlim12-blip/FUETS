@@ -47,7 +47,6 @@ export default function ConversationRow({ data, active, onSelect, onTogglePin, o
 
     return (
         <div className="group relative">
-            {/* THAY ĐỔI: Chuyển button ngoài cùng thành div với role="button" */}
             <div
                 role="button"
                 tabIndex={0}
@@ -70,9 +69,6 @@ export default function ConversationRow({ data, active, onSelect, onTogglePin, o
                     <div className="flex items-center gap-2">
                         {data.pinned && <Pin className="h-3 w-3 shrink-0 text-zinc-500 dark:text-zinc-400" />}
                         <span className="truncate text-sm font-medium tracking-tight">{data.title}</span>
-                        <span className="shrink-0 text-[11px] text-zinc-500 dark:text-zinc-400">
-                            {timeAgo(data.updatedAt)}
-                        </span>
                     </div>
                     {showMeta && (
                         <div className="mt-0.5 text-[11px] text-zinc-500 dark:text-zinc-400">
@@ -81,12 +77,11 @@ export default function ConversationRow({ data, active, onSelect, onTogglePin, o
                     )}
                 </div>
 
-                {/* Phần Options Button */}
                 <div className="relative" ref={menuRef}>
                     <button
                         type="button"
                         onClick={(e) => {
-                            e.stopPropagation(); // Không cho kích hoạt onSelect của hàng
+                            e.stopPropagation();
                             setShowMenu(prev => !prev);
                         }}
                         className={cls(
