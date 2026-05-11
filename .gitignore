@@ -14,7 +14,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
 lib64/
 parts/
 sdist/
@@ -220,8 +219,8 @@ node_modules/
 /coverage
 
 # next.js specific
-/.next/
-/out/
+.next/
+out/
 
 # production
 /build
@@ -248,3 +247,5 @@ next-env.d.ts
 
 # eslint
 .eslintcache
+backend/src/utils/
+

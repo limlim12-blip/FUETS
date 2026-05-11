@@ -1,12 +1,12 @@
 services:
   frontend:
     build:
-      context: ./services/web
+      context: ./frontend
     container_name: fuet-frontend
     ports:
       - "3000:3000"
     volumes:
-      - ./services/web:/app
+      - ./frontend:/app
       - /app/node_modules
     environment:
       - NODE_ENV=development
@@ -19,12 +19,12 @@ services:
 
   backend:
     build:
-      context: ./services/api
+      context: ./backend
     container_name: fuet-backend
     ports:
       - "8000:8000"
     volumes:
-      - ./services/api:/app
+      - ./backend:/app
     networks:
       - fuet-network
     depends_on:

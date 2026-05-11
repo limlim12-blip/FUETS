@@ -1,0 +1,21 @@
+from fastapi import FastAPI
+from contextlib import asynccontextmanager
+from fastapi.middleware.cors import CORSMiddleware
+from src.database.db import init_db
+from src.core.logging import setup_logging
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    setup_logging()
+    init_db()
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # For testing only
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
