@@ -1,0 +1,118 @@
+@import '../styles/themes/index';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+    font-weight: var(--font-weight-normal);
+    letter-spacing: -0.01em;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  html {
+    transition: background-color 0.3s ease;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: var(--font-weight-medium);
+    letter-spacing: -0.025em;
+    @apply text-foreground;
+  }
+}
+
+// Custom scrollbar with theme support
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-muted;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-muted-foreground;
+  border-radius: calc(var(--radius) - 4px);
+  opacity: 0.5;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  opacity: 0.8;
+}
+
+// Theme-aware component styles with transitions
+.card {
+  @apply bg-card text-card-foreground border-border;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.button-primary {
+  @apply bg-primary text-primary-foreground;
+  border-radius: var(--radius);
+  transition: all 0.2s ease;
+
+  &:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+}
+
+.button-secondary {
+  @apply bg-secondary text-secondary-foreground;
+  border-radius: var(--radius);
+  transition: all 0.2s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.input {
+  @apply bg-input border-border text-foreground;
+  border-radius: var(--radius);
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+}
+
+// Enhanced theme transitions
+[data-theme] {
+  transition: all 0.3s ease;
+}
+
+// Theme change animation
+@keyframes themeTransition {
+  0% { opacity: 0.9; }
+  100% { opacity: 1; }
+}
+
+[data-theme] * {
+  animation: themeTransition 0.2s ease-out;
+}
+
+// Responsive utilities
+@media (max-width: 640px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .text-responsive {
+    font-size: 0.875rem;
+  }
+}
