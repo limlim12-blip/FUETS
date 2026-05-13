@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
-from src.database.db import init_db
-from src.core.logging import setup_logging
+from src.core.db import init_db
+from src.core.logger import setup_logging
 
 
 @asynccontextmanager

@@ -1,0 +1,11 @@
+uvicorn==0.44.0
+pydantic_settings
+pydantic
+psycopg
+fastapi==0.136.0
+psycopg[binary]
+sqlmodel
+pandas
+psycopg2-binary
+asyncpg
+python-dotenv

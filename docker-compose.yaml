@@ -3,6 +3,8 @@ services:
     build:
       context: ./frontend
     container_name: fuet-frontend
+    env_file:
+      - .env
     ports:
       - "3000:3000"
     volumes:
@@ -21,6 +23,8 @@ services:
     build:
       context: ./backend
     container_name: fuet-backend
+    env_file:
+      - .env
     ports:
       - "8000:8000"
     volumes:
@@ -39,9 +43,9 @@ services:
       - postgres_data:/var/lib/postgresql/data
     env_file: .env
     environment:
-      - POSTGRES_DB=${RDS_DB_NAME}
-      - POSTGRES_USER=${RDS_USERNAME}
-      - POSTGRES_PASSWORD=${RDS_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
     networks:
       - fuet-network
 

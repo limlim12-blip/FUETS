@@ -10,18 +10,15 @@ export default function ComposerActionsPopover({ children }) {
         {
             icon: Paperclip,
             label: "Add photos & files",
+            badge: "TODO",
+
             action: () => console.log("Add photos & files"),
         },
         {
             icon: Bot,
-            label: "Agent mode",
-            badge: "NEW",
-            action: () => console.log("Agent mode"),
-        },
-        {
-            icon: BookOpen,
-            label: "Study and learn",
-            action: () => console.log("Study and learn"),
+            label: "Change param",
+            badge: "TODO",
+            action: () => console.log("param"),
         },
     ]
 

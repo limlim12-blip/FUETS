@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, forwardRef, useImperativeHandle, useRef } from "react"
 import { RefreshCw, Square } from "lucide-react"
 import Message from "./Message"

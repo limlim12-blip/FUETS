@@ -2,7 +2,7 @@ from sqlmodel import Session, SQLModel, create_engine  # type:ignore
 from src.core.config import config
 
 DATABASE_URL = config.DB_URL
-engine = create_engine(DATABASE_URL, echo=True)
+engine = create_engine(DATABASE_URL, echo=True, pool_pre_ping=True)
 
 
 def init_db():
