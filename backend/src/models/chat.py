@@ -2,11 +2,9 @@ from sqlmodel import Field, SQLModel, Relationship
 
 from datetime import datetime, timezone
 
-from pydantic import EmailStr
 from sqlalchemy import DateTime
-from decimal import Decimal
 import uuid
-from typing import List, Any
+from typing import List
 from src.models.user import User
 
 
@@ -33,10 +31,10 @@ class Chat(ChatBase, table=True):
         default_factory=Field(default_factory=lambda: datetime.now(timezone.utc)),
         sa_type=DateTime(timezone=True),  # type: ignore
     )
-    owner_id: uuid.UUID = Field(
+    user_id: uuid.UUID = Field(
         foreign_key="user.id", nullable=False, ondelete="CASCADE"
     )
-    owner: User | None = Relationship(back_populates="chats")
+    user: User | None = Relationship(back_populates="chats")
     messages: List["Message"] = Relationship(back_populates="chat")
 
 
@@ -73,10 +71,9 @@ class Message(MessageBase, table=True):
         default_factory=Field(default_factory=lambda: datetime.now(timezone.utc)),
         sa_type=DateTime(timezone=True),  # type: ignore
     )
-    owner_id: uuid.UUID = Field(
-        foreign_key="user.id", nullable=False, ondelete="CASCADE"
+    chat_id: uuid.UUID = Field(
+        foreign_key="chat.id", nullable=False, ondelete="CASCADE"
     )
-    owner: User | None = Relationship(back_populates="chats")
     chat: List["Chat"] = Relationship(back_populates="messages")
 
 

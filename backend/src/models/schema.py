@@ -12,7 +12,7 @@ from typing import List, Any
 # NOTE: PROFESSOR
 # Shared properties
 class ProfBase(SQLModel):
-    prof_name: str = Field(index=True)
+    name: str = Field(index=True)
     university: str | None
     academic_rank: str | None
     average_rating: Decimal | None = Field(
@@ -27,19 +27,19 @@ class ProfCreate(ProfBase):
 
 # Properties to receive on item update
 class ProfUpdate(ProfBase):
-    prof_name: str | None = Field(index=True)  # type:ignore
+    name: str | None = Field(index=True)  # type:ignore
 
 
 # Database model, database table inferred from class name
 class Professor(ProfBase, table=True):
     __tablename__: Any = "professors"
-    prof_id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, index=True)
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, index=True)
     reviews: List["Review"] = Relationship(back_populates="professor")
 
 
 # Properties to return via API, id is always required
 class ProfPublic(ProfBase):
-    prof_id: uuid.UUID
+    id: uuid.UUID
 
 
 class ProfsPublic(SQLModel):
@@ -50,8 +50,8 @@ class ProfsPublic(SQLModel):
 # NOTE: COURSES
 # Shared properties
 class CourseBase(SQLModel):
-    course_code: str | None
-    course_name: str = Field(index=True)
+    code: str | None
+    name: str = Field(index=True)
 
 
 # Properties to receive on item creation
@@ -61,15 +61,13 @@ class CourseCreate(CourseBase):
 
 # Properties to receive on item update
 class CourseUpdate(CourseBase):
-    course_name: str | None = Field(index=True)  # type:ignore
+    name: str | None = Field(index=True)  # type:ignore
 
 
 # Database model, database table inferred from class name
 class Course(CourseBase, table=True):
     __tablename__: Any = "courses"
-    course_id: uuid.UUID = Field(
-        default_factory=uuid.uuid4, primary_key=True, index=True
-    )
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, index=True)
     reviews: List["Review"] = Relationship(back_populates="course")
 
 
@@ -85,10 +83,10 @@ class CoursesPublic(SQLModel):
 
 # NOTE: REVIEWS
 # Shared properties
-class ReviewBase(SQLModel, table=True):
+class ReviewBase(SQLModel):
     rating: int = Field(default=2, ge=1, le=5)
     content: str | None
-    courses_id: uuid.UUID | None = Field(default=None, foreign_key="courses.id")
+    course_id: uuid.UUID | None = Field(default=None, foreign_key="courses.id")
     prof_id: uuid.UUID | None = Field(default=None, foreign_key="professors.id")
 
 
@@ -105,7 +103,7 @@ class ReviewUpdate(ReviewBase):
 # Database model, database table inferred from class name
 class Review(ReviewBase, table=True):
     __tablename__: Any = "reviews"
-    review_id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     course: Course = Relationship(back_populates="reviews")
     professor: Professor = Relationship(back_populates="reviews")

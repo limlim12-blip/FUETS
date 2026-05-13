@@ -19,7 +19,7 @@ router = APIRouter(prefix="/courses")
 def read_courses(session: SessionDep, offset: int = 0, limit: int = 100) -> Any:
     count = session.exec(select(func.count()).select_from(Course)).one()
     courses = session.exec(
-        select(Course).order_by(col(Course.course_name)).offset(offset).limit(limit)
+        select(Course).order_by(col(Course.name)).offset(offset).limit(limit)
     ).all()
     courses_public = [CoursePublic.model_validate(course) for course in courses]
     return CoursesPublic(data=courses_public, count=count)

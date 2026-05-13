@@ -19,7 +19,7 @@ router = APIRouter(prefix="/profs")
 def read_profs(session: SessionDep, offset: int = 0, limit: int = 100) -> Any:
     count = session.exec(select(func.count()).select_from(Professor)).one()
     profs = session.exec(
-        select(Professor).order_by(col(Professor.prof_name)).offset(offset).limit(limit)
+        select(Professor).order_by(col(Professor.name)).offset(offset).limit(limit)
     ).all()
     profs_public = [ProfPublic.model_validate(course) for course in profs]
     return ProfsPublic(data=profs_public, count=count)
