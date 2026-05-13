@@ -3,8 +3,6 @@ const nextConfig = {
     typescript: {
         ignoreBuildErrors: true,
     },
-    output: 'standalone', // BẮT BUỘC
-
     images: {
         unoptimized: true,
     },
