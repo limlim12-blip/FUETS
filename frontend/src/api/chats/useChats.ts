@@ -1,4 +1,5 @@
-import { useCreateChatApiV1ChatsPost, useReadChatsApiV1ChatsGet, useDeleteChatApiV1ChatsIdDelete, getReadChatsApiV1ChatsGetQueryKey } from "./chats";
+import { ChatUpdate } from "../model";
+import { useCreateChatApiV1ChatsPost, useReadChatsApiV1ChatsGet, useDeleteChatApiV1ChatsIdDelete, getReadChatsApiV1ChatsGetQueryKey, useUpdateChatApiV1ChatsIdPut } from "./chats";
 import { useQueryClient } from '@tanstack/react-query';
 
 
@@ -12,20 +13,31 @@ export const useChatActions = () => {
 
     const createMutation = useCreateChatApiV1ChatsPost();
     const deleteMutation = useDeleteChatApiV1ChatsIdDelete();
+    const updateMutation = useUpdateChatApiV1ChatsIdPut()
 
+    const handleUpdate = async (id: string, { pinned, title }: { pinned?: boolean; title?: string } = {}) => {
+        return updateMutation.mutateAsync({
+            id: id,
+            data: { pinned, title },
+        }, {
+            onSuccess: async () => {
+                await queryClient.invalidateQueries({ queryKey: getReadChatsApiV1ChatsGetQueryKey({ limit: 20, offset: 0 }) });
+            }
+        });
+    };
     const handleCreate = async () => {
         return createMutation.mutateAsync({
             data: { title: "New Chat" }
         }, {
-            onSuccess: () => {
-                queryClient.invalidateQueries({ queryKey: ['read_chats_api_v1_chats__get'] });
+            onSuccess: async () => {
+                await queryClient.invalidateQueries({ queryKey: getReadChatsApiV1ChatsGetQueryKey({ limit: 20, offset: 0 }) });
             }
         });
     };
     const handleDelete = (id: string) => {
         deleteMutation.mutateAsync({ id }, {
-            onSuccess: () => {
-                queryClient.invalidateQueries({ queryKey: getReadChatsApiV1ChatsGetQueryKey() });
+            onSuccess: async () => {
+                await queryClient.invalidateQueries({ queryKey: getReadChatsApiV1ChatsGetQueryKey({ limit: 20, offset: 0 }) });
             }
         });
     };
@@ -33,10 +45,12 @@ export const useChatActions = () => {
     return {
         handleCreate,
         handleDelete,
+        handleUpdate,
         conversations: data?.data ?? [],
         error: isError,
         isLoading,
         isCreating: createMutation.isPending,
         isDeleting: deleteMutation.isPending,
+        isUpdating: updateMutation.isPending,
     };
 };

@@ -1,10 +1,17 @@
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel, DateTime
+
+from sqlmodel import Relationship
 
 from datetime import datetime, timezone
 
-from pydantic import EmailStr
-from sqlalchemy import DateTime
 import uuid
+from typing import List, TYPE_CHECKING
+
+
+from pydantic import EmailStr
+
+if TYPE_CHECKING:
+    from src.models.chat import Chat
 
 
 # NOTE: TOKEN
@@ -66,8 +73,10 @@ class User(UserBase, table=True):
     hashed_password: str
     created_at: datetime | None = Field(
         default_factory=(lambda: datetime.now(timezone.utc)),
-        sa_type=DateTime(timezone=True),  # type: ignore
+        sa_type=DateTime(timezone=True),  # type:ignore
     )
+
+    chats: List["Chat"] = Relationship(back_populates="user")
 
 
 # Properties to return via API, id is always required
@@ -79,3 +88,8 @@ class UserPublic(UserBase):
 class UsersPublic(SQLModel):
     data: list[UserPublic]
     count: int
+
+
+# Generic message
+class Message(SQLModel):
+    message: str

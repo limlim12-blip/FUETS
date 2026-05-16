@@ -1,10 +1,11 @@
-from sqlmodel import Field, SQLModel, Relationship
+from sqlmodel import Field, SQLModel, Relationship, DateTime, Column, Enum
+
 
 from datetime import datetime, timezone
 
-from sqlalchemy import DateTime
 import uuid
 from typing import List
+import enum
 from src.models.user import User
 
 
@@ -22,19 +23,21 @@ class ChatCreate(ChatBase):
 # Properties to receive on item update
 class ChatUpdate(ChatBase):
     title: str | None = Field(default=None, min_length=1, max_length=255)  # type: ignore
+    pinned: bool | None = Field(default=False)
 
 
 # Database model, database table inferred from class name
 class Chat(ChatBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, index=True)
     created_at: datetime | None = Field(
-        default_factory=Field(default_factory=lambda: datetime.now(timezone.utc)),
+        default_factory=lambda: datetime.now(timezone.utc),
         sa_type=DateTime(timezone=True),  # type: ignore
     )
     user_id: uuid.UUID = Field(
         foreign_key="user.id", nullable=False, ondelete="CASCADE"
     )
-    user: User | None = Relationship(back_populates="chats")
+    user: User = Relationship(back_populates="chats")
+    pinned: bool = Field(default=False)
     messages: List["Message"] = Relationship(back_populates="chat")
 
 
@@ -50,8 +53,17 @@ class ChatsPublic(SQLModel):
 
 # NOTE: Message
 # Shared properties
+class MessageRole(str, enum.Enum):
+    USER = "user"
+    ASSISTANT = "assistant"
+    SYSTEM = "system"
+
+
 class MessageBase(SQLModel):
     content: str
+    role: MessageRole = Field(
+        default=MessageRole.USER, sa_column=Column(Enum(MessageRole))
+    )
 
 
 # Properties to receive on item creation
@@ -68,13 +80,13 @@ class MessageUpdate(MessageBase):
 class Message(MessageBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, index=True)
     created_at: datetime | None = Field(
-        default_factory=Field(default_factory=lambda: datetime.now(timezone.utc)),
-        sa_type=DateTime(timezone=True),  # type: ignore
+        default_factory=lambda: datetime.now(timezone.utc),
+        sa_column=Column(DateTime(timezone=True)),
     )
     chat_id: uuid.UUID = Field(
         foreign_key="chat.id", nullable=False, ondelete="CASCADE"
     )
-    chat: List["Chat"] = Relationship(back_populates="messages")
+    chat: Chat = Relationship(back_populates="messages")
 
 
 # Properties to return via API, id is always required

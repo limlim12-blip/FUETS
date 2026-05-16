@@ -20,9 +20,7 @@ export default function SearchModal({
     isOpen,
     onClose,
     conversations,
-    selectedId,
     onSelect,
-    togglePin,
     createNewChat,
 }) {
     const [query, setQuery] = useState("")

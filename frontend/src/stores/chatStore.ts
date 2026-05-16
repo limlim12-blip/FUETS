@@ -24,7 +24,6 @@ interface ChatStore {
     setSelectedId: (id: string | null) => void
     setThinkingConvId: (convId: string | null) => void
     setIsThinking: (thinking: boolean) => void
-    // togglePin: (id: string) => void
     setCollapsedComponent: (updater: SidebarComponentState | ((prev: SidebarComponentState) => SidebarComponentState)) => void
     pauseThinking: () => void
 }
@@ -56,11 +55,6 @@ export const UseChatStore = create<ChatStore>()(
 
             pauseThinking: () => set({ isThinking: false, thinkingConvId: null }),
             setSidebarCollapsed: (sidebarCollapsed) => set({ sidebarCollapsed }),
-            // togglePin: (id) => {
-            //     set((state) => ({
-            //         conversations: state.conversations.map((c) => (c.id === id ? { ...c, pinned: !c.pinned } : c))
-            //     }))
-            // }
         }),
         {
             name: 'chat-storage',

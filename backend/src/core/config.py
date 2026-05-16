@@ -29,8 +29,11 @@ class Config(BaseSettings):
     R2_ENDPOINT_URL: str = ""
 
     # groq not grok
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
+    EMAIL_RESET_TOKEN_EXPIRE_HOURS: int = 60 * 24 * 8
     GROQ_API_KEY: str = ""
     NEON_DB_URL: str = ""
+    QDRANT_URL: str = ""
     QDRANT_API_KEY: str = ""
 
     @property

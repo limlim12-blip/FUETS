@@ -2,8 +2,6 @@ from sqlmodel import Field, SQLModel, Relationship
 
 from datetime import datetime, timezone
 
-from pydantic import EmailStr
-from sqlalchemy import DateTime
 from decimal import Decimal
 import uuid
 from typing import List, Any

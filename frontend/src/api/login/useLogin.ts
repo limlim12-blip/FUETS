@@ -42,7 +42,6 @@ export const useAuthActions = () => {
     };
 
     return {
-        // Actions
         handleLogin,
         handleRegister,
         handleLogout,

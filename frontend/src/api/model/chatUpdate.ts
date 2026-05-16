@@ -7,4 +7,5 @@
 
 export interface ChatUpdate {
   title?: string | null;
+  pinned?: boolean | null;
 }

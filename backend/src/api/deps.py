@@ -1,18 +1,20 @@
 from collections.abc import Generator
-from typing import Annotated
-
+import logging
 import jwt
+from jwt.exceptions import InvalidTokenError
+from src.core import security
+from src.core.config import config
+from typing import Annotated
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jwt.exceptions import InvalidTokenError
 from pydantic import ValidationError
 from sqlmodel import Session
 
-from src.core import security
-from src.core.config import config
 from src.core.db import engine
 from src.models.user import TokenPayload, User
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{config.API_V1_STR}/login/access-token"
 )

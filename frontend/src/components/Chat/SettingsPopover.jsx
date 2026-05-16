@@ -1,4 +1,6 @@
 "use client"
+import React from 'react';
+
 import { useState } from "react"
 import { BookOpen, LogOut, ChevronRight, Settings } from "lucide-react"
 import { Popover, PopoverContent, PopoverTrigger } from "@/src/components/ui/popover"

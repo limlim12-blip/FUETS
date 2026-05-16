@@ -8,6 +8,7 @@ from sqlalchemy import func
 from sqlmodel import col, select
 from src.api.deps import CurrentUser, SessionDep
 from src.models.chat import (
+    MessageRole,
     MessageCreate,
     ChatsPublic,
     MessagesPublic,
@@ -19,7 +20,7 @@ from src.models.chat import (
     Message,
 )
 
-router = APIRouter(prefix="/chat")
+router = APIRouter(prefix="/chats")
 
 
 @router.get("/", response_model=ChatsPublic)
@@ -39,7 +40,11 @@ def read_chats(
             .where(Chat.user_id == current_user.id)
         ).one()
         chats = session.exec(
-            select(Chat).order_by(col(Chat.created_at)).offset(offset).limit(limit)
+            select(Chat)
+            .where(Chat.user_id == current_user.id)
+            .order_by(col(Chat.created_at).desc())
+            .offset(offset)
+            .limit(limit)
         ).all()
     courses_public = [ChatPublic.model_validate(chat) for chat in chats]
     return ChatsPublic(data=courses_public, count=count)
@@ -61,7 +66,7 @@ def create_chat(
     session.add(chat)
     session.commit()
     session.refresh(chat)
-    pass
+    return chat
 
 
 @router.put("/{id}", response_model=ChatPublic)
@@ -96,10 +101,11 @@ def delete_chat(session: SessionDep, current_user: CurrentUser, id: uuid.UUID) -
     session.commit()
 
 
-@router.get("/{id}/messages", response_model=MessagePublic)
+@router.get("/{id}/messages", response_model=MessagesPublic)
 def read_messages(
     session: SessionDep,
     current_user: CurrentUser,
+    id: uuid.UUID,
     skip: int = 0,
     limit: int = 20,
 ) -> Any:
@@ -121,7 +127,7 @@ def read_messages(
         statement = (
             select(Message)
             .where(Message.chat_id == id)
-            .order_by(col(Message.created_at).desc())
+            .order_by(col(Message.created_at).asc())
             .offset(skip)
             .limit(limit)
         )
@@ -133,9 +139,20 @@ def read_messages(
 
 @router.post("/{id}", response_model=MessagePublic)
 def create_message(
-    *, session: SessionDep, current_user: CurrentUser, item_in: MessageCreate
+    *,
+    session: SessionDep,
+    current_user: CurrentUser,
+    item_in: MessageCreate,
+    id: uuid.UUID,
 ) -> Any:
-    message = Message.model_validate(item_in, update={"user_id": current_user.id})
+    message = Message.model_validate(item_in, update={"chat_id": id})
     session.add(message)
     session.commit()
     session.refresh(message)
+    ai_text = "This is a placeholder AI response"
+
+    ai_message = Message(content=ai_text, role=MessageRole.ASSISTANT, chat_id=id)
+    session.add(ai_message)
+    session.commit()
+    session.refresh(ai_message)
+    return ai_message

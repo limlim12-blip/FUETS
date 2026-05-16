@@ -1,17 +1,16 @@
 "use client"
 
 
-import React, { useEffect, useMemo, useRef, useState } from "react"
-import { Calendar, LayoutGrid, MoreHorizontal, FileText } from "lucide-react"
+import React, { useEffect, useMemo, useRef, useState, useCallback } from "react"
+import { Calendar, LayoutGrid, MoreHorizontal, } from "lucide-react"
 import { LoadingScreen } from "@/src/components/Chat/loading-screen"
 import Sidebar from "@/src/components/Chat/Sidebar"
 import Header from "@/src/components/Chat/Header"
 import ChatPane from "@/src/components/Chat/ChatPane"
 import GhostIconButton from "@/src/components/Chat/GhostIconButton"
 import { UseChatStore } from "@/src/stores/chatStore"
-import { useCovs, useCreateCov } from "@/src/hooks/useConv"
-import { useMessages, useCreateMessages, useUpdateMessage } from "@/src/hooks/useMessages"
-import { Conversation } from '@/src/api/conversations';
+import { useChatActions } from "@/src/api/chats/useChats"
+import { useMessageActions } from "@/src/api/chats/useMessages"
 
 
 export default function AIAssistantUI() {
@@ -30,52 +29,65 @@ export default function AIAssistantUI() {
         thinkingConvId,
         setThinkingConvId,
         pauseThinking,
-        togglePin
     } = UseChatStore()
     //  Local State
-    const { data: conversations = [], isFetched } = useCovs();
-    const createCovMutation = useCreateCov();
-    const handleCreateNewChat = () => {
-        if (createCovMutation.isPending) return;
-        createCovMutation.mutate(undefined, {
-            onSuccess: (NewChat) => {
-                setSelectedId(NewChat.id);
-            },
-            onError: (error) => {
-                console.error("Error creating conv", error);
-            }
+    const {
+        handleCreate: handleCreateChat,
+        handleUpdate: handleUpdateChat,
+        conversations = [],
+        isCreating: isCreatingChat,
+        isLoading: isLoadingChat,
+        isUpdating: isUpdatingChat
+    } = useChatActions()
+    const {
+        handleCreate: handleCreateMessage,
+        isCreating: isCreatingMessage,
+    } = useMessageActions(selectedId)
+    const handleTogglePin = useCallback(async (id, newPinnedState) => {
+        console.log("WHAT IS ID??", typeof id, id);
+        if (isUpdatingChat) return;
+        await handleUpdateChat({
+            id: id,
+            data: { pinned: newPinnedState }
+        }).catch((error) => {
+            console.error("Error updating conv", error);
         });
-    };
+    }, [isUpdatingChat, handleUpdateChat]);
 
-    const createMessageMutation = useCreateMessages();
-    const handleSendMessage = (selectedId, content) => {
-        if (createMessageMutation.isPending) return;
-        createMessageMutation.mutate({
-            convId: selectedId,
-            content: content
-        }, {
-            onSuccess: () => {
-                setIsThinking(true)
-                setThinkingConvId(selectedId)
-            },
-            onError: (error) => {
-                setTimeout(() => {
-                    setIsThinking(false)
-                    setThinkingConvId(null)
-                }, 2)
-                console.error("Error sending message", error);
-            }
+
+    const handleCreateNewChat = useCallback(async () => {
+        if (isCreatingChat) return;
+        await handleCreateChat().then((response) => {
+            setSelectedId(response.id);
+        }).catch((error) => {
+            console.error("Error creating conv", error);
         });
-    }
-    const handleResendMessage = (selectedId, msgId) => {
-        const msg = selected.messages.find((c) => c.id === msgId)
-        if (isThinking) {
-            //TODO: turn this error print to a popup or a smth like that
-            console.error("could not resend while thinking. Please stop the current action first");
-            return
+    }, [isCreatingChat, handleCreateChat, setSelectedId]);
+
+    const handleSendMessage = useCallback(async (selectedId, content) => {
+        if (!selectedId) {
+            console.error("No chat is selected!.");
+            return;
         }
-        handleSendMessage(selectedId, msg.content)
-    }
+
+        if (isCreatingMessage?.isPending) return;
+
+        try {
+            setIsThinking(true);
+            setThinkingConvId(selectedId);
+
+            await handleCreateMessage(selectedId, { content: content });
+            setIsThinking(false);
+            setThinkingConvId(null);
+
+        } catch (error) {
+            setTimeout(() => {
+                setIsThinking(false);
+                setThinkingConvId(null);
+            }, 2);
+            console.error("Error sending message", error);
+        }
+    }, [handleCreateMessage]);
 
     const [isMounted, setIsMounted] = useState(false)
     const [query, setQuery] = useState("")
@@ -89,23 +101,24 @@ export default function AIAssistantUI() {
 
     const hasInitialized = useRef(false)
     useEffect(() => {
-        if (isFetched && !hasInitialized.current) {
+        if (!isLoadingChat && !hasInitialized.current) {
             if (conversations.length === 0) {
                 hasInitialized.current = true;
                 handleCreateNewChat();
             }
             else if (conversations.length > 0 && !selectedId) {
                 hasInitialized.current = true;
+                setSelectedId(conversations[0].id);
             }
         }
-    }, [isFetched, conversations.length, isMounted]);
+    }, [!isLoadingChat, conversations.length, isMounted, selectedId, handleCreateNewChat, setSelectedId]);
     // fileter
     // NOTE: What a mess
     const filtered = useMemo(() => {
         if (!query.trim()) return conversations
         const q = query.toLowerCase()
         return conversations.filter((c) =>
-            c.title.toLowerCase().includes(q) || c.preview.toLowerCase().includes(q)
+            c.title?.toLowerCase().includes(q) || c.preview?.toLowerCase().includes(q)
         )
     }, [conversations, query])
     const pinned = filtered.filter((c) => c.pinned).sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1))
@@ -152,7 +165,7 @@ export default function AIAssistantUI() {
                     recent={recent}
                     selectedId={selectedId}
                     onSelect={(id) => setSelectedId(id)}
-                    togglePin={togglePin}
+                    togglePin={handleTogglePin}
                     query={query}
                     setQuery={setQuery}
                     searchRef={searchRef}
@@ -164,7 +177,6 @@ export default function AIAssistantUI() {
                         ref={composerRef}
                         conversation={selected}
                         onSend={(content) => selected && handleSendMessage(selected.id, content)}
-                        onResendMessage={(messageId) => selected && handleResendMessage(selected.id, messageId)}
                         isThinking={isThinking && thinkingConvId === selected?.id}
                         onPauseThinking={pauseThinking}
                     />

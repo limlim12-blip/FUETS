@@ -1,4 +1,6 @@
+/* eslint-disable react/prop-types */
 "use client"
+import React from 'react';
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { FileText } from "lucide-react"
@@ -24,10 +26,7 @@ export default function Sidebar({
     onClose = () => { },
     collapsed = { pinned: true, recent: false },
     setCollapsed = () => { },
-    sidebarCollapsed = false,
-    setSidebarCollapsed = () => { },
-    conversations = [],
-    pinned = [],
+    sidebarCollapsed = false, setSidebarCollapsed = () => { }, conversations = [], pinned = [],
     recent = [],
     selectedId = null,
     onSelect = () => { },
@@ -49,7 +48,6 @@ export default function Sidebar({
 
     // Prevent hydration errors
     if (!mounted) return null
-
     if (sidebarCollapsed) {
         return (
             <>
@@ -112,9 +110,7 @@ export default function Sidebar({
                     isOpen={showSearchModal}
                     onClose={() => setShowSearchModal(false)}
                     conversations={conversations}
-                    selectedId={selectedId}
                     onSelect={onSelect}
-                    togglePin={togglePin}
                     createNewChat={createNewChat}
                 />
             </>
@@ -231,7 +227,7 @@ export default function Sidebar({
                                             data={c}
                                             active={c.id === selectedId}
                                             onSelect={() => onSelect(c.id)}
-                                            onTogglePin={() => togglePin(c.id)}
+                                            onTogglePin={() => togglePin(c.id, !c.pinned)}
                                         />
                                     ))
                                 )}
@@ -253,7 +249,7 @@ export default function Sidebar({
                                             data={c}
                                             active={c.id === selectedId}
                                             onSelect={() => onSelect(c.id)}
-                                            onTogglePin={() => togglePin(c.id)}
+                                            onTogglePin={() => togglePin(c.id, c.pinned)}
                                             showMeta
                                         />
                                     ))
@@ -283,9 +279,7 @@ export default function Sidebar({
                 isOpen={showSearchModal}
                 onClose={() => setShowSearchModal(false)}
                 conversations={conversations}
-                selectedId={selectedId}
                 onSelect={onSelect}
-                togglePin={togglePin}
                 createNewChat={createNewChat}
             />
         </>

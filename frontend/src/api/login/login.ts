@@ -25,6 +25,8 @@ import type {
 import { customInstance } from '.././axios-custom';
 
 
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
 
 
 export type loginAccessTokenApiV1LoginAccessTokenPostResponse200 = {
@@ -88,15 +90,15 @@ if(bodyLoginAccessTokenApiV1LoginAccessTokenPost.client_secret !== undefined && 
 
 
 export const getLoginAccessTokenApiV1LoginAccessTokenPostMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginAccessTokenApiV1LoginAccessTokenPost>>, TError,{data: BodyLoginAccessTokenApiV1LoginAccessTokenPost}, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginAccessTokenApiV1LoginAccessTokenPost>>, TError,{data: BodyLoginAccessTokenApiV1LoginAccessTokenPost}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof loginAccessTokenApiV1LoginAccessTokenPost>>, TError,{data: BodyLoginAccessTokenApiV1LoginAccessTokenPost}, TContext> => {
 
 const mutationKey = ['loginAccessTokenApiV1LoginAccessTokenPost'];
-const {mutation: mutationOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
+      : {mutation: { mutationKey, }, request: undefined};
 
 
 
@@ -104,7 +106,7 @@ const {mutation: mutationOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof loginAccessTokenApiV1LoginAccessTokenPost>>, {data: BodyLoginAccessTokenApiV1LoginAccessTokenPost}> = (props) => {
           const {data} = props ?? {};
 
-          return  loginAccessTokenApiV1LoginAccessTokenPost(data,)
+          return  loginAccessTokenApiV1LoginAccessTokenPost(data,requestOptions)
         }
 
 
@@ -122,7 +124,7 @@ const {mutation: mutationOptions} = options ?
  * @summary Login Access Token
  */
 export const useLoginAccessTokenApiV1LoginAccessTokenPost = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginAccessTokenApiV1LoginAccessTokenPost>>, TError,{data: BodyLoginAccessTokenApiV1LoginAccessTokenPost}, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginAccessTokenApiV1LoginAccessTokenPost>>, TError,{data: BodyLoginAccessTokenApiV1LoginAccessTokenPost}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof loginAccessTokenApiV1LoginAccessTokenPost>>,
         TError,
@@ -177,15 +179,15 @@ export const registerUserApiV1SignupPost = async (userRegister: UserRegister, op
 
 
 export const getRegisterUserApiV1SignupPostMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerUserApiV1SignupPost>>, TError,{data: UserRegister}, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerUserApiV1SignupPost>>, TError,{data: UserRegister}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof registerUserApiV1SignupPost>>, TError,{data: UserRegister}, TContext> => {
 
 const mutationKey = ['registerUserApiV1SignupPost'];
-const {mutation: mutationOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
+      : {mutation: { mutationKey, }, request: undefined};
 
 
 
@@ -193,7 +195,7 @@ const {mutation: mutationOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof registerUserApiV1SignupPost>>, {data: UserRegister}> = (props) => {
           const {data} = props ?? {};
 
-          return  registerUserApiV1SignupPost(data,)
+          return  registerUserApiV1SignupPost(data,requestOptions)
         }
 
 
@@ -211,7 +213,7 @@ const {mutation: mutationOptions} = options ?
  * @summary Register User
  */
 export const useRegisterUserApiV1SignupPost = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerUserApiV1SignupPost>>, TError,{data: UserRegister}, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerUserApiV1SignupPost>>, TError,{data: UserRegister}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof registerUserApiV1SignupPost>>,
         TError,

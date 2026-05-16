@@ -3,7 +3,7 @@ from qdrant_client.models import Distance, VectorParams, PointStruct, Document
 from src.core.config import config
 
 qdrant_client = QdrantClient(
-    url="https://dd188b33-2feb-4eb3-9992-452a7e7cfbeb.australia-southeast1-0.gcp.cloud.qdrant.io:6333",
+    url=config.QDRANT_URL,
     api_key=config.QDRANT_API_KEY,
     cloud_inference=True,
 )

@@ -35,6 +35,8 @@ import type {
 import { customInstance } from '.././axios-custom';
 
 
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
 
 
 export type readCoursesApiV1CoursesGetResponse200 = {
@@ -96,16 +98,16 @@ export const getReadCoursesApiV1CoursesGetQueryKey = (params?: ReadCoursesApiV1C
     }
 
 
-export const getReadCoursesApiV1CoursesGetQueryOptions = <TData = Awaited<ReturnType<typeof readCoursesApiV1CoursesGet>>, TError = HTTPValidationError>(params?: ReadCoursesApiV1CoursesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readCoursesApiV1CoursesGet>>, TError, TData>>, }
+export const getReadCoursesApiV1CoursesGetQueryOptions = <TData = Awaited<ReturnType<typeof readCoursesApiV1CoursesGet>>, TError = HTTPValidationError>(params?: ReadCoursesApiV1CoursesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readCoursesApiV1CoursesGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
-const {query: queryOptions} = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getReadCoursesApiV1CoursesGetQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof readCoursesApiV1CoursesGet>>> = ({ signal }) => readCoursesApiV1CoursesGet(params, { signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof readCoursesApiV1CoursesGet>>> = ({ signal }) => readCoursesApiV1CoursesGet(params, { signal, ...requestOptions });
 
 
 
@@ -125,7 +127,7 @@ export function useReadCoursesApiV1CoursesGet<TData = Awaited<ReturnType<typeof 
           TError,
           Awaited<ReturnType<typeof readCoursesApiV1CoursesGet>>
         > , 'initialData'
-      >, }
+      >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useReadCoursesApiV1CoursesGet<TData = Awaited<ReturnType<typeof readCoursesApiV1CoursesGet>>, TError = HTTPValidationError>(
@@ -135,11 +137,11 @@ export function useReadCoursesApiV1CoursesGet<TData = Awaited<ReturnType<typeof 
           TError,
           Awaited<ReturnType<typeof readCoursesApiV1CoursesGet>>
         > , 'initialData'
-      >, }
+      >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useReadCoursesApiV1CoursesGet<TData = Awaited<ReturnType<typeof readCoursesApiV1CoursesGet>>, TError = HTTPValidationError>(
- params?: ReadCoursesApiV1CoursesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readCoursesApiV1CoursesGet>>, TError, TData>>, }
+ params?: ReadCoursesApiV1CoursesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readCoursesApiV1CoursesGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
@@ -147,7 +149,7 @@ export function useReadCoursesApiV1CoursesGet<TData = Awaited<ReturnType<typeof 
  */
 
 export function useReadCoursesApiV1CoursesGet<TData = Awaited<ReturnType<typeof readCoursesApiV1CoursesGet>>, TError = HTTPValidationError>(
- params?: ReadCoursesApiV1CoursesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readCoursesApiV1CoursesGet>>, TError, TData>>, }
+ params?: ReadCoursesApiV1CoursesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readCoursesApiV1CoursesGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -208,15 +210,15 @@ export const createCourseApiV1CoursesPost = async (courseCreate: CourseCreate, o
 
 
 export const getCreateCourseApiV1CoursesPostMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createCourseApiV1CoursesPost>>, TError,{data: CourseCreate}, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createCourseApiV1CoursesPost>>, TError,{data: CourseCreate}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof createCourseApiV1CoursesPost>>, TError,{data: CourseCreate}, TContext> => {
 
 const mutationKey = ['createCourseApiV1CoursesPost'];
-const {mutation: mutationOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
+      : {mutation: { mutationKey, }, request: undefined};
 
 
 
@@ -224,7 +226,7 @@ const {mutation: mutationOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof createCourseApiV1CoursesPost>>, {data: CourseCreate}> = (props) => {
           const {data} = props ?? {};
 
-          return  createCourseApiV1CoursesPost(data,)
+          return  createCourseApiV1CoursesPost(data,requestOptions)
         }
 
 
@@ -242,7 +244,7 @@ const {mutation: mutationOptions} = options ?
  * @summary Create Course
  */
 export const useCreateCourseApiV1CoursesPost = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createCourseApiV1CoursesPost>>, TError,{data: CourseCreate}, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createCourseApiV1CoursesPost>>, TError,{data: CourseCreate}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof createCourseApiV1CoursesPost>>,
         TError,
@@ -303,16 +305,16 @@ export const getReadCourseApiV1CoursesIdGetQueryKey = (id: string,) => {
     }
 
 
-export const getReadCourseApiV1CoursesIdGetQueryOptions = <TData = Awaited<ReturnType<typeof readCourseApiV1CoursesIdGet>>, TError = HTTPValidationError>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readCourseApiV1CoursesIdGet>>, TError, TData>>, }
+export const getReadCourseApiV1CoursesIdGetQueryOptions = <TData = Awaited<ReturnType<typeof readCourseApiV1CoursesIdGet>>, TError = HTTPValidationError>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readCourseApiV1CoursesIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
-const {query: queryOptions} = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getReadCourseApiV1CoursesIdGetQueryKey(id);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof readCourseApiV1CoursesIdGet>>> = ({ signal }) => readCourseApiV1CoursesIdGet(id, { signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof readCourseApiV1CoursesIdGet>>> = ({ signal }) => readCourseApiV1CoursesIdGet(id, { signal, ...requestOptions });
 
 
 
@@ -332,7 +334,7 @@ export function useReadCourseApiV1CoursesIdGet<TData = Awaited<ReturnType<typeof
           TError,
           Awaited<ReturnType<typeof readCourseApiV1CoursesIdGet>>
         > , 'initialData'
-      >, }
+      >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useReadCourseApiV1CoursesIdGet<TData = Awaited<ReturnType<typeof readCourseApiV1CoursesIdGet>>, TError = HTTPValidationError>(
@@ -342,11 +344,11 @@ export function useReadCourseApiV1CoursesIdGet<TData = Awaited<ReturnType<typeof
           TError,
           Awaited<ReturnType<typeof readCourseApiV1CoursesIdGet>>
         > , 'initialData'
-      >, }
+      >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useReadCourseApiV1CoursesIdGet<TData = Awaited<ReturnType<typeof readCourseApiV1CoursesIdGet>>, TError = HTTPValidationError>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readCourseApiV1CoursesIdGet>>, TError, TData>>, }
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readCourseApiV1CoursesIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
@@ -354,7 +356,7 @@ export function useReadCourseApiV1CoursesIdGet<TData = Awaited<ReturnType<typeof
  */
 
 export function useReadCourseApiV1CoursesIdGet<TData = Awaited<ReturnType<typeof readCourseApiV1CoursesIdGet>>, TError = HTTPValidationError>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readCourseApiV1CoursesIdGet>>, TError, TData>>, }
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readCourseApiV1CoursesIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -416,15 +418,15 @@ export const updateCourseApiV1CoursesIdPut = async (id: string,
 
 
 export const getUpdateCourseApiV1CoursesIdPutMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCourseApiV1CoursesIdPut>>, TError,{id: string;data: CourseUpdate}, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCourseApiV1CoursesIdPut>>, TError,{id: string;data: CourseUpdate}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof updateCourseApiV1CoursesIdPut>>, TError,{id: string;data: CourseUpdate}, TContext> => {
 
 const mutationKey = ['updateCourseApiV1CoursesIdPut'];
-const {mutation: mutationOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
+      : {mutation: { mutationKey, }, request: undefined};
 
 
 
@@ -432,7 +434,7 @@ const {mutation: mutationOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateCourseApiV1CoursesIdPut>>, {id: string;data: CourseUpdate}> = (props) => {
           const {id,data} = props ?? {};
 
-          return  updateCourseApiV1CoursesIdPut(id,data,)
+          return  updateCourseApiV1CoursesIdPut(id,data,requestOptions)
         }
 
 
@@ -450,7 +452,7 @@ const {mutation: mutationOptions} = options ?
  * @summary Update Course
  */
 export const useUpdateCourseApiV1CoursesIdPut = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCourseApiV1CoursesIdPut>>, TError,{id: string;data: CourseUpdate}, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCourseApiV1CoursesIdPut>>, TError,{id: string;data: CourseUpdate}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof updateCourseApiV1CoursesIdPut>>,
         TError,
@@ -504,15 +506,15 @@ export const deleteCourseApiV1CoursesIdDelete = async (id: string, options?: Req
 
 
 export const getDeleteCourseApiV1CoursesIdDeleteMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteCourseApiV1CoursesIdDelete>>, TError,{id: string}, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteCourseApiV1CoursesIdDelete>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof deleteCourseApiV1CoursesIdDelete>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['deleteCourseApiV1CoursesIdDelete'];
-const {mutation: mutationOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
+      : {mutation: { mutationKey, }, request: undefined};
 
 
 
@@ -520,7 +522,7 @@ const {mutation: mutationOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteCourseApiV1CoursesIdDelete>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  deleteCourseApiV1CoursesIdDelete(id,)
+          return  deleteCourseApiV1CoursesIdDelete(id,requestOptions)
         }
 
 
@@ -538,7 +540,7 @@ const {mutation: mutationOptions} = options ?
  * @summary Delete Course
  */
 export const useDeleteCourseApiV1CoursesIdDelete = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteCourseApiV1CoursesIdDelete>>, TError,{id: string}, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteCourseApiV1CoursesIdDelete>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof deleteCourseApiV1CoursesIdDelete>>,
         TError,

@@ -1,12 +1,15 @@
 "use client"
 
+import React from 'react';
 import { useState, useRef, useEffect } from "react"
 import { MoreHorizontal, Pin, Edit3, Trash2 } from "lucide-react"
 import { cls } from "@/src/components/utils"
+import { useChatActions } from '@/src/api/chats/useChats';
 
 export default function ConversationRow({ data, active, onSelect, onTogglePin, onDelete, onRename }) {
     const [showMenu, setShowMenu] = useState(false)
     const menuRef = useRef(null)
+    const { handleDelete: handleDeleteChat, handleUpdate: handleUpdateChat } = useChatActions()
 
     useEffect(() => {
         const handleClickOutside = (event) => {
