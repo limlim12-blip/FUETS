@@ -39,9 +39,9 @@ services:
       - postgres_data:/var/lib/postgresql/data
     env_file: .env
     environment:
-      - POSTGRES_DB=${RDS_DB_NAME}
-      - POSTGRES_USER=${RDS_USERNAME}
-      - POSTGRES_PASSWORD=${RDS_PASSWORD}
+      - POSTGRES_DB=admin
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
     networks:
       - fuet-network
 
