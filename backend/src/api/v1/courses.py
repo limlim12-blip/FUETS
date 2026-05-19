@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends, dependencies
 import uuid
 from sqlmodel import col, select
 from sqlalchemy import func
@@ -9,10 +9,10 @@ from src.models.schema import (
     CoursesPublic,
     CourseUpdate,
 )
-from src.api.deps import CurrentUser, SessionDep
+from src.api.deps import CurrentUser, SessionDep, get_current_user
 from typing import Any
 
-router = APIRouter(prefix="/courses")
+router = APIRouter(prefix="/courses", dependencies=[Depends(get_current_user)])
 
 
 @router.get("/", response_model=CoursesPublic)

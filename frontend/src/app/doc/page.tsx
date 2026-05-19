@@ -1,11 +1,11 @@
 "use client"
-import SettingsPopover from "@/src/components/Dashboard/SettingsPopover"
+import SettingsPopover from "@/src/components/SettingsPopover"
 
 import Link from "next/link"
 import { useState, useEffect } from "react"
 import { LoadingScreen } from "@/src/components/Dashboard/loading-screen"
 import { DashboardContent } from "@/src/components/Dashboard/dashboard-content"
-import { BarChart3, FileText, Settings, AngryIcon } from "lucide-react"
+import { BarChart3, FileText, AngryIcon } from "lucide-react"
 import { useUserStore } from "@/src/stores/userStore"
 
 const getViewInfo = (activeTab: string) => {
@@ -47,7 +47,6 @@ function AdminDashboardContent() {
                 <header className="bg-card border-b border-border px-4 lg:px-8 py-3 flex-shrink-0">
                     <div className="flex items-center justify-between">
 
-                        {/* 1. CỤM BÊN TRÁI: Icon + Title + Chat Button */}
                         <div className="flex items-center space-x-4 pl-12 lg:pl-0">
                             <div className="w-7 h-7 lg:w-8 lg:h-8 bg-primary rounded-md flex items-center justify-center">
                                 <Icon className="h-3.5 w-3.5 lg:h-4 lg:w-4 text-primary-foreground" />
@@ -56,12 +55,20 @@ function AdminDashboardContent() {
                                 {viewInfo.title}
                             </h1>
                             <Link
-                                href="/"
-                                className="flex items-center gap-2.5 rounded-full bg-[#f8bc78] px-5 py-2 text-sm font-semibold text-zinc-950 shadow-lg shadow-[#f8bc78]/30 transition-all hover:bg-[#f6a94d] hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f8bc78] dark:text-zinc-950"
+                                href="/chat"
+                                className="flex items-center gap-2.5 rounded-full bg-black px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-black/20 transition-all hover:bg-zinc-800 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black dark:bg-zinc-900 dark:text-white"
                             >
                                 <AngryIcon className="h-4 w-4" />
                                 Chat
                             </Link>
+                            <Link
+                                href="/review"
+                                className="flex items-center gap-2.5 rounded-full bg-gradient-to-b from-white to-zinc-50 px-5 py-2 text-sm font-semibold text-zinc-900 border border-zinc-200/80 shadow-[0_4px_12px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.08)] transition-all hover:scale-105 hover:shadow-[0_6px_20px_rgba(0,0,0,0.1)] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 dark:from-zinc-900 dark:to-zinc-950 dark:text-white dark:border-zinc-800"
+                            >
+                                Reviews
+                                <FileText className="h-5 w-5 text-zinc-500 dark:text-zinc-400" />
+                            </Link>
+
                         </div>
 
                         <div className="flex items-center gap-2">
@@ -73,7 +80,6 @@ function AdminDashboardContent() {
                                 <option value="student">REMEMBER TO DELETE THIS</option>
                                 <option value="admin">Admin View</option>
                             </select>
-                            <SettingsPopover>...</SettingsPopover>
                         </div>
 
                         <div className="flex items-center">
@@ -93,7 +99,6 @@ function AdminDashboardContent() {
                                 </button>
                             </SettingsPopover>
                         </div>
-
                     </div>
                 </header>
                 <main className="flex-1 overflow-hidden">

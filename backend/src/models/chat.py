@@ -1,4 +1,5 @@
 from sqlmodel import Field, SQLModel, Relationship, DateTime, Column, Enum
+from sqlalchemy import text
 
 
 from datetime import datetime, timezone
@@ -23,27 +24,38 @@ class ChatCreate(ChatBase):
 # Properties to receive on item update
 class ChatUpdate(ChatBase):
     title: str | None = Field(default=None, min_length=1, max_length=255)  # type: ignore
-    pinned: bool | None = Field(default=False)
+    pinned: bool | None = Field(default=None)
 
 
 # Database model, database table inferred from class name
 class Chat(ChatBase, table=True):
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, index=True)
-    created_at: datetime | None = Field(
-        default_factory=lambda: datetime.now(timezone.utc),
-        sa_type=DateTime(timezone=True),  # type: ignore
+    id: uuid.UUID = Field(
+        default_factory=uuid.uuid4,
+        primary_key=True,
+        index=True,
+        sa_column_kwargs={"server_default": text("gen_random_uuid()")},
     )
     user_id: uuid.UUID = Field(
         foreign_key="user.id", nullable=False, ondelete="CASCADE"
     )
+    created_at: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
+        sa_column_kwargs={"server_default": text("CURRENT_TIMESTAMP")},
+    )
+
     user: User = Relationship(back_populates="chats")
     pinned: bool = Field(default=False)
-    messages: List["Message"] = Relationship(back_populates="chat")
+    messages: List["Message"] = Relationship(
+        back_populates="chat",
+        cascade_delete=True,
+    )
 
 
 # Properties to return via API, id is always required
 class ChatPublic(ChatBase):
     id: uuid.UUID
+    pinned: bool
+    created_at: datetime | None = None
 
 
 class ChatsPublic(SQLModel):
@@ -78,10 +90,15 @@ class MessageUpdate(MessageBase):
 
 # Database model, database table inferred from class name
 class Message(MessageBase, table=True):
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, index=True)
-    created_at: datetime | None = Field(
+    id: uuid.UUID = Field(
+        default_factory=uuid.uuid4,
+        primary_key=True,
+        index=True,
+        sa_column_kwargs={"server_default": text("gen_random_uuid()")},
+    )
+    created_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc),
-        sa_column=Column(DateTime(timezone=True)),
+        sa_column_kwargs={"server_default": text("CURRENT_TIMESTAMP")},
     )
     chat_id: uuid.UUID = Field(
         foreign_key="chat.id", nullable=False, ondelete="CASCADE"

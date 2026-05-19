@@ -6,10 +6,9 @@ import { MoreHorizontal, Pin, Edit3, Trash2 } from "lucide-react"
 import { cls } from "@/src/components/utils"
 import { useChatActions } from '@/src/api/chats/useChats';
 
-export default function ConversationRow({ data, active, onSelect, onTogglePin, onDelete, onRename }) {
+export default function ConversationRow({ data, active, onSelect, togglePin, onDelete, onRename }) {
     const [showMenu, setShowMenu] = useState(false)
     const menuRef = useRef(null)
-    const { handleDelete: handleDeleteChat, handleUpdate: handleUpdateChat } = useChatActions()
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -25,23 +24,36 @@ export default function ConversationRow({ data, active, onSelect, onTogglePin, o
 
     const handlePin = (e) => {
         e.stopPropagation()
-        onTogglePin?.()
+        togglePin?.(data.id, !data.pinned)
         setShowMenu(false)
     }
 
-    const handleRename = (e) => {
+    const {
+        handleUpdate: handleUpdateChat,
+        isUpdating: isUpdatingChat,
+        handleDelete: handleDeleteChat,
+        isDeleting,
+    } = useChatActions()
+    const handleRename = async (e) => {
         e.stopPropagation()
         const newName = prompt(`Rename chat "${data.title}" to:`, data.title)
         if (newName && newName.trim() && newName !== data.title) {
-            onRename?.(data.id, newName.trim())
+            if (isUpdatingChat) return;
+            await handleUpdateChat(data.id, { title: newName }).catch((error) => {
+                console.error("Error updating conv", error);
+            });
         }
         setShowMenu(false)
     }
 
-    const handleDelete = (e) => {
+    const handleDelete = async (e) => {
         e.stopPropagation()
         if (confirm(`Are you sure you want to delete "${data.title}"?`)) {
-            onDelete?.(data.id)
+            try {
+                await handleDeleteChat(data.id);
+            } catch (error) {
+                console.error("Error deleting message", error);
+            }
         }
         setShowMenu(false)
     }
@@ -59,7 +71,7 @@ export default function ConversationRow({ data, active, onSelect, onTogglePin, o
                     }
                 }}
                 className={cls(
-                    "-mx-1 flex w-[calc(100%+8px)] items-center gap-2 rounded-lg px-2 py-2 text-left transition cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-zinc-400",
+                    "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left transition cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-zinc-400",
                     active
                         ? "bg-zinc-100 text-zinc-900 dark:bg-zinc-800/60 dark:text-zinc-100"
                         : "hover:bg-zinc-100 dark:hover:bg-zinc-800",
@@ -91,7 +103,7 @@ export default function ConversationRow({ data, active, onSelect, onTogglePin, o
 
                     <div
                         className={cls(
-                            "absolute right-0 top-full mt-1 w-36 origin-top-right rounded-lg border border-zinc-200 bg-white py-1 shadow-xl dark:border-zinc-800 dark:bg-zinc-900 z-[100]",
+                            "absolute right-0 top-full mt-1 w-36 origin-top-right rounded-lg border border-zinc-200 bg-white py-1 shadow-xl dark:border-zinc-800 dark:bg-zinc-900 z-50",
                             "transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]",
                             showMenu
                                 ? "visible translate-y-0 scale-100 opacity-100"
@@ -131,10 +143,6 @@ export default function ConversationRow({ data, active, onSelect, onTogglePin, o
                 </div>
             </div>
 
-            {/* Tooltip Preview */}
-            <div className="pointer-events-none absolute left-[calc(100%+6px)] top-1 hidden w-64 rounded-xl border border-zinc-200 bg-white p-3 text-xs text-zinc-700 shadow-lg dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 md:group-hover:block animate-in fade-in zoom-in-95 duration-200 z-[110]">
-                <div className="line-clamp-6 whitespace-pre-wrap">{data.preview}</div>
-            </div>
         </div>
     )
 }

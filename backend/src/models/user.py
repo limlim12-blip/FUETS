@@ -1,6 +1,6 @@
 from sqlmodel import Field, SQLModel, DateTime
 
-from sqlmodel import Relationship
+from sqlmodel import Relationship, text
 
 from datetime import datetime, timezone
 
@@ -71,9 +71,9 @@ class UpdatePassword(SQLModel):
 class User(UserBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     hashed_password: str
-    created_at: datetime | None = Field(
-        default_factory=(lambda: datetime.now(timezone.utc)),
-        sa_type=DateTime(timezone=True),  # type:ignore
+    created_at: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
+        sa_column_kwargs={"server_default": text("CURRENT_TIMESTAMP")},
     )
 
     chats: List["Chat"] = Relationship(back_populates="user")

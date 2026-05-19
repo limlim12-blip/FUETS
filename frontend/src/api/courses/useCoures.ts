@@ -1,13 +1,10 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { getReadCoursesApiV1CoursesGetQueryKey, useCreateCourseApiV1CoursesPost, useDeleteCourseApiV1CoursesIdDelete, useReadCoursesApiV1CoursesGet, useUpdateCourseApiV1CoursesIdPut } from "./courses";
-import { CourseUpdate, CourseCreate } from "../model";
+import { CourseUpdate, CourseCreate, ReadCoursesApiV1CoursesGetParams } from "../model";
 
-export const useCourseActions = () => {
+export const useCourseActions = (params?: ReadCoursesApiV1CoursesGetParams) => {
     const queryClient = useQueryClient();
-    const { data, isLoading, isError } = useReadCoursesApiV1CoursesGet({
-        limit: 20,
-        offset: 0
-    });
+    const { data, isLoading, isError } = useReadCoursesApiV1CoursesGet(params);
 
     const createMutation = useCreateCourseApiV1CoursesPost();
     const updateMutation = useUpdateCourseApiV1CoursesIdPut();
@@ -43,7 +40,7 @@ export const useCourseActions = () => {
     };
 
     return {
-        courses: data?.data ?? [],
+        Courses: data?.data ?? [],
         isLoading,
         error: isError,
 

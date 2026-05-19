@@ -1,8 +1,12 @@
 import type { Metadata } from 'next'
 import { Analytics } from '@vercel/analytics/next'
-import { Providers } from './providers'
+import { Providers } from '@/src/app/providers'
 import "@/src/app/globals.css"
+import { Toaster } from 'sonner'
+import { Inter } from "next/font/google";
+import { cn } from "@/lib/utils";
 
+const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
 export const metadata: Metadata = {
     title: 'v0 App',
@@ -33,11 +37,12 @@ export default function RootLayout({
     children: React.ReactNode
 }>) {
     return (
-        <html lang="en">
+        <html lang="en" className={cn("font-sans", inter.variable)}>
             <body className="font-sans antialiased">
                 <Providers>
                     {children}
                     {process.env.NODE_ENV === 'production' && <Analytics />}
+                    <Toaster richColors closeButton position="top-right" />
                 </Providers>
             </body>
         </html>

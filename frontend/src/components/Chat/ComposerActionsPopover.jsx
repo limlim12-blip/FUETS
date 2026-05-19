@@ -1,5 +1,6 @@
 "use client"
 import { useState } from "react"
+import React from 'react';
 import { Paperclip, Bot, BookOpen } from "lucide-react"
 import { Popover, PopoverContent, PopoverTrigger } from "@/src/components/ui/popover"
 

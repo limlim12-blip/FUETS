@@ -1,5 +1,5 @@
-import AIAssistantUI from "@/src/components/Chat/AIAssistantUI"
+import { redirect } from "next/navigation";
 
-export default function Page() {
-    return <AIAssistantUI />
+export default function RootPage() {
+    redirect("/chat");
 }

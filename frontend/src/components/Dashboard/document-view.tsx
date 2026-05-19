@@ -10,7 +10,6 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
 import {
     Download,
     Share2,
-    Edit,
     Trash2,
     FileText,
     ImageIcon,
@@ -23,13 +22,14 @@ import {
     ExternalLink,
 } from "lucide-react"
 import type { DocumentData } from "@/src/api/documents"
+import { DocumentPublic } from "@/src/api/model"
 
 interface DocumentViewProps {
-    document: DocumentData | null
+    document: DocumentPublic | null
     isOpen: boolean
     onClose: () => void
     onEdit?: (document: DocumentData) => void
-    onDelete?: (id: number) => void
+    onDelete?: (id: string) => void
     onShare?: (document: DocumentData) => void
 }
 
@@ -90,39 +90,38 @@ export function DocumentView({ document, isOpen, onClose, onEdit, onDelete, onSh
                 <div className="flex flex-col h-full">
                     {/* Header */}
                     <SheetHeader className="px-6 py-4 border-b border-border bg-card">
-                        <div className="flex items-start justify-between">
-                            <div className="flex items-start space-x-4 flex-1 min-w-0">
-                                <div className="p-3 bg-secondary rounded-lg flex-shrink-0">{getFileIcon(document.type, "lg")}</div>
-                                <div className="flex-1 min-w-0">
-                                    <SheetTitle className="text-xl font-semibold text-foreground truncate">{document.name}</SheetTitle>
-                                    <SheetDescription className="text-muted-foreground mt-1">
-                                        {document.category} • {document.size} • Modified {document.lastModified}
-                                    </SheetDescription>
-                                </div>
+                        <div className="flex items-start space-x-4 flex-1 min-w-0">
+
+                            <div className="p-3 bg-secondary rounded-lg flex-shrink-0 mt-1">
+                                {getFileIcon(document.type, "lg")}
                             </div>
-                            {/* <Button variant="ghost" size="icon" onClick={onClose} className="flex-shrink-0"> */}
-                            {/*     <X className="h-4 w-4" /> */}
-                            {/* </Button> */}
+
+                            <div className="flex-1 min-w-0">
+                                {/* 2. Removed 'truncate', added 'whitespace-normal' and 'break-words' */}
+                                <SheetTitle className="text-xl font-semibold text-foreground whitespace-normal break-words text-left">
+                                    {document.title}
+                                </SheetTitle>
+                            </div>
+
                         </div>
+                        {/* <Button variant="ghost" size="icon" onClick={onClose} className="flex-shrink-0"> */}
+                        {/*     <X className="h-4 w-4" /> */}
+                        {/* </Button> */}
 
                         {/* Action Buttons */}
                         <div className="flex items-center space-x-2 mt-4">
-                            <Button size="sm" className="button-primary" onClick={handleDownload}>
-                                <Download className="h-4 w-4 mr-2" />
-                                Download
-                            </Button>
+                            {/* <Button size="sm" className="button-primary" onClick={handleDownload}> */}
+                            {/*     <Download className="h-4 w-4 mr-2" /> */}
+                            {/*     Download */}
+                            {/* </Button> */}
                             <Button variant="outline" size="sm" onClick={handleShare}>
                                 <Share2 className="h-4 w-4 mr-2" />
                                 Share
                             </Button>
-                            <Button variant="outline" size="sm" onClick={handleEdit}>
-                                <Edit className="h-4 w-4 mr-2" />
-                                Edit
-                            </Button>
-                            <Button variant="outline" size="sm">
-                                <ExternalLink className="h-4 w-4 mr-2" />
-                                Open
-                            </Button>
+                            {/* <Button variant="outline" size="sm"> */}
+                            {/*     <ExternalLink className="h-4 w-4 mr-2" /> */}
+                            {/*     Open */}
+                            {/* </Button> */}
                             <Button
                                 variant="ghost"
                                 size="sm"
@@ -162,14 +161,11 @@ export function DocumentView({ document, isOpen, onClose, onEdit, onDelete, onSh
                                                             <Calendar className="h-4 w-4 text-muted-foreground" />
                                                             <div>
                                                                 <p className="text-sm font-medium text-foreground">Created</p>
-                                                                <p className="text-sm text-muted-foreground">{document.created}</p>
-                                                            </div>
-                                                        </div>
-                                                        <div className="flex items-center space-x-3">
-                                                            <Clock className="h-4 w-4 text-muted-foreground" />
-                                                            <div>
-                                                                <p className="text-sm font-medium text-foreground">Last Modified</p>
-                                                                <p className="text-sm text-muted-foreground">{document.lastModified}</p>
+                                                                <p className="text-sm text-muted-foreground">
+                                                                    {document.created_at
+                                                                        ? document.created_at.split('T')[0].split('-').reverse().join('-')
+                                                                        : "N/A"}
+                                                                </p>
                                                             </div>
                                                         </div>
                                                         <div className="flex items-center space-x-3">
@@ -186,7 +182,6 @@ export function DocumentView({ document, isOpen, onClose, onEdit, onDelete, onSh
                                                     <h3 className="text-lg font-medium text-foreground">Tags & Categories</h3>
                                                     <div className="space-y-3">
                                                         <div>
-                                                            <p className="text-sm font-medium text-foreground mb-2">Category</p>
                                                             <Badge variant="secondary" className="bg-secondary text-secondary-foreground">
                                                                 {document.category}
                                                             </Badge>
@@ -222,7 +217,7 @@ export function DocumentView({ document, isOpen, onClose, onEdit, onDelete, onSh
 
                                             {/* Recent Activity */}
                                             <div>
-                                                <h3 className="text-lg font-medium text-foreground mb-3">Recent Activity</h3>
+                                                <h3 className="text-lg font-medium text-foreground mb-3">Content Details </h3>
                                                 <div className="space-y-3">
                                                     <div className="flex items-center space-x-3 p-3 bg-muted/30 rounded-lg">
                                                         <div className="w-2 h-2 bg-primary rounded-full"></div>
@@ -240,7 +235,7 @@ export function DocumentView({ document, isOpen, onClose, onEdit, onDelete, onSh
                         </Tabs>
                     </div>
                 </div>
-            </SheetContent>
-        </Sheet>
+            </SheetContent >
+        </Sheet >
     )
 }

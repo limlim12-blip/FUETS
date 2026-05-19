@@ -37,60 +37,28 @@ import type {
 } from '../model';
 
 import { customInstance } from '.././axios-custom';
+import type { ErrorType , BodyType } from '.././axios-custom';
 
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type readChatsApiV1ChatsGetResponse200 = {
-  data: ChatsPublic
-  status: 200
-}
-
-export type readChatsApiV1ChatsGetResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-
-export type readChatsApiV1ChatsGetResponseSuccess = (readChatsApiV1ChatsGetResponse200) & {
-  headers: Headers;
-};
-export type readChatsApiV1ChatsGetResponseError = (readChatsApiV1ChatsGetResponse422) & {
-  headers: Headers;
-};
-
-export type readChatsApiV1ChatsGetResponse = (readChatsApiV1ChatsGetResponseSuccess | readChatsApiV1ChatsGetResponseError)
-
-export const getReadChatsApiV1ChatsGetUrl = (params?: ReadChatsApiV1ChatsGetParams,) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
-    }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0 ? `/api/v1/chats/?${stringifiedParams}` : `/api/v1/chats/`
-}
-
 /**
  * @summary Read Chats
  */
-export const readChatsApiV1ChatsGet = async (params?: ReadChatsApiV1ChatsGetParams, options?: RequestInit): Promise<readChatsApiV1ChatsGetResponse> => {
-
-  return customInstance<readChatsApiV1ChatsGetResponse>(getReadChatsApiV1ChatsGetUrl(params),
-  {
-    ...options,
-    method: 'GET'
+export const readChatsApiV1ChatsGet = (
+    params?: ReadChatsApiV1ChatsGetParams,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-  }
-);}
-
+      return customInstance<ChatsPublic>(
+      {url: `/api/v1/chats/`, method: 'GET',
+        params, signal
+    },
+      options);
+    }
 
 
 
@@ -102,7 +70,7 @@ export const getReadChatsApiV1ChatsGetQueryKey = (params?: ReadChatsApiV1ChatsGe
     }
 
 
-export const getReadChatsApiV1ChatsGetQueryOptions = <TData = Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError = HTTPValidationError>(params?: ReadChatsApiV1ChatsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getReadChatsApiV1ChatsGetQueryOptions = <TData = Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError = ErrorType<HTTPValidationError>>(params?: ReadChatsApiV1ChatsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -111,7 +79,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>> = ({ signal }) => readChatsApiV1ChatsGet(params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>> = ({ signal }) => readChatsApiV1ChatsGet(params, requestOptions, signal);
 
 
 
@@ -121,10 +89,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type ReadChatsApiV1ChatsGetQueryResult = NonNullable<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>>
-export type ReadChatsApiV1ChatsGetQueryError = HTTPValidationError
+export type ReadChatsApiV1ChatsGetQueryError = ErrorType<HTTPValidationError>
 
 
-export function useReadChatsApiV1ChatsGet<TData = Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError = HTTPValidationError>(
+export function useReadChatsApiV1ChatsGet<TData = Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError = ErrorType<HTTPValidationError>>(
  params: undefined |  ReadChatsApiV1ChatsGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>,
@@ -134,7 +102,7 @@ export function useReadChatsApiV1ChatsGet<TData = Awaited<ReturnType<typeof read
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useReadChatsApiV1ChatsGet<TData = Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError = HTTPValidationError>(
+export function useReadChatsApiV1ChatsGet<TData = Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError = ErrorType<HTTPValidationError>>(
  params?: ReadChatsApiV1ChatsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>,
@@ -144,7 +112,7 @@ export function useReadChatsApiV1ChatsGet<TData = Awaited<ReturnType<typeof read
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useReadChatsApiV1ChatsGet<TData = Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError = HTTPValidationError>(
+export function useReadChatsApiV1ChatsGet<TData = Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError = ErrorType<HTTPValidationError>>(
  params?: ReadChatsApiV1ChatsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
@@ -152,7 +120,7 @@ export function useReadChatsApiV1ChatsGet<TData = Awaited<ReturnType<typeof read
  * @summary Read Chats
  */
 
-export function useReadChatsApiV1ChatsGet<TData = Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError = HTTPValidationError>(
+export function useReadChatsApiV1ChatsGet<TData = Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError = ErrorType<HTTPValidationError>>(
  params?: ReadChatsApiV1ChatsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -169,53 +137,28 @@ export function useReadChatsApiV1ChatsGet<TData = Awaited<ReturnType<typeof read
 
 
 
-export type createChatApiV1ChatsPostResponse200 = {
-  data: ChatPublic
-  status: 200
-}
-
-export type createChatApiV1ChatsPostResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-
-export type createChatApiV1ChatsPostResponseSuccess = (createChatApiV1ChatsPostResponse200) & {
-  headers: Headers;
-};
-export type createChatApiV1ChatsPostResponseError = (createChatApiV1ChatsPostResponse422) & {
-  headers: Headers;
-};
-
-export type createChatApiV1ChatsPostResponse = (createChatApiV1ChatsPostResponseSuccess | createChatApiV1ChatsPostResponseError)
-
-export const getCreateChatApiV1ChatsPostUrl = () => {
-
-
-
-
-  return `/api/v1/chats/`
-}
-
 /**
  * @summary Create Chat
  */
-export const createChatApiV1ChatsPost = async (chatCreate: ChatCreate, options?: RequestInit): Promise<createChatApiV1ChatsPostResponse> => {
-
-  return customInstance<createChatApiV1ChatsPostResponse>(getCreateChatApiV1ChatsPostUrl(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(chatCreate)
-  }
-);}
+export const createChatApiV1ChatsPost = (
+    chatCreate: BodyType<ChatCreate>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
+      return customInstance<ChatPublic>(
+      {url: `/api/v1/chats/`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: chatCreate, signal
+    },
+      options);
+    }
 
 
-export const getCreateChatApiV1ChatsPostMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createChatApiV1ChatsPost>>, TError,{data: ChatCreate}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof createChatApiV1ChatsPost>>, TError,{data: ChatCreate}, TContext> => {
+
+export const getCreateChatApiV1ChatsPostMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createChatApiV1ChatsPost>>, TError,{data: BodyType<ChatCreate>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof createChatApiV1ChatsPost>>, TError,{data: BodyType<ChatCreate>}, TContext> => {
 
 const mutationKey = ['createChatApiV1ChatsPost'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -227,7 +170,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createChatApiV1ChatsPost>>, {data: ChatCreate}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createChatApiV1ChatsPost>>, {data: BodyType<ChatCreate>}> = (props) => {
           const {data} = props ?? {};
 
           return  createChatApiV1ChatsPost(data,requestOptions)
@@ -241,63 +184,36 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type CreateChatApiV1ChatsPostMutationResult = NonNullable<Awaited<ReturnType<typeof createChatApiV1ChatsPost>>>
-    export type CreateChatApiV1ChatsPostMutationBody = ChatCreate
-    export type CreateChatApiV1ChatsPostMutationError = HTTPValidationError
+    export type CreateChatApiV1ChatsPostMutationBody = BodyType<ChatCreate>
+    export type CreateChatApiV1ChatsPostMutationError = ErrorType<HTTPValidationError>
 
     /**
  * @summary Create Chat
  */
-export const useCreateChatApiV1ChatsPost = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createChatApiV1ChatsPost>>, TError,{data: ChatCreate}, TContext>, request?: SecondParameter<typeof customInstance>}
+export const useCreateChatApiV1ChatsPost = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createChatApiV1ChatsPost>>, TError,{data: BodyType<ChatCreate>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof createChatApiV1ChatsPost>>,
         TError,
-        {data: ChatCreate},
+        {data: BodyType<ChatCreate>},
         TContext
       > => {
       return useMutation(getCreateChatApiV1ChatsPostMutationOptions(options), queryClient);
     }
-    export type readChatApiV1ChatsIdGetResponse200 = {
-  data: ChatPublic
-  status: 200
-}
-
-export type readChatApiV1ChatsIdGetResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-
-export type readChatApiV1ChatsIdGetResponseSuccess = (readChatApiV1ChatsIdGetResponse200) & {
-  headers: Headers;
-};
-export type readChatApiV1ChatsIdGetResponseError = (readChatApiV1ChatsIdGetResponse422) & {
-  headers: Headers;
-};
-
-export type readChatApiV1ChatsIdGetResponse = (readChatApiV1ChatsIdGetResponseSuccess | readChatApiV1ChatsIdGetResponseError)
-
-export const getReadChatApiV1ChatsIdGetUrl = (id: string,) => {
-
-
-
-
-  return `/api/v1/chats/${id}`
-}
-
-/**
+    /**
  * @summary Read Chat
  */
-export const readChatApiV1ChatsIdGet = async (id: string, options?: RequestInit): Promise<readChatApiV1ChatsIdGetResponse> => {
-
-  return customInstance<readChatApiV1ChatsIdGetResponse>(getReadChatApiV1ChatsIdGetUrl(id),
-  {
-    ...options,
-    method: 'GET'
+export const readChatApiV1ChatsIdGet = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-  }
-);}
-
+      return customInstance<ChatPublic>(
+      {url: `/api/v1/chats/${id}`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -309,7 +225,7 @@ export const getReadChatApiV1ChatsIdGetQueryKey = (id: string,) => {
     }
 
 
-export const getReadChatApiV1ChatsIdGetQueryOptions = <TData = Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError = HTTPValidationError>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getReadChatApiV1ChatsIdGetQueryOptions = <TData = Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError = ErrorType<HTTPValidationError>>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -318,7 +234,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>> = ({ signal }) => readChatApiV1ChatsIdGet(id, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>> = ({ signal }) => readChatApiV1ChatsIdGet(id, requestOptions, signal);
 
 
 
@@ -328,10 +244,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type ReadChatApiV1ChatsIdGetQueryResult = NonNullable<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>>
-export type ReadChatApiV1ChatsIdGetQueryError = HTTPValidationError
+export type ReadChatApiV1ChatsIdGetQueryError = ErrorType<HTTPValidationError>
 
 
-export function useReadChatApiV1ChatsIdGet<TData = Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError = HTTPValidationError>(
+export function useReadChatApiV1ChatsIdGet<TData = Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError = ErrorType<HTTPValidationError>>(
  id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>,
@@ -341,7 +257,7 @@ export function useReadChatApiV1ChatsIdGet<TData = Awaited<ReturnType<typeof rea
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useReadChatApiV1ChatsIdGet<TData = Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError = HTTPValidationError>(
+export function useReadChatApiV1ChatsIdGet<TData = Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError = ErrorType<HTTPValidationError>>(
  id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>,
@@ -351,7 +267,7 @@ export function useReadChatApiV1ChatsIdGet<TData = Awaited<ReturnType<typeof rea
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useReadChatApiV1ChatsIdGet<TData = Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError = HTTPValidationError>(
+export function useReadChatApiV1ChatsIdGet<TData = Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError = ErrorType<HTTPValidationError>>(
  id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
@@ -359,7 +275,7 @@ export function useReadChatApiV1ChatsIdGet<TData = Awaited<ReturnType<typeof rea
  * @summary Read Chat
  */
 
-export function useReadChatApiV1ChatsIdGet<TData = Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError = HTTPValidationError>(
+export function useReadChatApiV1ChatsIdGet<TData = Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError = ErrorType<HTTPValidationError>>(
  id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -376,54 +292,29 @@ export function useReadChatApiV1ChatsIdGet<TData = Awaited<ReturnType<typeof rea
 
 
 
-export type updateChatApiV1ChatsIdPutResponse200 = {
-  data: ChatPublic
-  status: 200
-}
-
-export type updateChatApiV1ChatsIdPutResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-
-export type updateChatApiV1ChatsIdPutResponseSuccess = (updateChatApiV1ChatsIdPutResponse200) & {
-  headers: Headers;
-};
-export type updateChatApiV1ChatsIdPutResponseError = (updateChatApiV1ChatsIdPutResponse422) & {
-  headers: Headers;
-};
-
-export type updateChatApiV1ChatsIdPutResponse = (updateChatApiV1ChatsIdPutResponseSuccess | updateChatApiV1ChatsIdPutResponseError)
-
-export const getUpdateChatApiV1ChatsIdPutUrl = (id: string,) => {
-
-
-
-
-  return `/api/v1/chats/${id}`
-}
-
 /**
  * @summary Update Chat
  */
-export const updateChatApiV1ChatsIdPut = async (id: string,
-    chatUpdate: ChatUpdate, options?: RequestInit): Promise<updateChatApiV1ChatsIdPutResponse> => {
-
-  return customInstance<updateChatApiV1ChatsIdPutResponse>(getUpdateChatApiV1ChatsIdPutUrl(id),
-  {
-    ...options,
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(chatUpdate)
-  }
-);}
+export const updateChatApiV1ChatsIdPut = (
+    id: string,
+    chatUpdate: BodyType<ChatUpdate>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
+      return customInstance<ChatPublic>(
+      {url: `/api/v1/chats/${id}`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: chatUpdate, signal
+    },
+      options);
+    }
 
 
-export const getUpdateChatApiV1ChatsIdPutMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateChatApiV1ChatsIdPut>>, TError,{id: string;data: ChatUpdate}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof updateChatApiV1ChatsIdPut>>, TError,{id: string;data: ChatUpdate}, TContext> => {
+
+export const getUpdateChatApiV1ChatsIdPutMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateChatApiV1ChatsIdPut>>, TError,{id: string;data: BodyType<ChatUpdate>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateChatApiV1ChatsIdPut>>, TError,{id: string;data: BodyType<ChatUpdate>}, TContext> => {
 
 const mutationKey = ['updateChatApiV1ChatsIdPut'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -435,7 +326,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateChatApiV1ChatsIdPut>>, {id: string;data: ChatUpdate}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateChatApiV1ChatsIdPut>>, {id: string;data: BodyType<ChatUpdate>}> = (props) => {
           const {id,data} = props ?? {};
 
           return  updateChatApiV1ChatsIdPut(id,data,requestOptions)
@@ -449,67 +340,40 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type UpdateChatApiV1ChatsIdPutMutationResult = NonNullable<Awaited<ReturnType<typeof updateChatApiV1ChatsIdPut>>>
-    export type UpdateChatApiV1ChatsIdPutMutationBody = ChatUpdate
-    export type UpdateChatApiV1ChatsIdPutMutationError = HTTPValidationError
+    export type UpdateChatApiV1ChatsIdPutMutationBody = BodyType<ChatUpdate>
+    export type UpdateChatApiV1ChatsIdPutMutationError = ErrorType<HTTPValidationError>
 
     /**
  * @summary Update Chat
  */
-export const useUpdateChatApiV1ChatsIdPut = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateChatApiV1ChatsIdPut>>, TError,{id: string;data: ChatUpdate}, TContext>, request?: SecondParameter<typeof customInstance>}
+export const useUpdateChatApiV1ChatsIdPut = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateChatApiV1ChatsIdPut>>, TError,{id: string;data: BodyType<ChatUpdate>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof updateChatApiV1ChatsIdPut>>,
         TError,
-        {id: string;data: ChatUpdate},
+        {id: string;data: BodyType<ChatUpdate>},
         TContext
       > => {
       return useMutation(getUpdateChatApiV1ChatsIdPutMutationOptions(options), queryClient);
     }
-    export type deleteChatApiV1ChatsIdDeleteResponse200 = {
-  data: unknown
-  status: 200
-}
-
-export type deleteChatApiV1ChatsIdDeleteResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-
-export type deleteChatApiV1ChatsIdDeleteResponseSuccess = (deleteChatApiV1ChatsIdDeleteResponse200) & {
-  headers: Headers;
-};
-export type deleteChatApiV1ChatsIdDeleteResponseError = (deleteChatApiV1ChatsIdDeleteResponse422) & {
-  headers: Headers;
-};
-
-export type deleteChatApiV1ChatsIdDeleteResponse = (deleteChatApiV1ChatsIdDeleteResponseSuccess | deleteChatApiV1ChatsIdDeleteResponseError)
-
-export const getDeleteChatApiV1ChatsIdDeleteUrl = (id: string,) => {
-
-
-
-
-  return `/api/v1/chats/${id}`
-}
-
-/**
+    /**
  * @summary Delete Chat
  */
-export const deleteChatApiV1ChatsIdDelete = async (id: string, options?: RequestInit): Promise<deleteChatApiV1ChatsIdDeleteResponse> => {
-
-  return customInstance<deleteChatApiV1ChatsIdDeleteResponse>(getDeleteChatApiV1ChatsIdDeleteUrl(id),
-  {
-    ...options,
-    method: 'DELETE'
+export const deleteChatApiV1ChatsIdDelete = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-  }
-);}
+      return customInstance<unknown>(
+      {url: `/api/v1/chats/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
 
 
 
-
-export const getDeleteChatApiV1ChatsIdDeleteMutationOptions = <TError = HTTPValidationError,
+export const getDeleteChatApiV1ChatsIdDeleteMutationOptions = <TError = ErrorType<HTTPValidationError>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteChatApiV1ChatsIdDelete>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof deleteChatApiV1ChatsIdDelete>>, TError,{id: string}, TContext> => {
 
@@ -538,12 +402,12 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type DeleteChatApiV1ChatsIdDeleteMutationResult = NonNullable<Awaited<ReturnType<typeof deleteChatApiV1ChatsIdDelete>>>
 
-    export type DeleteChatApiV1ChatsIdDeleteMutationError = HTTPValidationError
+    export type DeleteChatApiV1ChatsIdDeleteMutationError = ErrorType<HTTPValidationError>
 
     /**
  * @summary Delete Chat
  */
-export const useDeleteChatApiV1ChatsIdDelete = <TError = HTTPValidationError,
+export const useDeleteChatApiV1ChatsIdDelete = <TError = ErrorType<HTTPValidationError>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteChatApiV1ChatsIdDelete>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof deleteChatApiV1ChatsIdDelete>>,
@@ -553,54 +417,29 @@ export const useDeleteChatApiV1ChatsIdDelete = <TError = HTTPValidationError,
       > => {
       return useMutation(getDeleteChatApiV1ChatsIdDeleteMutationOptions(options), queryClient);
     }
-    export type createMessageApiV1ChatsIdPostResponse200 = {
-  data: MessagePublic
-  status: 200
-}
-
-export type createMessageApiV1ChatsIdPostResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-
-export type createMessageApiV1ChatsIdPostResponseSuccess = (createMessageApiV1ChatsIdPostResponse200) & {
-  headers: Headers;
-};
-export type createMessageApiV1ChatsIdPostResponseError = (createMessageApiV1ChatsIdPostResponse422) & {
-  headers: Headers;
-};
-
-export type createMessageApiV1ChatsIdPostResponse = (createMessageApiV1ChatsIdPostResponseSuccess | createMessageApiV1ChatsIdPostResponseError)
-
-export const getCreateMessageApiV1ChatsIdPostUrl = (id: string,) => {
-
-
-
-
-  return `/api/v1/chats/${id}`
-}
-
-/**
+    /**
  * @summary Create Message
  */
-export const createMessageApiV1ChatsIdPost = async (id: string,
-    messageCreate: MessageCreate, options?: RequestInit): Promise<createMessageApiV1ChatsIdPostResponse> => {
-
-  return customInstance<createMessageApiV1ChatsIdPostResponse>(getCreateMessageApiV1ChatsIdPostUrl(id),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(messageCreate)
-  }
-);}
+export const createMessageApiV1ChatsIdPost = (
+    id: string,
+    messageCreate: BodyType<MessageCreate>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
+      return customInstance<MessagePublic>(
+      {url: `/api/v1/chats/${id}`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: messageCreate, signal
+    },
+      options);
+    }
 
 
-export const getCreateMessageApiV1ChatsIdPostMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createMessageApiV1ChatsIdPost>>, TError,{id: string;data: MessageCreate}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof createMessageApiV1ChatsIdPost>>, TError,{id: string;data: MessageCreate}, TContext> => {
+
+export const getCreateMessageApiV1ChatsIdPostMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createMessageApiV1ChatsIdPost>>, TError,{id: string;data: BodyType<MessageCreate>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof createMessageApiV1ChatsIdPost>>, TError,{id: string;data: BodyType<MessageCreate>}, TContext> => {
 
 const mutationKey = ['createMessageApiV1ChatsIdPost'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -612,7 +451,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createMessageApiV1ChatsIdPost>>, {id: string;data: MessageCreate}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createMessageApiV1ChatsIdPost>>, {id: string;data: BodyType<MessageCreate>}> = (props) => {
           const {id,data} = props ?? {};
 
           return  createMessageApiV1ChatsIdPost(id,data,requestOptions)
@@ -626,72 +465,38 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type CreateMessageApiV1ChatsIdPostMutationResult = NonNullable<Awaited<ReturnType<typeof createMessageApiV1ChatsIdPost>>>
-    export type CreateMessageApiV1ChatsIdPostMutationBody = MessageCreate
-    export type CreateMessageApiV1ChatsIdPostMutationError = HTTPValidationError
+    export type CreateMessageApiV1ChatsIdPostMutationBody = BodyType<MessageCreate>
+    export type CreateMessageApiV1ChatsIdPostMutationError = ErrorType<HTTPValidationError>
 
     /**
  * @summary Create Message
  */
-export const useCreateMessageApiV1ChatsIdPost = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createMessageApiV1ChatsIdPost>>, TError,{id: string;data: MessageCreate}, TContext>, request?: SecondParameter<typeof customInstance>}
+export const useCreateMessageApiV1ChatsIdPost = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createMessageApiV1ChatsIdPost>>, TError,{id: string;data: BodyType<MessageCreate>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof createMessageApiV1ChatsIdPost>>,
         TError,
-        {id: string;data: MessageCreate},
+        {id: string;data: BodyType<MessageCreate>},
         TContext
       > => {
       return useMutation(getCreateMessageApiV1ChatsIdPostMutationOptions(options), queryClient);
     }
-    export type readMessagesApiV1ChatsIdMessagesGetResponse200 = {
-  data: MessagesPublic
-  status: 200
-}
-
-export type readMessagesApiV1ChatsIdMessagesGetResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-
-export type readMessagesApiV1ChatsIdMessagesGetResponseSuccess = (readMessagesApiV1ChatsIdMessagesGetResponse200) & {
-  headers: Headers;
-};
-export type readMessagesApiV1ChatsIdMessagesGetResponseError = (readMessagesApiV1ChatsIdMessagesGetResponse422) & {
-  headers: Headers;
-};
-
-export type readMessagesApiV1ChatsIdMessagesGetResponse = (readMessagesApiV1ChatsIdMessagesGetResponseSuccess | readMessagesApiV1ChatsIdMessagesGetResponseError)
-
-export const getReadMessagesApiV1ChatsIdMessagesGetUrl = (id: string,
-    params?: ReadMessagesApiV1ChatsIdMessagesGetParams,) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
-    }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0 ? `/api/v1/chats/${id}/messages?${stringifiedParams}` : `/api/v1/chats/${id}/messages`
-}
-
-/**
+    /**
  * @summary Read Messages
  */
-export const readMessagesApiV1ChatsIdMessagesGet = async (id: string,
-    params?: ReadMessagesApiV1ChatsIdMessagesGetParams, options?: RequestInit): Promise<readMessagesApiV1ChatsIdMessagesGetResponse> => {
-
-  return customInstance<readMessagesApiV1ChatsIdMessagesGetResponse>(getReadMessagesApiV1ChatsIdMessagesGetUrl(id,params),
-  {
-    ...options,
-    method: 'GET'
+export const readMessagesApiV1ChatsIdMessagesGet = (
+    id: string,
+    params?: ReadMessagesApiV1ChatsIdMessagesGetParams,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-  }
-);}
-
+      return customInstance<MessagesPublic>(
+      {url: `/api/v1/chats/${id}/messages`, method: 'GET',
+        params, signal
+    },
+      options);
+    }
 
 
 
@@ -704,7 +509,7 @@ export const getReadMessagesApiV1ChatsIdMessagesGetQueryKey = (id: string,
     }
 
 
-export const getReadMessagesApiV1ChatsIdMessagesGetQueryOptions = <TData = Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError = HTTPValidationError>(id: string,
+export const getReadMessagesApiV1ChatsIdMessagesGetQueryOptions = <TData = Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError = ErrorType<HTTPValidationError>>(id: string,
     params?: ReadMessagesApiV1ChatsIdMessagesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
@@ -714,7 +519,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>> = ({ signal }) => readMessagesApiV1ChatsIdMessagesGet(id,params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>> = ({ signal }) => readMessagesApiV1ChatsIdMessagesGet(id,params, requestOptions, signal);
 
 
 
@@ -724,10 +529,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type ReadMessagesApiV1ChatsIdMessagesGetQueryResult = NonNullable<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>>
-export type ReadMessagesApiV1ChatsIdMessagesGetQueryError = HTTPValidationError
+export type ReadMessagesApiV1ChatsIdMessagesGetQueryError = ErrorType<HTTPValidationError>
 
 
-export function useReadMessagesApiV1ChatsIdMessagesGet<TData = Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError = HTTPValidationError>(
+export function useReadMessagesApiV1ChatsIdMessagesGet<TData = Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError = ErrorType<HTTPValidationError>>(
  id: string,
     params: undefined |  ReadMessagesApiV1ChatsIdMessagesGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
@@ -738,7 +543,7 @@ export function useReadMessagesApiV1ChatsIdMessagesGet<TData = Awaited<ReturnTyp
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useReadMessagesApiV1ChatsIdMessagesGet<TData = Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError = HTTPValidationError>(
+export function useReadMessagesApiV1ChatsIdMessagesGet<TData = Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError = ErrorType<HTTPValidationError>>(
  id: string,
     params?: ReadMessagesApiV1ChatsIdMessagesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
@@ -749,7 +554,7 @@ export function useReadMessagesApiV1ChatsIdMessagesGet<TData = Awaited<ReturnTyp
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useReadMessagesApiV1ChatsIdMessagesGet<TData = Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError = HTTPValidationError>(
+export function useReadMessagesApiV1ChatsIdMessagesGet<TData = Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError = ErrorType<HTTPValidationError>>(
  id: string,
     params?: ReadMessagesApiV1ChatsIdMessagesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
@@ -758,7 +563,7 @@ export function useReadMessagesApiV1ChatsIdMessagesGet<TData = Awaited<ReturnTyp
  * @summary Read Messages
  */
 
-export function useReadMessagesApiV1ChatsIdMessagesGet<TData = Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError = HTTPValidationError>(
+export function useReadMessagesApiV1ChatsIdMessagesGet<TData = Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError = ErrorType<HTTPValidationError>>(
  id: string,
     params?: ReadMessagesApiV1ChatsIdMessagesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient

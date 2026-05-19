@@ -1,11 +1,6 @@
-import { Conversation, Message } from "@/src/api/chats";
 import { create } from "zustand"
-import { persist } from 'zustand/middleware'
 
 
-const sleep = (ms: number): Promise<void> => {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-};
 export interface SidebarComponentState {
     pinned: boolean;
     recent: boolean;
@@ -29,41 +24,30 @@ interface ChatStore {
 }
 
 export const UseChatStore = create<ChatStore>()(
-    persist(
-        (set) => ({
-            // state
-            sidebarOpen: false,
-            conversations: [],
-            selectedId: null,
-            collapsedComponent: { pinned: true, recent: false },
-            isThinking: false,
-            thinkingConvId: null,
-            sidebarCollapsed: false,
+    (set) => ({
+        // state
+        sidebarOpen: false,
+        conversations: [],
+        selectedId: null,
+        collapsedComponent: { pinned: true, recent: false },
+        isThinking: false,
+        thinkingConvId: null,
+        sidebarCollapsed: false,
 
-            // action
-            setSidebarOpen: (sidebarOpen) => set({ sidebarOpen }),
-            setSelectedId: (selectedId) => set({ selectedId }),
-            setThinkingConvId: (thinkingConvId) => set({ thinkingConvId }),
-            setIsThinking: (isThinking) => set({ isThinking }),
+        // action
+        setSidebarOpen: (sidebarOpen) => set({ sidebarOpen }),
+        setSelectedId: (selectedId) => set({ selectedId }),
+        setThinkingConvId: (thinkingConvId) => set({ thinkingConvId }),
+        setIsThinking: (isThinking) => set({ isThinking }),
 
-            //NOTE: they say c++ look like shit
-            setCollapsedComponent: (updater) => set((state) => ({
-                collapsedComponent: typeof updater === 'function'
-                    ? updater(state.collapsedComponent)
-                    : { ...state.collapsedComponent, ...updater }
-            })),
+        //NOTE: they say c++ look like shit
+        setCollapsedComponent: (updater) => set((state) => ({
+            collapsedComponent: typeof updater === 'function'
+                ? updater(state.collapsedComponent)
+                : { ...state.collapsedComponent, ...updater }
+        })),
 
-            pauseThinking: () => set({ isThinking: false, thinkingConvId: null }),
-            setSidebarCollapsed: (sidebarCollapsed) => set({ sidebarCollapsed }),
-        }),
-        {
-            name: 'chat-storage',
-            partialize: (state) => ({
-                sidebarOpen: state.sidebarOpen,
-                selectedId: state.selectedId,
-                sidebarCollapsed: state.sidebarCollapsed,
-                collapsedComponent: state.collapsedComponent
-            })
-        }
-    )
+        pauseThinking: () => set({ isThinking: false, thinkingConvId: null }),
+        setSidebarCollapsed: (sidebarCollapsed) => set({ sidebarCollapsed }),
+    }),
 )

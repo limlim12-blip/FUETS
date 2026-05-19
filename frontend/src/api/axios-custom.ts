@@ -1,28 +1,47 @@
-import axios, { AxiosRequestConfig } from 'axios';
+import Axios, { AxiosRequestConfig, AxiosError } from 'axios';
+import { useQueryClient } from '@tanstack/react-query';
 
-export const AXIOS_INSTANCE = axios.create({ baseURL: 'http://localhost:8000' });
+export const AXIOS_INSTANCE = Axios.create({
+    baseURL: "http://localhost:8000"
+});
+
+// Request interceptor for auth
+AXIOS_INSTANCE.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => Promise.reject(error),
+);
+
+// Response interceptor for error handling
+AXIOS_INSTANCE.interceptors.response.use(
+
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 401) {
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+            const queryClient = useQueryClient();
+            queryClient.clear();
+
+        }
+        return Promise.reject(error);
+    },
+);
 
 export const customInstance = <T>(
-    url: string,
-    options?: AxiosRequestConfig & { body?: any }
+    config: AxiosRequestConfig,
+    options?: AxiosRequestConfig,
 ): Promise<T> => {
-    // const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    const access_detail =
-    {
-        "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3Nzk2MDE5NTYsInN1YiI6ImE4ZGZhNjJjLWU0NjktNGY0Yi1iZTY2LWE5YTIzNjlhN2I0ZCJ9.Z9359x9BMfgUzpB2VXKUudYdUCLWYzpD3nOu6_NkE5o",
-        "token_type": "bearer"
-    }
-    const token = access_detail.access_token
-
-    const requestData = options?.data ?? options?.body;
-
     return AXIOS_INSTANCE({
+        ...config,
         ...options,
-        url,
-        data: requestData,
-        headers: {
-            ...options?.headers,
-            Authorization: token ? `Bearer ${token}` : undefined,
-        },
     }).then(({ data }) => data);
 };
+
+export type ErrorType<Error> = AxiosError<Error>;
+export type BodyType<BodyData> = BodyData;

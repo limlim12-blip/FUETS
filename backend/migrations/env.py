@@ -4,6 +4,7 @@ from sqlalchemy import engine_from_config
 from src.core.config import config as a_config
 from src.models.chat import Chat, Message
 from src.models.user import User
+from src.models.documents import Documents, DocumentFile
 from src.models.schema import Professor, Course, Review
 from sqlmodel import SQLModel
 from sqlalchemy import pool
@@ -56,12 +57,6 @@ def run_migrations_offline() -> None:
 
 
 def run_migrations_online() -> None:
-    """Run migrations in 'online' mode.
-
-    In this scenario we need to create an Engine
-    and associate a connection with the context.
-
-    """
     configuration = config.get_section(config.config_ini_section)
     configuration["sqlalchemy.url"] = a_config.DB_URL
     connectable = engine_from_config(
@@ -71,7 +66,11 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata)
+        context.configure(
+            connection=connection,
+            target_metadata=target_metadata,
+            compare_type=True,
+        )
 
         with context.begin_transaction():
             context.run_migrations()

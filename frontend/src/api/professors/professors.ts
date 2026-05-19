@@ -33,60 +33,28 @@ import type {
 } from '../model';
 
 import { customInstance } from '.././axios-custom';
+import type { ErrorType , BodyType } from '.././axios-custom';
 
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type readProfsApiV1ProfsGetResponse200 = {
-  data: ProfsPublic
-  status: 200
-}
-
-export type readProfsApiV1ProfsGetResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-
-export type readProfsApiV1ProfsGetResponseSuccess = (readProfsApiV1ProfsGetResponse200) & {
-  headers: Headers;
-};
-export type readProfsApiV1ProfsGetResponseError = (readProfsApiV1ProfsGetResponse422) & {
-  headers: Headers;
-};
-
-export type readProfsApiV1ProfsGetResponse = (readProfsApiV1ProfsGetResponseSuccess | readProfsApiV1ProfsGetResponseError)
-
-export const getReadProfsApiV1ProfsGetUrl = (params?: ReadProfsApiV1ProfsGetParams,) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
-    }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0 ? `/api/v1/profs/?${stringifiedParams}` : `/api/v1/profs/`
-}
-
 /**
  * @summary Read Profs
  */
-export const readProfsApiV1ProfsGet = async (params?: ReadProfsApiV1ProfsGetParams, options?: RequestInit): Promise<readProfsApiV1ProfsGetResponse> => {
-
-  return customInstance<readProfsApiV1ProfsGetResponse>(getReadProfsApiV1ProfsGetUrl(params),
-  {
-    ...options,
-    method: 'GET'
+export const readProfsApiV1ProfsGet = (
+    params?: ReadProfsApiV1ProfsGetParams,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-  }
-);}
-
+      return customInstance<ProfsPublic>(
+      {url: `/api/v1/profs/`, method: 'GET',
+        params, signal
+    },
+      options);
+    }
 
 
 
@@ -98,7 +66,7 @@ export const getReadProfsApiV1ProfsGetQueryKey = (params?: ReadProfsApiV1ProfsGe
     }
 
 
-export const getReadProfsApiV1ProfsGetQueryOptions = <TData = Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>, TError = HTTPValidationError>(params?: ReadProfsApiV1ProfsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getReadProfsApiV1ProfsGetQueryOptions = <TData = Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>, TError = ErrorType<HTTPValidationError>>(params?: ReadProfsApiV1ProfsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -107,7 +75,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>> = ({ signal }) => readProfsApiV1ProfsGet(params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>> = ({ signal }) => readProfsApiV1ProfsGet(params, requestOptions, signal);
 
 
 
@@ -117,10 +85,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type ReadProfsApiV1ProfsGetQueryResult = NonNullable<Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>>
-export type ReadProfsApiV1ProfsGetQueryError = HTTPValidationError
+export type ReadProfsApiV1ProfsGetQueryError = ErrorType<HTTPValidationError>
 
 
-export function useReadProfsApiV1ProfsGet<TData = Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>, TError = HTTPValidationError>(
+export function useReadProfsApiV1ProfsGet<TData = Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>, TError = ErrorType<HTTPValidationError>>(
  params: undefined |  ReadProfsApiV1ProfsGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>,
@@ -130,7 +98,7 @@ export function useReadProfsApiV1ProfsGet<TData = Awaited<ReturnType<typeof read
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useReadProfsApiV1ProfsGet<TData = Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>, TError = HTTPValidationError>(
+export function useReadProfsApiV1ProfsGet<TData = Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>, TError = ErrorType<HTTPValidationError>>(
  params?: ReadProfsApiV1ProfsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>,
@@ -140,7 +108,7 @@ export function useReadProfsApiV1ProfsGet<TData = Awaited<ReturnType<typeof read
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useReadProfsApiV1ProfsGet<TData = Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>, TError = HTTPValidationError>(
+export function useReadProfsApiV1ProfsGet<TData = Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>, TError = ErrorType<HTTPValidationError>>(
  params?: ReadProfsApiV1ProfsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
@@ -148,7 +116,7 @@ export function useReadProfsApiV1ProfsGet<TData = Awaited<ReturnType<typeof read
  * @summary Read Profs
  */
 
-export function useReadProfsApiV1ProfsGet<TData = Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>, TError = HTTPValidationError>(
+export function useReadProfsApiV1ProfsGet<TData = Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>, TError = ErrorType<HTTPValidationError>>(
  params?: ReadProfsApiV1ProfsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -165,53 +133,28 @@ export function useReadProfsApiV1ProfsGet<TData = Awaited<ReturnType<typeof read
 
 
 
-export type createProfApiV1ProfsPostResponse200 = {
-  data: ProfPublic
-  status: 200
-}
-
-export type createProfApiV1ProfsPostResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-
-export type createProfApiV1ProfsPostResponseSuccess = (createProfApiV1ProfsPostResponse200) & {
-  headers: Headers;
-};
-export type createProfApiV1ProfsPostResponseError = (createProfApiV1ProfsPostResponse422) & {
-  headers: Headers;
-};
-
-export type createProfApiV1ProfsPostResponse = (createProfApiV1ProfsPostResponseSuccess | createProfApiV1ProfsPostResponseError)
-
-export const getCreateProfApiV1ProfsPostUrl = () => {
-
-
-
-
-  return `/api/v1/profs/`
-}
-
 /**
  * @summary Create Prof
  */
-export const createProfApiV1ProfsPost = async (profCreate: ProfCreate, options?: RequestInit): Promise<createProfApiV1ProfsPostResponse> => {
-
-  return customInstance<createProfApiV1ProfsPostResponse>(getCreateProfApiV1ProfsPostUrl(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(profCreate)
-  }
-);}
+export const createProfApiV1ProfsPost = (
+    profCreate: BodyType<ProfCreate>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
+      return customInstance<ProfPublic>(
+      {url: `/api/v1/profs/`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: profCreate, signal
+    },
+      options);
+    }
 
 
-export const getCreateProfApiV1ProfsPostMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createProfApiV1ProfsPost>>, TError,{data: ProfCreate}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof createProfApiV1ProfsPost>>, TError,{data: ProfCreate}, TContext> => {
+
+export const getCreateProfApiV1ProfsPostMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createProfApiV1ProfsPost>>, TError,{data: BodyType<ProfCreate>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof createProfApiV1ProfsPost>>, TError,{data: BodyType<ProfCreate>}, TContext> => {
 
 const mutationKey = ['createProfApiV1ProfsPost'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -223,7 +166,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createProfApiV1ProfsPost>>, {data: ProfCreate}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createProfApiV1ProfsPost>>, {data: BodyType<ProfCreate>}> = (props) => {
           const {data} = props ?? {};
 
           return  createProfApiV1ProfsPost(data,requestOptions)
@@ -237,63 +180,36 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type CreateProfApiV1ProfsPostMutationResult = NonNullable<Awaited<ReturnType<typeof createProfApiV1ProfsPost>>>
-    export type CreateProfApiV1ProfsPostMutationBody = ProfCreate
-    export type CreateProfApiV1ProfsPostMutationError = HTTPValidationError
+    export type CreateProfApiV1ProfsPostMutationBody = BodyType<ProfCreate>
+    export type CreateProfApiV1ProfsPostMutationError = ErrorType<HTTPValidationError>
 
     /**
  * @summary Create Prof
  */
-export const useCreateProfApiV1ProfsPost = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createProfApiV1ProfsPost>>, TError,{data: ProfCreate}, TContext>, request?: SecondParameter<typeof customInstance>}
+export const useCreateProfApiV1ProfsPost = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createProfApiV1ProfsPost>>, TError,{data: BodyType<ProfCreate>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof createProfApiV1ProfsPost>>,
         TError,
-        {data: ProfCreate},
+        {data: BodyType<ProfCreate>},
         TContext
       > => {
       return useMutation(getCreateProfApiV1ProfsPostMutationOptions(options), queryClient);
     }
-    export type readProfApiV1ProfsIdGetResponse200 = {
-  data: ProfPublic
-  status: 200
-}
-
-export type readProfApiV1ProfsIdGetResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-
-export type readProfApiV1ProfsIdGetResponseSuccess = (readProfApiV1ProfsIdGetResponse200) & {
-  headers: Headers;
-};
-export type readProfApiV1ProfsIdGetResponseError = (readProfApiV1ProfsIdGetResponse422) & {
-  headers: Headers;
-};
-
-export type readProfApiV1ProfsIdGetResponse = (readProfApiV1ProfsIdGetResponseSuccess | readProfApiV1ProfsIdGetResponseError)
-
-export const getReadProfApiV1ProfsIdGetUrl = (id: string,) => {
-
-
-
-
-  return `/api/v1/profs/${id}`
-}
-
-/**
+    /**
  * @summary Read Prof
  */
-export const readProfApiV1ProfsIdGet = async (id: string, options?: RequestInit): Promise<readProfApiV1ProfsIdGetResponse> => {
-
-  return customInstance<readProfApiV1ProfsIdGetResponse>(getReadProfApiV1ProfsIdGetUrl(id),
-  {
-    ...options,
-    method: 'GET'
+export const readProfApiV1ProfsIdGet = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-  }
-);}
-
+      return customInstance<ProfPublic>(
+      {url: `/api/v1/profs/${id}`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -305,7 +221,7 @@ export const getReadProfApiV1ProfsIdGetQueryKey = (id: string,) => {
     }
 
 
-export const getReadProfApiV1ProfsIdGetQueryOptions = <TData = Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>, TError = HTTPValidationError>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getReadProfApiV1ProfsIdGetQueryOptions = <TData = Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>, TError = ErrorType<HTTPValidationError>>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -314,7 +230,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>> = ({ signal }) => readProfApiV1ProfsIdGet(id, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>> = ({ signal }) => readProfApiV1ProfsIdGet(id, requestOptions, signal);
 
 
 
@@ -324,10 +240,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type ReadProfApiV1ProfsIdGetQueryResult = NonNullable<Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>>
-export type ReadProfApiV1ProfsIdGetQueryError = HTTPValidationError
+export type ReadProfApiV1ProfsIdGetQueryError = ErrorType<HTTPValidationError>
 
 
-export function useReadProfApiV1ProfsIdGet<TData = Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>, TError = HTTPValidationError>(
+export function useReadProfApiV1ProfsIdGet<TData = Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>, TError = ErrorType<HTTPValidationError>>(
  id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>,
@@ -337,7 +253,7 @@ export function useReadProfApiV1ProfsIdGet<TData = Awaited<ReturnType<typeof rea
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useReadProfApiV1ProfsIdGet<TData = Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>, TError = HTTPValidationError>(
+export function useReadProfApiV1ProfsIdGet<TData = Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>, TError = ErrorType<HTTPValidationError>>(
  id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>,
@@ -347,7 +263,7 @@ export function useReadProfApiV1ProfsIdGet<TData = Awaited<ReturnType<typeof rea
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useReadProfApiV1ProfsIdGet<TData = Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>, TError = HTTPValidationError>(
+export function useReadProfApiV1ProfsIdGet<TData = Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>, TError = ErrorType<HTTPValidationError>>(
  id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
@@ -355,7 +271,7 @@ export function useReadProfApiV1ProfsIdGet<TData = Awaited<ReturnType<typeof rea
  * @summary Read Prof
  */
 
-export function useReadProfApiV1ProfsIdGet<TData = Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>, TError = HTTPValidationError>(
+export function useReadProfApiV1ProfsIdGet<TData = Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>, TError = ErrorType<HTTPValidationError>>(
  id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -372,54 +288,29 @@ export function useReadProfApiV1ProfsIdGet<TData = Awaited<ReturnType<typeof rea
 
 
 
-export type updateProfApiV1ProfsIdPutResponse200 = {
-  data: ProfPublic
-  status: 200
-}
-
-export type updateProfApiV1ProfsIdPutResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-
-export type updateProfApiV1ProfsIdPutResponseSuccess = (updateProfApiV1ProfsIdPutResponse200) & {
-  headers: Headers;
-};
-export type updateProfApiV1ProfsIdPutResponseError = (updateProfApiV1ProfsIdPutResponse422) & {
-  headers: Headers;
-};
-
-export type updateProfApiV1ProfsIdPutResponse = (updateProfApiV1ProfsIdPutResponseSuccess | updateProfApiV1ProfsIdPutResponseError)
-
-export const getUpdateProfApiV1ProfsIdPutUrl = (id: string,) => {
-
-
-
-
-  return `/api/v1/profs/${id}`
-}
-
 /**
  * @summary Update Prof
  */
-export const updateProfApiV1ProfsIdPut = async (id: string,
-    profUpdate: ProfUpdate, options?: RequestInit): Promise<updateProfApiV1ProfsIdPutResponse> => {
-
-  return customInstance<updateProfApiV1ProfsIdPutResponse>(getUpdateProfApiV1ProfsIdPutUrl(id),
-  {
-    ...options,
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(profUpdate)
-  }
-);}
+export const updateProfApiV1ProfsIdPut = (
+    id: string,
+    profUpdate: BodyType<ProfUpdate>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
+      return customInstance<ProfPublic>(
+      {url: `/api/v1/profs/${id}`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: profUpdate, signal
+    },
+      options);
+    }
 
 
-export const getUpdateProfApiV1ProfsIdPutMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateProfApiV1ProfsIdPut>>, TError,{id: string;data: ProfUpdate}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof updateProfApiV1ProfsIdPut>>, TError,{id: string;data: ProfUpdate}, TContext> => {
+
+export const getUpdateProfApiV1ProfsIdPutMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateProfApiV1ProfsIdPut>>, TError,{id: string;data: BodyType<ProfUpdate>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateProfApiV1ProfsIdPut>>, TError,{id: string;data: BodyType<ProfUpdate>}, TContext> => {
 
 const mutationKey = ['updateProfApiV1ProfsIdPut'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -431,7 +322,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateProfApiV1ProfsIdPut>>, {id: string;data: ProfUpdate}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateProfApiV1ProfsIdPut>>, {id: string;data: BodyType<ProfUpdate>}> = (props) => {
           const {id,data} = props ?? {};
 
           return  updateProfApiV1ProfsIdPut(id,data,requestOptions)
@@ -445,67 +336,40 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type UpdateProfApiV1ProfsIdPutMutationResult = NonNullable<Awaited<ReturnType<typeof updateProfApiV1ProfsIdPut>>>
-    export type UpdateProfApiV1ProfsIdPutMutationBody = ProfUpdate
-    export type UpdateProfApiV1ProfsIdPutMutationError = HTTPValidationError
+    export type UpdateProfApiV1ProfsIdPutMutationBody = BodyType<ProfUpdate>
+    export type UpdateProfApiV1ProfsIdPutMutationError = ErrorType<HTTPValidationError>
 
     /**
  * @summary Update Prof
  */
-export const useUpdateProfApiV1ProfsIdPut = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateProfApiV1ProfsIdPut>>, TError,{id: string;data: ProfUpdate}, TContext>, request?: SecondParameter<typeof customInstance>}
+export const useUpdateProfApiV1ProfsIdPut = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateProfApiV1ProfsIdPut>>, TError,{id: string;data: BodyType<ProfUpdate>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof updateProfApiV1ProfsIdPut>>,
         TError,
-        {id: string;data: ProfUpdate},
+        {id: string;data: BodyType<ProfUpdate>},
         TContext
       > => {
       return useMutation(getUpdateProfApiV1ProfsIdPutMutationOptions(options), queryClient);
     }
-    export type deleteProfApiV1ProfsIdDeleteResponse200 = {
-  data: unknown
-  status: 200
-}
-
-export type deleteProfApiV1ProfsIdDeleteResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-
-export type deleteProfApiV1ProfsIdDeleteResponseSuccess = (deleteProfApiV1ProfsIdDeleteResponse200) & {
-  headers: Headers;
-};
-export type deleteProfApiV1ProfsIdDeleteResponseError = (deleteProfApiV1ProfsIdDeleteResponse422) & {
-  headers: Headers;
-};
-
-export type deleteProfApiV1ProfsIdDeleteResponse = (deleteProfApiV1ProfsIdDeleteResponseSuccess | deleteProfApiV1ProfsIdDeleteResponseError)
-
-export const getDeleteProfApiV1ProfsIdDeleteUrl = (id: string,) => {
-
-
-
-
-  return `/api/v1/profs/${id}`
-}
-
-/**
+    /**
  * @summary Delete Prof
  */
-export const deleteProfApiV1ProfsIdDelete = async (id: string, options?: RequestInit): Promise<deleteProfApiV1ProfsIdDeleteResponse> => {
-
-  return customInstance<deleteProfApiV1ProfsIdDeleteResponse>(getDeleteProfApiV1ProfsIdDeleteUrl(id),
-  {
-    ...options,
-    method: 'DELETE'
+export const deleteProfApiV1ProfsIdDelete = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-  }
-);}
+      return customInstance<unknown>(
+      {url: `/api/v1/profs/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
 
 
 
-
-export const getDeleteProfApiV1ProfsIdDeleteMutationOptions = <TError = HTTPValidationError,
+export const getDeleteProfApiV1ProfsIdDeleteMutationOptions = <TError = ErrorType<HTTPValidationError>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteProfApiV1ProfsIdDelete>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof deleteProfApiV1ProfsIdDelete>>, TError,{id: string}, TContext> => {
 
@@ -534,12 +398,12 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type DeleteProfApiV1ProfsIdDeleteMutationResult = NonNullable<Awaited<ReturnType<typeof deleteProfApiV1ProfsIdDelete>>>
 
-    export type DeleteProfApiV1ProfsIdDeleteMutationError = HTTPValidationError
+    export type DeleteProfApiV1ProfsIdDeleteMutationError = ErrorType<HTTPValidationError>
 
     /**
  * @summary Delete Prof
  */
-export const useDeleteProfApiV1ProfsIdDelete = <TError = HTTPValidationError,
+export const useDeleteProfApiV1ProfsIdDelete = <TError = ErrorType<HTTPValidationError>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteProfApiV1ProfsIdDelete>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof deleteProfApiV1ProfsIdDelete>>,

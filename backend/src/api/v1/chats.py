@@ -77,11 +77,11 @@ def update_chat(
     id: uuid.UUID,
     item_in: ChatUpdate,
 ) -> Any:
-    if not current_user.is_superuser:
-        raise HTTPException(status_code=403, detail="Not enough permissions")
     chat = session.get(Chat, id)
     if not chat:
         raise HTTPException(status_code=404, detail="Message not found")
+    if not current_user.is_superuser and chat.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not enough permissions")
     update_dict = item_in.model_dump(exclude_unset=True)
     chat.sqlmodel_update(update_dict)
     session.add(chat)
@@ -95,7 +95,7 @@ def delete_chat(session: SessionDep, current_user: CurrentUser, id: uuid.UUID) -
     chat = session.get(Chat, id)
     if not chat:
         raise HTTPException(status_code=404, detail="Message not found")
-    if not current_user.is_superuser:
+    if not current_user.is_superuser and chat.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not enough permissions")
     session.delete(chat)
     session.commit()

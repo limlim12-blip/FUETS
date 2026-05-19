@@ -8,5 +8,5 @@
 export interface CoursePublic {
   code: string | null;
   name: string;
-  course_id: string;
+  id: string;
 }

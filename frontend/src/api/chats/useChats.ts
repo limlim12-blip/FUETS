@@ -1,27 +1,24 @@
-import { ChatUpdate } from "../model";
 import { useCreateChatApiV1ChatsPost, useReadChatsApiV1ChatsGet, useDeleteChatApiV1ChatsIdDelete, getReadChatsApiV1ChatsGetQueryKey, useUpdateChatApiV1ChatsIdPut } from "./chats";
 import { useQueryClient } from '@tanstack/react-query';
+import type { ReadChatsApiV1ChatsGetParams } from "../model";
 
 
-
-export const useChatActions = () => {
+export const useChatActions = (params?: ReadChatsApiV1ChatsGetParams) => {
     const queryClient = useQueryClient();
-    const { data, isLoading, isError } = useReadChatsApiV1ChatsGet({
-        limit: 20,
-        offset: 0
-    });
+    const { data, isLoading, isError } = useReadChatsApiV1ChatsGet(params);
 
     const createMutation = useCreateChatApiV1ChatsPost();
     const deleteMutation = useDeleteChatApiV1ChatsIdDelete();
     const updateMutation = useUpdateChatApiV1ChatsIdPut()
 
     const handleUpdate = async (id: string, { pinned, title }: { pinned?: boolean; title?: string } = {}) => {
+        console.log("SENDING TO BACKEND:", { pinned, title });
         return updateMutation.mutateAsync({
             id: id,
             data: { pinned, title },
         }, {
             onSuccess: async () => {
-                await queryClient.invalidateQueries({ queryKey: getReadChatsApiV1ChatsGetQueryKey({ limit: 20, offset: 0 }) });
+                await queryClient.invalidateQueries({ queryKey: getReadChatsApiV1ChatsGetQueryKey(params) });
             }
         });
     };
@@ -30,14 +27,14 @@ export const useChatActions = () => {
             data: { title: "New Chat" }
         }, {
             onSuccess: async () => {
-                await queryClient.invalidateQueries({ queryKey: getReadChatsApiV1ChatsGetQueryKey({ limit: 20, offset: 0 }) });
+                await queryClient.invalidateQueries({ queryKey: getReadChatsApiV1ChatsGetQueryKey(params) });
             }
         });
     };
     const handleDelete = (id: string) => {
         deleteMutation.mutateAsync({ id }, {
             onSuccess: async () => {
-                await queryClient.invalidateQueries({ queryKey: getReadChatsApiV1ChatsGetQueryKey({ limit: 20, offset: 0 }) });
+                await queryClient.invalidateQueries({ queryKey: getReadChatsApiV1ChatsGetQueryKey(params) });
             }
         });
     };

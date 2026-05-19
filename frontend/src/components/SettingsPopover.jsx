@@ -1,13 +1,21 @@
 "use client"
 import React from 'react';
 
+import { useRouter } from 'next/navigation'
 import { useState } from "react"
-import { BookOpen, LogOut, ChevronRight, Settings } from "lucide-react"
+import { LogOut, Settings } from "lucide-react"
+import { useQueryClient } from '@tanstack/react-query';
 import { Popover, PopoverContent, PopoverTrigger } from "@/src/components/ui/popover"
 
 export default function SettingsPopover({ children }) {
     const [open, setOpen] = useState(false)
-
+    const router = useRouter()
+    const queryClient = useQueryClient();
+    const handleLogOut = () => {
+        localStorage.removeItem('token');
+        router.push("/login")
+        queryClient.clear();
+    }
     return (
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>{children}</PopoverTrigger>
@@ -35,30 +43,28 @@ export default function SettingsPopover({ children }) {
                     </div>
 
                     <div className="space-y-0.5">
-                        <button className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-left hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors">
+                        <button
+                            className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-left hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors">
                             <Settings className="h-4 w-4 text-zinc-500" />
                             <span>Settings</span>
+                            <span className="ml-auto px-2 py-0.5 text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 rounded-full font-medium">
+                                {"TODO"}
+                            </span>
                         </button>
                     </div>
 
-                    <div className="my-2 border-t border-zinc-200 dark:border-zinc-700" />
-
-                    <div className="space-y-0.5">
-                        <button className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-left hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors">
-                            <BookOpen className="h-4 w-4 text-zinc-500" />
-                            <span>Learn more</span>
-                            <ChevronRight className="h-4 w-4 ml-auto text-zinc-400" />
-                        </button>
-                    </div>
 
                     <div className="my-2 border-t border-zinc-200 dark:border-zinc-700" />
 
-                    <button className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-left hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors text-red-600 dark:text-red-400">
+                    <button
+                        onClick={() => handleLogOut()}
+                        className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-left hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors text-red-600 dark:text-red-400">
                         <LogOut className="h-4 w-4" />
                         <span>Log out</span>
+
                     </button>
                 </div>
             </PopoverContent>
-        </Popover>
+        </Popover >
     )
 }

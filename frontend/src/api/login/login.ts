@@ -23,45 +23,23 @@ import type {
 } from '../model';
 
 import { customInstance } from '.././axios-custom';
+import type { ErrorType , BodyType } from '.././axios-custom';
 
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type loginAccessTokenApiV1LoginAccessTokenPostResponse200 = {
-  data: Token
-  status: 200
-}
-
-export type loginAccessTokenApiV1LoginAccessTokenPostResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-
-export type loginAccessTokenApiV1LoginAccessTokenPostResponseSuccess = (loginAccessTokenApiV1LoginAccessTokenPostResponse200) & {
-  headers: Headers;
-};
-export type loginAccessTokenApiV1LoginAccessTokenPostResponseError = (loginAccessTokenApiV1LoginAccessTokenPostResponse422) & {
-  headers: Headers;
-};
-
-export type loginAccessTokenApiV1LoginAccessTokenPostResponse = (loginAccessTokenApiV1LoginAccessTokenPostResponseSuccess | loginAccessTokenApiV1LoginAccessTokenPostResponseError)
-
-export const getLoginAccessTokenApiV1LoginAccessTokenPostUrl = () => {
-
-
-
-
-  return `/api/v1/login/access-token`
-}
-
 /**
  * OAuth2 compatible token login, get an access token for future requests
  * @summary Login Access Token
  */
-export const loginAccessTokenApiV1LoginAccessTokenPost = async (bodyLoginAccessTokenApiV1LoginAccessTokenPost: BodyLoginAccessTokenApiV1LoginAccessTokenPost, options?: RequestInit): Promise<loginAccessTokenApiV1LoginAccessTokenPostResponse> => {
-    const formUrlEncoded = new URLSearchParams();
+export const loginAccessTokenApiV1LoginAccessTokenPost = (
+    bodyLoginAccessTokenApiV1LoginAccessTokenPost: BodyType<BodyLoginAccessTokenApiV1LoginAccessTokenPost>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+      const formUrlEncoded = new URLSearchParams();
 if(bodyLoginAccessTokenApiV1LoginAccessTokenPost.grant_type !== undefined && bodyLoginAccessTokenApiV1LoginAccessTokenPost.grant_type !== null) {
  formUrlEncoded.append(`grant_type`, bodyLoginAccessTokenApiV1LoginAccessTokenPost.grant_type);
  }
@@ -77,21 +55,19 @@ if(bodyLoginAccessTokenApiV1LoginAccessTokenPost.client_secret !== undefined && 
  formUrlEncoded.append(`client_secret`, bodyLoginAccessTokenApiV1LoginAccessTokenPost.client_secret);
  }
 
-  return customInstance<loginAccessTokenApiV1LoginAccessTokenPostResponse>(getLoginAccessTokenApiV1LoginAccessTokenPostUrl(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded', ...options?.headers },
-    body: formUrlEncoded
-  }
-);}
+      return customInstance<Token>(
+      {url: `/api/v1/login/access-token`, method: 'POST',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded', },
+       data: formUrlEncoded, signal
+    },
+      options);
+    }
 
 
 
-
-export const getLoginAccessTokenApiV1LoginAccessTokenPostMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginAccessTokenApiV1LoginAccessTokenPost>>, TError,{data: BodyLoginAccessTokenApiV1LoginAccessTokenPost}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof loginAccessTokenApiV1LoginAccessTokenPost>>, TError,{data: BodyLoginAccessTokenApiV1LoginAccessTokenPost}, TContext> => {
+export const getLoginAccessTokenApiV1LoginAccessTokenPostMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginAccessTokenApiV1LoginAccessTokenPost>>, TError,{data: BodyType<BodyLoginAccessTokenApiV1LoginAccessTokenPost>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof loginAccessTokenApiV1LoginAccessTokenPost>>, TError,{data: BodyType<BodyLoginAccessTokenApiV1LoginAccessTokenPost>}, TContext> => {
 
 const mutationKey = ['loginAccessTokenApiV1LoginAccessTokenPost'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -103,7 +79,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof loginAccessTokenApiV1LoginAccessTokenPost>>, {data: BodyLoginAccessTokenApiV1LoginAccessTokenPost}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof loginAccessTokenApiV1LoginAccessTokenPost>>, {data: BodyType<BodyLoginAccessTokenApiV1LoginAccessTokenPost>}> = (props) => {
           const {data} = props ?? {};
 
           return  loginAccessTokenApiV1LoginAccessTokenPost(data,requestOptions)
@@ -117,70 +93,45 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type LoginAccessTokenApiV1LoginAccessTokenPostMutationResult = NonNullable<Awaited<ReturnType<typeof loginAccessTokenApiV1LoginAccessTokenPost>>>
-    export type LoginAccessTokenApiV1LoginAccessTokenPostMutationBody = BodyLoginAccessTokenApiV1LoginAccessTokenPost
-    export type LoginAccessTokenApiV1LoginAccessTokenPostMutationError = HTTPValidationError
+    export type LoginAccessTokenApiV1LoginAccessTokenPostMutationBody = BodyType<BodyLoginAccessTokenApiV1LoginAccessTokenPost>
+    export type LoginAccessTokenApiV1LoginAccessTokenPostMutationError = ErrorType<HTTPValidationError>
 
     /**
  * @summary Login Access Token
  */
-export const useLoginAccessTokenApiV1LoginAccessTokenPost = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginAccessTokenApiV1LoginAccessTokenPost>>, TError,{data: BodyLoginAccessTokenApiV1LoginAccessTokenPost}, TContext>, request?: SecondParameter<typeof customInstance>}
+export const useLoginAccessTokenApiV1LoginAccessTokenPost = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginAccessTokenApiV1LoginAccessTokenPost>>, TError,{data: BodyType<BodyLoginAccessTokenApiV1LoginAccessTokenPost>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof loginAccessTokenApiV1LoginAccessTokenPost>>,
         TError,
-        {data: BodyLoginAccessTokenApiV1LoginAccessTokenPost},
+        {data: BodyType<BodyLoginAccessTokenApiV1LoginAccessTokenPost>},
         TContext
       > => {
       return useMutation(getLoginAccessTokenApiV1LoginAccessTokenPostMutationOptions(options), queryClient);
     }
-    export type registerUserApiV1SignupPostResponse200 = {
-  data: UserPublic
-  status: 200
-}
-
-export type registerUserApiV1SignupPostResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-
-export type registerUserApiV1SignupPostResponseSuccess = (registerUserApiV1SignupPostResponse200) & {
-  headers: Headers;
-};
-export type registerUserApiV1SignupPostResponseError = (registerUserApiV1SignupPostResponse422) & {
-  headers: Headers;
-};
-
-export type registerUserApiV1SignupPostResponse = (registerUserApiV1SignupPostResponseSuccess | registerUserApiV1SignupPostResponseError)
-
-export const getRegisterUserApiV1SignupPostUrl = () => {
-
-
-
-
-  return `/api/v1/signup`
-}
-
-/**
+    /**
  * Create new user without the need to be logged in.
  * @summary Register User
  */
-export const registerUserApiV1SignupPost = async (userRegister: UserRegister, options?: RequestInit): Promise<registerUserApiV1SignupPostResponse> => {
-
-  return customInstance<registerUserApiV1SignupPostResponse>(getRegisterUserApiV1SignupPostUrl(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(userRegister)
-  }
-);}
+export const registerUserApiV1SignupPost = (
+    userRegister: BodyType<UserRegister>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
+      return customInstance<UserPublic>(
+      {url: `/api/v1/signup`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: userRegister, signal
+    },
+      options);
+    }
 
 
-export const getRegisterUserApiV1SignupPostMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerUserApiV1SignupPost>>, TError,{data: UserRegister}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof registerUserApiV1SignupPost>>, TError,{data: UserRegister}, TContext> => {
+
+export const getRegisterUserApiV1SignupPostMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerUserApiV1SignupPost>>, TError,{data: BodyType<UserRegister>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof registerUserApiV1SignupPost>>, TError,{data: BodyType<UserRegister>}, TContext> => {
 
 const mutationKey = ['registerUserApiV1SignupPost'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -192,7 +143,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof registerUserApiV1SignupPost>>, {data: UserRegister}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof registerUserApiV1SignupPost>>, {data: BodyType<UserRegister>}> = (props) => {
           const {data} = props ?? {};
 
           return  registerUserApiV1SignupPost(data,requestOptions)
@@ -206,18 +157,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type RegisterUserApiV1SignupPostMutationResult = NonNullable<Awaited<ReturnType<typeof registerUserApiV1SignupPost>>>
-    export type RegisterUserApiV1SignupPostMutationBody = UserRegister
-    export type RegisterUserApiV1SignupPostMutationError = HTTPValidationError
+    export type RegisterUserApiV1SignupPostMutationBody = BodyType<UserRegister>
+    export type RegisterUserApiV1SignupPostMutationError = ErrorType<HTTPValidationError>
 
     /**
  * @summary Register User
  */
-export const useRegisterUserApiV1SignupPost = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerUserApiV1SignupPost>>, TError,{data: UserRegister}, TContext>, request?: SecondParameter<typeof customInstance>}
+export const useRegisterUserApiV1SignupPost = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerUserApiV1SignupPost>>, TError,{data: BodyType<UserRegister>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof registerUserApiV1SignupPost>>,
         TError,
-        {data: UserRegister},
+        {data: BodyType<UserRegister>},
         TContext
       > => {
       return useMutation(getRegisterUserApiV1SignupPostMutationOptions(options), queryClient);

@@ -1,4 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
+import { toast } from "sonner"
 import {
     useLoginAccessTokenApiV1LoginAccessTokenPost,
     useRegisterUserApiV1SignupPost,
@@ -11,7 +12,6 @@ import {
 export const useAuthActions = () => {
     const queryClient = useQueryClient();
 
-    // 1. Initialize Mutations
     const loginMutation = useLoginAccessTokenApiV1LoginAccessTokenPost();
     const registerMutation = useRegisterUserApiV1SignupPost();
 
@@ -20,8 +20,8 @@ export const useAuthActions = () => {
             data: credentials
         }, {
             onSuccess: (response) => {
-                if (response.status === 200) {
-                    localStorage.setItem('token', response.data.access_token);
+                if (response && response.access_token) {
+                    localStorage.setItem('token', response.access_token);
                 }
             },
             onError: (error) => {
@@ -33,6 +33,14 @@ export const useAuthActions = () => {
     const handleRegister = async (userData: UserRegister) => {
         return await registerMutation.mutateAsync({
             data: userData
+        }, {
+            onSuccess: (response) => {
+                return response;
+            },
+            onError: (error) => {
+                return error
+            },
+
         });
     };
 

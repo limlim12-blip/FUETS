@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
-import { FileText } from "lucide-react"
+import { FileText, SquareDashedKanban } from "lucide-react"
 import {
     PanelLeftClose,
     PanelLeftOpen,
@@ -17,7 +17,7 @@ import {
 import SidebarSection from "./SidebarSection"
 import ConversationRow from "./ConversationRow"
 import SearchModal from "./SearchModal"
-import SettingsPopover from "./SettingsPopover"
+import SettingsPopover from "../SettingsPopover"
 import { cls } from "@/src/components/utils"
 import { useState, useEffect } from "react"
 
@@ -92,6 +92,15 @@ export default function Sidebar({
                                 <FileText className="h-5 w-5" />
                             </Link>
                         </button>
+                        <button>
+                            <Link
+                                href="/review"
+                                className="rounded-xl p-2.5 hover:bg-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:hover:bg-zinc-800 transition-colors"
+                            >
+                                <Star className="h-5 w-5" />
+                            </Link>
+                        </button>
+
                     </div>
 
                     <div className="mt-auto flex flex-col items-center gap-2 pb-4">
@@ -204,11 +213,22 @@ export default function Sidebar({
                         <div className="px-3 pt-2">
                             <Link
                                 href="/doc"
-                                className="flex w-full items-center justify-center gap-2 rounded-full border border-zinc-200 bg-transparent px-4 py-2 text-sm font-medium text-zinc-700 shadow-sm transition hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
+                                className="flex w-full items-center justify-center gap-2 rounded-full bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:bg-blue-600 dark:hover:bg-blue-700"
+
                             >
                                 <FileText className="h-4 w-4" /> Go to Docs
                             </Link>
                         </div>
+                        <div className="px-3 pt-2">
+                            <Link
+                                href="/review"
+                                className="flex w-full items-center justify-center gap-2 rounded-full border border-zinc-200 bg-transparent px-4 py-2 text-sm font-medium text-zinc-700 shadow-sm transition hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
+
+                            >
+                                <SquareDashedKanban className="h-4 w-4" /> Go to professor reviews
+                            </Link>
+                        </div>
+
                         <nav className="mt-4 flex flex-1 flex-col gap-0 overflow-y-auto px-2 pb-4">
                             <SidebarSection
                                 icon={<Star className="h-4 w-4" />}
@@ -227,11 +247,12 @@ export default function Sidebar({
                                             data={c}
                                             active={c.id === selectedId}
                                             onSelect={() => onSelect(c.id)}
-                                            onTogglePin={() => togglePin(c.id, !c.pinned)}
+                                            togglePin={togglePin}
                                         />
                                     ))
                                 )}
                             </SidebarSection>
+
                             <SidebarSection
                                 icon={<Clock className="h-4 w-4" />}
                                 title="RECENT"
@@ -243,16 +264,18 @@ export default function Sidebar({
                                         No conversations yet. Start a new one!
                                     </div>
                                 ) : (
-                                    recent.map((c) => (
-                                        <ConversationRow
-                                            key={c.id}
-                                            data={c}
-                                            active={c.id === selectedId}
-                                            onSelect={() => onSelect(c.id)}
-                                            onTogglePin={() => togglePin(c.id, c.pinned)}
-                                            showMeta
-                                        />
-                                    ))
+                                    <div className="pt-1.5 flex flex-col gap-0.5">
+                                        {recent.map((c) => (
+                                            <ConversationRow
+                                                key={c.id}
+                                                data={c}
+                                                active={c.id === selectedId}
+                                                onSelect={() => onSelect(c.id)}
+                                                togglePin={togglePin}
+                                                showMeta
+                                            />
+                                        ))}
+                                    </div>
                                 )}
                             </SidebarSection>
                         </nav>

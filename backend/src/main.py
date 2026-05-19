@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 from src.core.db import init_db
 from src.core.logger import setup_logging
-from src.api.v1.main import router
+from src.api.main import router
 
 
 @asynccontextmanager

@@ -1,13 +1,10 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { getReadProfsApiV1ProfsGetQueryKey, useCreateProfApiV1ProfsPost, useDeleteProfApiV1ProfsIdDelete, useReadProfsApiV1ProfsGet, useUpdateProfApiV1ProfsIdPut } from "./professors";
-import { ProfUpdate, ProfCreate } from "../model";
+import { ProfUpdate, ProfCreate, ReadProfsApiV1ProfsGetParams } from "../model";
 
-export const useProfActions = () => {
+export const useProfActions = (params?: ReadProfsApiV1ProfsGetParams) => {
     const queryClient = useQueryClient();
-    const { data, isLoading, isError } = useReadProfsApiV1ProfsGet({
-        limit: 20,
-        offset: 0
-    });
+    const { data, isLoading, isError } = useReadProfsApiV1ProfsGet(params);
 
     const createMutation = useCreateProfApiV1ProfsPost();
     const updateMutation = useUpdateProfApiV1ProfsIdPut();

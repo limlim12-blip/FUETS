@@ -44,12 +44,8 @@ export default function AIAssistantUI() {
         isCreating: isCreatingMessage,
     } = useMessageActions(selectedId)
     const handleTogglePin = useCallback(async (id, newPinnedState) => {
-        console.log("WHAT IS ID??", typeof id, id);
         if (isUpdatingChat) return;
-        await handleUpdateChat({
-            id: id,
-            data: { pinned: newPinnedState }
-        }).catch((error) => {
+        await handleUpdateChat(id, { pinned: newPinnedState }).catch((error) => {
             console.error("Error updating conv", error);
         });
     }, [isUpdatingChat, handleUpdateChat]);
@@ -118,14 +114,26 @@ export default function AIAssistantUI() {
         if (!query.trim()) return conversations
         const q = query.toLowerCase()
         return conversations.filter((c) =>
-            c.title?.toLowerCase().includes(q) || c.preview?.toLowerCase().includes(q)
+            c.title?.toLowerCase().includes(q)
         )
     }, [conversations, query])
-    const pinned = filtered.filter((c) => c.pinned).sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1))
+
+    const pinned = filtered
+        .filter((c) => c.pinned === true)
+        .sort((a, b) => {
+            const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+            const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+            return dateB - dateA;
+        });
+
     const recent = filtered
-        .filter((c) => !c.pinned)
-        .sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1))
-        .slice(0, 10)
+        .filter((c) => c.pinned !== true)
+        .sort((a, b) => {
+            const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+            const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+            return dateB - dateA;
+        })
+        .slice(0, 100);
 
     const selected = conversations.find((c) => c.id === selectedId) || null
 

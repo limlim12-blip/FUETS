@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 import uuid
 from sqlmodel import col, select, func
 from src.models.schema import (
@@ -9,10 +9,11 @@ from src.models.schema import (
     ProfUpdate,
 )
 
-from src.api.deps import CurrentUser, SessionDep
 from typing import Any
 
-router = APIRouter(prefix="/profs")
+from src.api.deps import CurrentUser, SessionDep, get_current_user
+
+router = APIRouter(prefix="/profs", dependencies=[Depends(get_current_user)])
 
 
 @router.get("/", response_model=ProfsPublic)

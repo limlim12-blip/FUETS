@@ -1,4 +1,5 @@
 from sqlmodel import Field, SQLModel, Relationship
+from sqlalchemy import text
 
 from datetime import datetime, timezone
 
@@ -31,7 +32,12 @@ class ProfUpdate(ProfBase):
 # Database model, database table inferred from class name
 class Professor(ProfBase, table=True):
     __tablename__: Any = "professors"
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, index=True)
+    id: uuid.UUID = Field(
+        default_factory=uuid.uuid4,
+        primary_key=True,
+        index=True,
+        sa_column_kwargs={"server_default": text("gen_random_uuid()")},
+    )
     reviews: List["Review"] = Relationship(back_populates="professor")
 
 
@@ -65,13 +71,18 @@ class CourseUpdate(CourseBase):
 # Database model, database table inferred from class name
 class Course(CourseBase, table=True):
     __tablename__: Any = "courses"
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, index=True)
+    id: uuid.UUID = Field(
+        default_factory=uuid.uuid4,
+        primary_key=True,
+        index=True,
+        sa_column_kwargs={"server_default": text("gen_random_uuid()")},
+    )
     reviews: List["Review"] = Relationship(back_populates="course")
 
 
 # Properties to return via API, id is always required
 class CoursePublic(CourseBase):
-    course_id: uuid.UUID
+    id: uuid.UUID
 
 
 class CoursesPublic(SQLModel):
@@ -101,8 +112,16 @@ class ReviewUpdate(ReviewBase):
 # Database model, database table inferred from class name
 class Review(ReviewBase, table=True):
     __tablename__: Any = "reviews"
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    id: uuid.UUID = Field(
+        default_factory=uuid.uuid4,
+        primary_key=True,
+        index=True,
+        sa_column_kwargs={"server_default": text("gen_random_uuid()")},
+    )
+    created_at: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
+        sa_column_kwargs={"server_default": text("CURRENT_TIMESTAMP")},
+    )
     course: Course = Relationship(back_populates="reviews")
     professor: Professor = Relationship(back_populates="reviews")
 
@@ -110,10 +129,15 @@ class Review(ReviewBase, table=True):
 # Properties to return via API, id is always required
 class ReviewPublic(ReviewBase):
     id: uuid.UUID
-    owner_id: uuid.UUID
+    prof_name: str | None = None
+    course_name: str | None = None
+    course_code: str | None = None
     created_at: datetime | None = None
 
 
 class ReviewsPublic(SQLModel):
     data: list[ReviewPublic]
-    count: int
+    count: int | None
+    page: int | None
+    page_size: int | None
+    total_pages: int | None
