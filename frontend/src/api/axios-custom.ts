@@ -2,7 +2,7 @@ import Axios, { AxiosRequestConfig, AxiosError } from 'axios';
 import { useQueryClient } from '@tanstack/react-query';
 
 export const AXIOS_INSTANCE = Axios.create({
-    baseURL: "http://localhost:8000"
+    baseURL: process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000"
 });
 
 // Request interceptor for auth
