@@ -15,12 +15,6 @@ export default function Review() {
     const [page, setPage] = useState(1);
     const [reviewsList, setReviews] = useState<any[]>([]);
     const [filters, setFilters] = useState({ search: "", professor_name: "", course_name: "" })
-    const { reviews, error, total } = useReviewActions({
-        page_size: 30,
-        search: filters.search,
-        professor_name: filters.professor_name,
-        course_name: filters.course_name
-    });
 
     const handleSearchSubmit = (newFilters: typeof filters) => {
         setReviews([])
@@ -28,26 +22,27 @@ export default function Review() {
         setFilters(newFilters)
     }
 
-    useEffect(() => {
-        if (reviews && !error) {
-            setReviews((prevItems) => {
-                const existingIds = new Set(prevItems.map(item => item.id));
-                const uniqueNewReviews = reviews.filter(item => !existingIds.has(item.id));
-                if (uniqueNewReviews.length === 0) {
-                    return prevItems;
-                }
-                return [...prevItems, ...uniqueNewReviews];
-            });
-        }
-    }, [reviews, error]);
-    console.log(total)
-
+    const { reviews, error, total } = useReviewActions({
+        page_size: 30,
+        page: page,
+        search: filters.search,
+        professor_name: filters.professor_name,
+        course_name: filters.course_name
+    });
     const handleLoadMoreData = () => {
-        setPage((prevPage) => prevPage + 1);
+        try {
+            if (reviews && !error) {
+                setPage(page + 1)
+                setReviews((prevItems) => [...prevItems, ...reviews]);
+            }
+        } catch (error) {
+            console.log(error)
+        }
+
     };
 
     return (
-        <div className="flex-1 flex flex-col overflow-hidden h-screen w-full">
+        <div className="flex-1 flex flex-col overflow-hidden h-screen w-full" >
             <header className="bg-card border-b border-border px-4 lg:px-8 py-3 flex-shrink-0">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3 pl-6 lg:pl-0">
@@ -115,7 +110,7 @@ export default function Review() {
                     hasMore={total ? total > reviewsList.length : false}
                     loader={<p className="text-center py-4 text-sm text-zinc-500">Loading more reviews...</p>}
                     endMessage={<p className="text-center py-4 text-sm text-zinc-500">No more data to load.</p>}
-                    scrollableTarget="scrollableDiv"
+                // scrollableTarget="scrollableDiv"
                 >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {reviewsList.map((review) => (
@@ -124,6 +119,6 @@ export default function Review() {
                     </div>
                 </InfiniteScroll>
             </div>
-        </div>
+        </div >
     )
 }
