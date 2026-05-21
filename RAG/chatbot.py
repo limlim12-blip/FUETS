@@ -3,10 +3,40 @@ from langchain_community.vectorstores import FAISS
 from langchain_community.vectorstores.utils import DistanceStrategy
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_openai import openAIEmbeddings, ChatOpenAI
+from langchain_experimental.text_splitter import SemanticChunker
+from langchain_google_genai import (
+    GoogleGenerativeAIEmbeddings,
+    ChatGoogleGenerativeAI
+)
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from dotenv import load_dotenv
+
+from langchain_core.messages import HumanMessage, AIMessage
+from langchain_core.runnables import RunnableLambda
+
+def format_docs(docs):
+    formatted = []
+
+    for doc in docs:
+        source = doc.metadata.get("source", "unknown")
+
+        formatted.append(
+            f"Source: {source}\n{doc.page_content}"
+        )
+
+    return "\n\n".join(formatted)
+
+def format_chat_history(history):
+    formatted = []
+
+    for msg in history:
+        if isinstance(msg, HumanMessage):
+            formatted.append(f"Human: {msg.content}")
+        elif isinstance(msg, AIMessage):
+            formatted.append(f"AI: {msg.content}")
+
+    return "\n".join(formatted)
 
 def rag_chatbot():
     load_dotenv()
@@ -20,6 +50,19 @@ def rag_chatbot():
 
     docs = loader.load()
 
+    # retrieve_context function
+    def retrieve_context(input_dict):
+        standalone_question = question_rewriter.invoke({
+            "chat_history": format_chat_history(input_dict["chat_history"]),
+            "question": input_dict["question"]
+        })
+
+        docs = retriever.invoke(standalone_question)
+        return {
+            "context": format_docs(docs),
+            "question": standalone_question
+        }
+
     MARKDOWN_SEPARATORS = [
         "\n#{1,6} ",
         "'''\n",
@@ -32,18 +75,24 @@ def rag_chatbot():
         "",
     ]
     # Split documents into chunks
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size = 1200,
-        chunk_overlap = 200,
-        add_start_index = True,
-        strip_whitespace = True,
-        separators=MARKDOWN_SEPARATORS,
+    #text_splitter = RecursiveCharacterTextSplitter(
+    #    chunk_size = 1200,
+    #    chunk_overlap = 200,
+    #    add_start_index = True,
+    #    strip_whitespace = True,
+    #    separators=MARKDOWN_SEPARATORS,
+    #)
+
+    text_splitter = SemanticChunker(
+        embeddings=GoogleGenerativeAIEmbeddings(model="text-embedding-004"),
+        breakpoint_threshold_amount=0.85,
     )
+
 
     splits = text_splitter.split_documents(docs)
 
-    embeddings = openAIEmbeddings(
-        model = "text-embedding-3-mini"
+    embeddings = GoogleGenerativeAIEmbeddings(
+        model = "text-embedding-004"
     )
 
     vectorstore = FAISS.from_documents(
@@ -51,10 +100,16 @@ def rag_chatbot():
         embedding=embeddings,
         distance_strategy=DistanceStrategy.COSINE,
     )
+    vectorstore.save_local("faiss_index")
+    vectorstore = FAISS.load_local(
+    "faiss_index",
+    embeddings,
+    allow_dangerous_deserialization=True
+    )
 
     retriever = vectorstore.as_retriever(
         search_type="similarity_score_threshold",
-        search_kwargs={"k": 5, "score_threshould": 0.2}
+        search_kwargs={"k": 5, "score_threshold": 0.2}
     )
 
     # Prompt 
@@ -63,35 +118,65 @@ def rag_chatbot():
         "RULES:\n"
         "1) Use ONLY the provided context to answer.\n"
         "2) If the answer is not clearly contained in the context, say: "
-        "\"I don't know bases on the provided documents.\"\n"
-        "4) If applicable, city sources as (source:page) using the metadata.\n\n"
+        "\"I don't know based on the provided documents.\"\n"
+        "4) If applicable, cite sources as (source:page) using the metadata.\n\n"
         "Context:\n{context}\n\n"
         "Question: {question}"
     )
 
     prompt = ChatPromptTemplate.from_template(template)
 
+    # rewrite
+    rewrite_template = """
+    Given the conversation history and the latest user question,
+    rewrite the question so it is standalone and fully self-contained.
+
+    Chat History:
+    {chat_history}
+
+    Question:
+    {question}
+
+    Standalone question:
+    """
+    rewrite_prompt = ChatPromptTemplate.from_template(rewrite_template)
+
     # LLM
-    llm = ChatOpenAI(
-        model="gpt-3.5-mini",
+    llm = ChatGoogleGenerativeAI(
+        model="gemini-1.5-flash",
         temperature=0,
     )
 
-    # RAG Chain
-    rag_chain = (
-        {"context": retriever, "question": RunnablePassthrough()} 
-        | prompt 
-        | llm 
+    # Rewriter Chain
+    question_rewriter = (
+        rewrite_prompt
+        | llm
         | StrOutputParser()
     )
+
+    chat_history = []
+
+    # RAG Chain
+    rag_chain = (
+    RunnableLambda(retrieve_context)
+    | prompt
+    | llm
+    | StrOutputParser()
+    )
+    
 
     while True:
         user_input = input("your question: ").strip()
         if user_input.lower() == "exit":
             print("Exiting the chatbot. Goodbye!")
             break
-        answer = rag_chain.invoke({"question": user_input})
+        answer = rag_chain.invoke({
+            "question": user_input,
+            "chat_history": chat_history
+        })
         print(f"Answer: {answer}\n")
+        chat_history.append(HumanMessage(content=user_input))
+        chat_history.append(AIMessage(content=answer))
 
 if __name__ == "__main__":
     rag_chatbot()
