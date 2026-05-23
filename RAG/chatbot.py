@@ -4,9 +4,9 @@ from langchain_community.vectorstores.utils import DistanceStrategy
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_experimental.text_splitter import SemanticChunker
-from langchain_google_genai import (
-    GoogleGenerativeAIEmbeddings,
-    ChatGoogleGenerativeAI
+from langchain_openai import (
+    OpenAIEmbeddings,
+    ChatOpenAI
 )
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
@@ -14,6 +14,9 @@ from dotenv import load_dotenv
 
 from langchain_core.messages import HumanMessage, AIMessage
 from langchain_core.runnables import RunnableLambda
+
+from langchain_community.document_loaders import PyPDFLoader
+import os
 
 def format_docs(docs):
     formatted = []
@@ -40,28 +43,16 @@ def format_chat_history(history):
 
 def rag_chatbot():
     load_dotenv()
+    
     loader = DirectoryLoader(
-        path="./data",
-        glob="**/*",
-        loader_cls=UnstructuredFileLoader,
+        path="./docs",
+        glob="**/*.pdf",
+        loader_cls=PyPDFLoader,
         show_progress=True,
         use_multithreading=True,
     )
 
     docs = loader.load()
-
-    # retrieve_context function
-    def retrieve_context(input_dict):
-        standalone_question = question_rewriter.invoke({
-            "chat_history": format_chat_history(input_dict["chat_history"]),
-            "question": input_dict["question"]
-        })
-
-        docs = retriever.invoke(standalone_question)
-        return {
-            "context": format_docs(docs),
-            "question": standalone_question
-        }
 
     MARKDOWN_SEPARATORS = [
         "\n#{1,6} ",
@@ -75,42 +66,43 @@ def rag_chatbot():
         "",
     ]
     # Split documents into chunks
-    #text_splitter = RecursiveCharacterTextSplitter(
-    #    chunk_size = 1200,
-    #    chunk_overlap = 200,
-    #    add_start_index = True,
-    #    strip_whitespace = True,
-    #    separators=MARKDOWN_SEPARATORS,
-    #)
-
-    text_splitter = SemanticChunker(
-        embeddings=GoogleGenerativeAIEmbeddings(model="text-embedding-004"),
-        breakpoint_threshold_amount=0.85,
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size = 1200,
+        chunk_overlap = 200,
+        add_start_index = True,
+        strip_whitespace = True,
+        separators=MARKDOWN_SEPARATORS,
     )
 
 
     splits = text_splitter.split_documents(docs)
 
-    embeddings = GoogleGenerativeAIEmbeddings(
-        model = "text-embedding-004"
+    embeddings = OpenAIEmbeddings(
+        model = "text-embedding-3-small",
     )
 
-    vectorstore = FAISS.from_documents(
-        documents=splits,
-        embedding=embeddings,
-        distance_strategy=DistanceStrategy.COSINE,
-    )
-    vectorstore.save_local("faiss_index")
-    vectorstore = FAISS.load_local(
-    "faiss_index",
-    embeddings,
-    allow_dangerous_deserialization=True
-    )
+    if os.path.exists("faiss_index"):
 
-    retriever = vectorstore.as_retriever(
-        search_type="similarity_score_threshold",
-        search_kwargs={"k": 5, "score_threshold": 0.2}
-    )
+        vectorstore = FAISS.load_local(
+            "faiss_index",
+            embeddings,
+            allow_dangerous_deserialization=True
+        )
+
+    else:
+
+        vectorstore = FAISS.from_documents(
+            documents=splits,
+            embedding=embeddings,
+            distance_strategy=DistanceStrategy.COSINE,
+        )
+
+        vectorstore.save_local("faiss_index")
+
+        retriever = vectorstore.as_retriever(
+            search_type="similarity_score_threshold",
+            search_kwargs={"k": 5, "score_threshold": 0.2}
+        )
 
     # Prompt 
     template = (
@@ -142,8 +134,8 @@ def rag_chatbot():
     rewrite_prompt = ChatPromptTemplate.from_template(rewrite_template)
 
     # LLM
-    llm = ChatGoogleGenerativeAI(
-        model="gemini-1.5-flash",
+    llm = ChatOpenAI(
+        model="gpt-4o-mini",
         temperature=0,
     )
 
@@ -153,6 +145,19 @@ def rag_chatbot():
         | llm
         | StrOutputParser()
     )
+
+    # retrieve_context function
+    def retrieve_context(input_dict):
+        standalone_question = question_rewriter.invoke({
+            "chat_history": format_chat_history(input_dict["chat_history"]),
+            "question": input_dict["question"]
+        })
+
+        docs = retriever.invoke(standalone_question)
+        return {
+            "context": format_docs(docs),
+            "question": standalone_question
+        }
 
     chat_history = []
 
