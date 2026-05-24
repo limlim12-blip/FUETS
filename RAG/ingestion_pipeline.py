@@ -2,7 +2,7 @@ import os
 from langchain_community.document_loaders import DirectoryLoader, PyPDFLoader
 
 from langchain_text_splitters import CharacterTextSplitter
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_experimental.text_splitter import SemanticChunker
 
 from langchain_openai import OpenAIEmbeddings
 from langchain_chroma import Chroma
@@ -32,22 +32,21 @@ def load_documents(docs_path='./docs'):
     return documents
 
 
-def split_documents(documents, chunk_size=1000, chunk_overlap=200):
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=chunk_size,
-        chunk_overlap=chunk_overlap,
-        length_function=len,
-        add_start_index=True, 
-        strip_whitespace=True
+def split_documents(documents):   
+    embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+
+    text_splitter = SemanticChunker(
+        embeddings=embeddings,
+        breakpoint_threshold_type="percentile", 
+        breakpoint_threshold_amount=70          
     )
-    
+
     chunks = text_splitter.split_documents(documents)
     return chunks
 
 
 def create_vector_store(chunks, persist_directory="db/chroma_db"):    
     embedding_model = OpenAIEmbeddings(model="text-embedding-3-small")
-    # kiểm tra nếu đã có dữ liệu trong thư mục persist_directory, nếu có thì load lại vectorstore từ đó, nếu không thì tạo mới
     if os.path.exists(persist_directory) and os.listdir(persist_directory):
         vectorstore = Chroma(
             persist_directory=persist_directory,
@@ -56,7 +55,6 @@ def create_vector_store(chunks, persist_directory="db/chroma_db"):
         )
         return vectorstore
 
-    # Nếu chưa có dữ liệu, tiến hành tạo mới
     vectorstore = Chroma.from_documents(
         documents=chunks,
         embedding=embedding_model,
@@ -69,7 +67,7 @@ def create_vector_store(chunks, persist_directory="db/chroma_db"):
 
 def main():
     documents = load_documents(docs_path='./docs')
-    chunks = split_documents(documents, chunk_size=1000, chunk_overlap=200)
+    chunks = split_documents(documents)
     vectorstore = create_vector_store(chunks, persist_directory="db/chroma_db")
 
 if __name__ == "__main__":
