@@ -5,18 +5,23 @@
  * OpenAPI spec version: 0.1.0
  */
 import {
+  useInfiniteQuery,
   useMutation,
   useQuery
 } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
+  DefinedUseInfiniteQueryResult,
   DefinedUseQueryResult,
+  InfiniteData,
   MutationFunction,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
+  UseInfiniteQueryOptions,
+  UseInfiniteQueryResult,
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
@@ -59,11 +64,84 @@ export const readReviewsApiV1ReviewsGet = (
 
 
 
+export const getReadReviewsApiV1ReviewsGetInfiniteQueryKey = (params?: ReadReviewsApiV1ReviewsGetParams,) => {
+    return [
+    'infinite', `/api/v1/reviews/`, ...(params ? [params] : [])
+    ] as const;
+    }
+
 export const getReadReviewsApiV1ReviewsGetQueryKey = (params?: ReadReviewsApiV1ReviewsGetParams,) => {
     return [
     `/api/v1/reviews/`, ...(params ? [params] : [])
     ] as const;
     }
+
+
+export const getReadReviewsApiV1ReviewsGetInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof readReviewsApiV1ReviewsGet>>, ReadReviewsApiV1ReviewsGetParams['page']>, TError = ErrorType<HTTPValidationError>>(params?: ReadReviewsApiV1ReviewsGetParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readReviewsApiV1ReviewsGet>>, TError, TData, QueryKey, ReadReviewsApiV1ReviewsGetParams['page']>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getReadReviewsApiV1ReviewsGetInfiniteQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof readReviewsApiV1ReviewsGet>>, QueryKey, ReadReviewsApiV1ReviewsGetParams['page']> = ({ signal, pageParam }) => readReviewsApiV1ReviewsGet({...params, 'page': pageParam || params?.['page']}, requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof readReviewsApiV1ReviewsGet>>, TError, TData, QueryKey, ReadReviewsApiV1ReviewsGetParams['page']> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ReadReviewsApiV1ReviewsGetInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof readReviewsApiV1ReviewsGet>>>
+export type ReadReviewsApiV1ReviewsGetInfiniteQueryError = ErrorType<HTTPValidationError>
+
+
+export function useReadReviewsApiV1ReviewsGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readReviewsApiV1ReviewsGet>>, ReadReviewsApiV1ReviewsGetParams['page']>, TError = ErrorType<HTTPValidationError>>(
+ params: undefined |  ReadReviewsApiV1ReviewsGetParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readReviewsApiV1ReviewsGet>>, TError, TData, QueryKey, ReadReviewsApiV1ReviewsGetParams['page']>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof readReviewsApiV1ReviewsGet>>,
+          TError,
+          Awaited<ReturnType<typeof readReviewsApiV1ReviewsGet>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReadReviewsApiV1ReviewsGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readReviewsApiV1ReviewsGet>>, ReadReviewsApiV1ReviewsGetParams['page']>, TError = ErrorType<HTTPValidationError>>(
+ params?: ReadReviewsApiV1ReviewsGetParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readReviewsApiV1ReviewsGet>>, TError, TData, QueryKey, ReadReviewsApiV1ReviewsGetParams['page']>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof readReviewsApiV1ReviewsGet>>,
+          TError,
+          Awaited<ReturnType<typeof readReviewsApiV1ReviewsGet>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReadReviewsApiV1ReviewsGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readReviewsApiV1ReviewsGet>>, ReadReviewsApiV1ReviewsGetParams['page']>, TError = ErrorType<HTTPValidationError>>(
+ params?: ReadReviewsApiV1ReviewsGetParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readReviewsApiV1ReviewsGet>>, TError, TData, QueryKey, ReadReviewsApiV1ReviewsGetParams['page']>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Read Reviews
+ */
+
+export function useReadReviewsApiV1ReviewsGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readReviewsApiV1ReviewsGet>>, ReadReviewsApiV1ReviewsGetParams['page']>, TError = ErrorType<HTTPValidationError>>(
+ params?: ReadReviewsApiV1ReviewsGetParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readReviewsApiV1ReviewsGet>>, TError, TData, QueryKey, ReadReviewsApiV1ReviewsGetParams['page']>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getReadReviewsApiV1ReviewsGetInfiniteQueryOptions(params,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
 
 
 export const getReadReviewsApiV1ReviewsGetQueryOptions = <TData = Awaited<ReturnType<typeof readReviewsApiV1ReviewsGet>>, TError = ErrorType<HTTPValidationError>>(params?: ReadReviewsApiV1ReviewsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readReviewsApiV1ReviewsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
@@ -214,11 +292,84 @@ export const readReviewApiV1ReviewsIdGet = (
 
 
 
+export const getReadReviewApiV1ReviewsIdGetInfiniteQueryKey = (id: string,) => {
+    return [
+    'infinite', `/api/v1/reviews/${id}`
+    ] as const;
+    }
+
 export const getReadReviewApiV1ReviewsIdGetQueryKey = (id: string,) => {
     return [
     `/api/v1/reviews/${id}`
     ] as const;
     }
+
+
+export const getReadReviewApiV1ReviewsIdGetInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof readReviewApiV1ReviewsIdGet>>>, TError = ErrorType<HTTPValidationError>>(id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readReviewApiV1ReviewsIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getReadReviewApiV1ReviewsIdGetInfiniteQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof readReviewApiV1ReviewsIdGet>>> = ({ signal }) => readReviewApiV1ReviewsIdGet(id, requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof readReviewApiV1ReviewsIdGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ReadReviewApiV1ReviewsIdGetInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof readReviewApiV1ReviewsIdGet>>>
+export type ReadReviewApiV1ReviewsIdGetInfiniteQueryError = ErrorType<HTTPValidationError>
+
+
+export function useReadReviewApiV1ReviewsIdGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readReviewApiV1ReviewsIdGet>>>, TError = ErrorType<HTTPValidationError>>(
+ id: string, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readReviewApiV1ReviewsIdGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof readReviewApiV1ReviewsIdGet>>,
+          TError,
+          Awaited<ReturnType<typeof readReviewApiV1ReviewsIdGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReadReviewApiV1ReviewsIdGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readReviewApiV1ReviewsIdGet>>>, TError = ErrorType<HTTPValidationError>>(
+ id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readReviewApiV1ReviewsIdGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof readReviewApiV1ReviewsIdGet>>,
+          TError,
+          Awaited<ReturnType<typeof readReviewApiV1ReviewsIdGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReadReviewApiV1ReviewsIdGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readReviewApiV1ReviewsIdGet>>>, TError = ErrorType<HTTPValidationError>>(
+ id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readReviewApiV1ReviewsIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Read Review
+ */
+
+export function useReadReviewApiV1ReviewsIdGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readReviewApiV1ReviewsIdGet>>>, TError = ErrorType<HTTPValidationError>>(
+ id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readReviewApiV1ReviewsIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getReadReviewApiV1ReviewsIdGetInfiniteQueryOptions(id,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
 
 
 export const getReadReviewApiV1ReviewsIdGetQueryOptions = <TData = Awaited<ReturnType<typeof readReviewApiV1ReviewsIdGet>>, TError = ErrorType<HTTPValidationError>>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readReviewApiV1ReviewsIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}

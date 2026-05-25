@@ -34,6 +34,32 @@ interface DataTableProps<TData> {
     onRowClick?: (row: TData) => void
 }
 
+export const getFileIcon = (identifier: string = "") => {
+    const sizeClasses = [
+        "text-blue-600",
+        "text-green-600",
+        "text-gray-600",
+        "text-purple-600",
+    ]
+    let hash = 0;
+    for (let i = 0; i < identifier.length; i++) {
+        hash += identifier.charCodeAt(i);
+    }
+    const randomChoice = hash % 4;
+    const size = Math.floor(hash / 3) % 4;
+    const iconProps = { className: sizeClasses[size] }
+    switch (randomChoice) {
+        case 0:
+            return <FileText {...iconProps} className={`${sizeClasses[size]}`} />
+        case 1:
+            return <FileSpreadsheet {...iconProps} className={`${sizeClasses[size]}`} />
+        case 2:
+            return <FileText {...iconProps} className={`${sizeClasses[size]}`} />
+        default:
+            return <ImageIcon {...iconProps} className={`${sizeClasses[size]}`} />
+    }
+}
+
 export function VirtualizedDataTable<TData>({
     searchPlaceholder = "Search...",
     onRowClick,
@@ -46,7 +72,7 @@ export function VirtualizedDataTable<TData>({
             cell: ({ row }) => {
                 return (
                     <div className="flex items-center space-x-3 w-full overflow-hidden">
-                        <FileSpreadsheet className="h-4 w-4 text-green-600 shrink-0" />
+                        {getFileIcon(row.original.id)}
                         <p className="font-medium text-foreground truncate">
                             {row.getValue("title")}
                         </p>
@@ -183,15 +209,15 @@ export function VirtualizedDataTable<TData>({
                             className="pl-9 w-full bg-card"
                         />
                     </div>
-                    <div className="flex items-center gap-2 w-full sm:w-auto">
-                        <Button variant="outline" className="w-full sm:w-auto bg-card">
-                            <Filter className="mr-2 h-4 w-4" /> Filter
-                            <span className="ml-auto px-2 py-0.5 text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 rounded-full font-meium">
-                                TODO
-                            </span>
-
-                        </Button>
-                    </div>
+                    {/* <div className="flex items-center gap-2 w-full sm:w-auto"> */}
+                    {/*     <Button variant="outline" className="w-full sm:w-auto bg-card"> */}
+                    {/*         <Filter className="mr-2 h-4 w-4" /> Filter */}
+                    {/*         <span className="ml-auto px-2 py-0.5 text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 rounded-full font-meium"> */}
+                    {/*             TODO */}
+                    {/*         </span> */}
+                    {/**/}
+                    {/*     </Button> */}
+                    {/* </div> */}
                 </div>
             )}
 

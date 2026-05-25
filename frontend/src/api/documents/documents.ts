@@ -5,18 +5,23 @@
  * OpenAPI spec version: 0.1.0
  */
 import {
+  useInfiniteQuery,
   useMutation,
   useQuery
 } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
+  DefinedUseInfiniteQueryResult,
   DefinedUseQueryResult,
+  InfiniteData,
   MutationFunction,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
+  UseInfiniteQueryOptions,
+  UseInfiniteQueryResult,
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
@@ -24,11 +29,16 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  BodyCreateDocumentFileApiV1DocumentsDocIdFilesPost,
   DocumentCreate,
+  DocumentFilePublic,
+  DocumentFileUpdate,
+  DocumentFilespublic,
   DocumentPublic,
   DocumentUpdate,
   Documentspublic,
   HTTPValidationError,
+  ReadDocumentFilesApiV1DocumentsDocIdFilesGetParams,
   ReadDocumentsApiV1DocumentsGetParams
 } from '../model';
 
@@ -59,11 +69,84 @@ export const readDocumentsApiV1DocumentsGet = (
 
 
 
+export const getReadDocumentsApiV1DocumentsGetInfiniteQueryKey = (params?: ReadDocumentsApiV1DocumentsGetParams,) => {
+    return [
+    'infinite', `/api/v1/documents/`, ...(params ? [params] : [])
+    ] as const;
+    }
+
 export const getReadDocumentsApiV1DocumentsGetQueryKey = (params?: ReadDocumentsApiV1DocumentsGetParams,) => {
     return [
     `/api/v1/documents/`, ...(params ? [params] : [])
     ] as const;
     }
+
+
+export const getReadDocumentsApiV1DocumentsGetInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof readDocumentsApiV1DocumentsGet>>, ReadDocumentsApiV1DocumentsGetParams['page']>, TError = ErrorType<HTTPValidationError>>(params?: ReadDocumentsApiV1DocumentsGetParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readDocumentsApiV1DocumentsGet>>, TError, TData, QueryKey, ReadDocumentsApiV1DocumentsGetParams['page']>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getReadDocumentsApiV1DocumentsGetInfiniteQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof readDocumentsApiV1DocumentsGet>>, QueryKey, ReadDocumentsApiV1DocumentsGetParams['page']> = ({ signal, pageParam }) => readDocumentsApiV1DocumentsGet({...params, 'page': pageParam || params?.['page']}, requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof readDocumentsApiV1DocumentsGet>>, TError, TData, QueryKey, ReadDocumentsApiV1DocumentsGetParams['page']> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ReadDocumentsApiV1DocumentsGetInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof readDocumentsApiV1DocumentsGet>>>
+export type ReadDocumentsApiV1DocumentsGetInfiniteQueryError = ErrorType<HTTPValidationError>
+
+
+export function useReadDocumentsApiV1DocumentsGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readDocumentsApiV1DocumentsGet>>, ReadDocumentsApiV1DocumentsGetParams['page']>, TError = ErrorType<HTTPValidationError>>(
+ params: undefined |  ReadDocumentsApiV1DocumentsGetParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readDocumentsApiV1DocumentsGet>>, TError, TData, QueryKey, ReadDocumentsApiV1DocumentsGetParams['page']>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof readDocumentsApiV1DocumentsGet>>,
+          TError,
+          Awaited<ReturnType<typeof readDocumentsApiV1DocumentsGet>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReadDocumentsApiV1DocumentsGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readDocumentsApiV1DocumentsGet>>, ReadDocumentsApiV1DocumentsGetParams['page']>, TError = ErrorType<HTTPValidationError>>(
+ params?: ReadDocumentsApiV1DocumentsGetParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readDocumentsApiV1DocumentsGet>>, TError, TData, QueryKey, ReadDocumentsApiV1DocumentsGetParams['page']>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof readDocumentsApiV1DocumentsGet>>,
+          TError,
+          Awaited<ReturnType<typeof readDocumentsApiV1DocumentsGet>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReadDocumentsApiV1DocumentsGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readDocumentsApiV1DocumentsGet>>, ReadDocumentsApiV1DocumentsGetParams['page']>, TError = ErrorType<HTTPValidationError>>(
+ params?: ReadDocumentsApiV1DocumentsGetParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readDocumentsApiV1DocumentsGet>>, TError, TData, QueryKey, ReadDocumentsApiV1DocumentsGetParams['page']>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Read Documents
+ */
+
+export function useReadDocumentsApiV1DocumentsGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readDocumentsApiV1DocumentsGet>>, ReadDocumentsApiV1DocumentsGetParams['page']>, TError = ErrorType<HTTPValidationError>>(
+ params?: ReadDocumentsApiV1DocumentsGetParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readDocumentsApiV1DocumentsGet>>, TError, TData, QueryKey, ReadDocumentsApiV1DocumentsGetParams['page']>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getReadDocumentsApiV1DocumentsGetInfiniteQueryOptions(params,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
 
 
 export const getReadDocumentsApiV1DocumentsGetQueryOptions = <TData = Awaited<ReturnType<typeof readDocumentsApiV1DocumentsGet>>, TError = ErrorType<HTTPValidationError>>(params?: ReadDocumentsApiV1DocumentsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readDocumentsApiV1DocumentsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
@@ -214,11 +297,84 @@ export const readDocumentApiV1DocumentsIdGet = (
 
 
 
+export const getReadDocumentApiV1DocumentsIdGetInfiniteQueryKey = (id: string,) => {
+    return [
+    'infinite', `/api/v1/documents/${id}`
+    ] as const;
+    }
+
 export const getReadDocumentApiV1DocumentsIdGetQueryKey = (id: string,) => {
     return [
     `/api/v1/documents/${id}`
     ] as const;
     }
+
+
+export const getReadDocumentApiV1DocumentsIdGetInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof readDocumentApiV1DocumentsIdGet>>>, TError = ErrorType<HTTPValidationError>>(id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readDocumentApiV1DocumentsIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getReadDocumentApiV1DocumentsIdGetInfiniteQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof readDocumentApiV1DocumentsIdGet>>> = ({ signal }) => readDocumentApiV1DocumentsIdGet(id, requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof readDocumentApiV1DocumentsIdGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ReadDocumentApiV1DocumentsIdGetInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof readDocumentApiV1DocumentsIdGet>>>
+export type ReadDocumentApiV1DocumentsIdGetInfiniteQueryError = ErrorType<HTTPValidationError>
+
+
+export function useReadDocumentApiV1DocumentsIdGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readDocumentApiV1DocumentsIdGet>>>, TError = ErrorType<HTTPValidationError>>(
+ id: string, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readDocumentApiV1DocumentsIdGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof readDocumentApiV1DocumentsIdGet>>,
+          TError,
+          Awaited<ReturnType<typeof readDocumentApiV1DocumentsIdGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReadDocumentApiV1DocumentsIdGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readDocumentApiV1DocumentsIdGet>>>, TError = ErrorType<HTTPValidationError>>(
+ id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readDocumentApiV1DocumentsIdGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof readDocumentApiV1DocumentsIdGet>>,
+          TError,
+          Awaited<ReturnType<typeof readDocumentApiV1DocumentsIdGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReadDocumentApiV1DocumentsIdGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readDocumentApiV1DocumentsIdGet>>>, TError = ErrorType<HTTPValidationError>>(
+ id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readDocumentApiV1DocumentsIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Read Document
+ */
+
+export function useReadDocumentApiV1DocumentsIdGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readDocumentApiV1DocumentsIdGet>>>, TError = ErrorType<HTTPValidationError>>(
+ id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readDocumentApiV1DocumentsIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getReadDocumentApiV1DocumentsIdGetInfiniteQueryOptions(id,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
 
 
 export const getReadDocumentApiV1DocumentsIdGetQueryOptions = <TData = Awaited<ReturnType<typeof readDocumentApiV1DocumentsIdGet>>, TError = ErrorType<HTTPValidationError>>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readDocumentApiV1DocumentsIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
@@ -412,4 +568,374 @@ export const useDeleteDocumentApiV1DocumentsIdDelete = <TError = ErrorType<HTTPV
         TContext
       > => {
       return useMutation(getDeleteDocumentApiV1DocumentsIdDeleteMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary Read Document Files
+ */
+export const readDocumentFilesApiV1DocumentsDocIdFilesGet = (
+    docId: string,
+    params?: ReadDocumentFilesApiV1DocumentsDocIdFilesGetParams,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<DocumentFilespublic>(
+      {url: `/api/v1/documents/${docId}/files`, method: 'GET',
+        params, signal
+    },
+      options);
+    }
+
+
+
+
+export const getReadDocumentFilesApiV1DocumentsDocIdFilesGetInfiniteQueryKey = (docId: string,
+    params?: ReadDocumentFilesApiV1DocumentsDocIdFilesGetParams,) => {
+    return [
+    'infinite', `/api/v1/documents/${docId}/files`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+export const getReadDocumentFilesApiV1DocumentsDocIdFilesGetQueryKey = (docId: string,
+    params?: ReadDocumentFilesApiV1DocumentsDocIdFilesGetParams,) => {
+    return [
+    `/api/v1/documents/${docId}/files`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getReadDocumentFilesApiV1DocumentsDocIdFilesGetInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>, ReadDocumentFilesApiV1DocumentsDocIdFilesGetParams['page']>, TError = ErrorType<HTTPValidationError>>(docId: string,
+    params?: ReadDocumentFilesApiV1DocumentsDocIdFilesGetParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>, TError, TData, QueryKey, ReadDocumentFilesApiV1DocumentsDocIdFilesGetParams['page']>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getReadDocumentFilesApiV1DocumentsDocIdFilesGetInfiniteQueryKey(docId,params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>, QueryKey, ReadDocumentFilesApiV1DocumentsDocIdFilesGetParams['page']> = ({ signal, pageParam }) => readDocumentFilesApiV1DocumentsDocIdFilesGet(docId,{...params, 'page': pageParam || params?.['page']}, requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: docId !== null && docId !== undefined, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>, TError, TData, QueryKey, ReadDocumentFilesApiV1DocumentsDocIdFilesGetParams['page']> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ReadDocumentFilesApiV1DocumentsDocIdFilesGetInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>>
+export type ReadDocumentFilesApiV1DocumentsDocIdFilesGetInfiniteQueryError = ErrorType<HTTPValidationError>
+
+
+export function useReadDocumentFilesApiV1DocumentsDocIdFilesGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>, ReadDocumentFilesApiV1DocumentsDocIdFilesGetParams['page']>, TError = ErrorType<HTTPValidationError>>(
+ docId: string,
+    params: undefined |  ReadDocumentFilesApiV1DocumentsDocIdFilesGetParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>, TError, TData, QueryKey, ReadDocumentFilesApiV1DocumentsDocIdFilesGetParams['page']>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>,
+          TError,
+          Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReadDocumentFilesApiV1DocumentsDocIdFilesGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>, ReadDocumentFilesApiV1DocumentsDocIdFilesGetParams['page']>, TError = ErrorType<HTTPValidationError>>(
+ docId: string,
+    params?: ReadDocumentFilesApiV1DocumentsDocIdFilesGetParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>, TError, TData, QueryKey, ReadDocumentFilesApiV1DocumentsDocIdFilesGetParams['page']>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>,
+          TError,
+          Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReadDocumentFilesApiV1DocumentsDocIdFilesGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>, ReadDocumentFilesApiV1DocumentsDocIdFilesGetParams['page']>, TError = ErrorType<HTTPValidationError>>(
+ docId: string,
+    params?: ReadDocumentFilesApiV1DocumentsDocIdFilesGetParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>, TError, TData, QueryKey, ReadDocumentFilesApiV1DocumentsDocIdFilesGetParams['page']>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Read Document Files
+ */
+
+export function useReadDocumentFilesApiV1DocumentsDocIdFilesGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>, ReadDocumentFilesApiV1DocumentsDocIdFilesGetParams['page']>, TError = ErrorType<HTTPValidationError>>(
+ docId: string,
+    params?: ReadDocumentFilesApiV1DocumentsDocIdFilesGetParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>, TError, TData, QueryKey, ReadDocumentFilesApiV1DocumentsDocIdFilesGetParams['page']>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getReadDocumentFilesApiV1DocumentsDocIdFilesGetInfiniteQueryOptions(docId,params,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+export const getReadDocumentFilesApiV1DocumentsDocIdFilesGetQueryOptions = <TData = Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>, TError = ErrorType<HTTPValidationError>>(docId: string,
+    params?: ReadDocumentFilesApiV1DocumentsDocIdFilesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getReadDocumentFilesApiV1DocumentsDocIdFilesGetQueryKey(docId,params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>> = ({ signal }) => readDocumentFilesApiV1DocumentsDocIdFilesGet(docId,params, requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: docId !== null && docId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ReadDocumentFilesApiV1DocumentsDocIdFilesGetQueryResult = NonNullable<Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>>
+export type ReadDocumentFilesApiV1DocumentsDocIdFilesGetQueryError = ErrorType<HTTPValidationError>
+
+
+export function useReadDocumentFilesApiV1DocumentsDocIdFilesGet<TData = Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>, TError = ErrorType<HTTPValidationError>>(
+ docId: string,
+    params: undefined |  ReadDocumentFilesApiV1DocumentsDocIdFilesGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>,
+          TError,
+          Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReadDocumentFilesApiV1DocumentsDocIdFilesGet<TData = Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>, TError = ErrorType<HTTPValidationError>>(
+ docId: string,
+    params?: ReadDocumentFilesApiV1DocumentsDocIdFilesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>,
+          TError,
+          Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReadDocumentFilesApiV1DocumentsDocIdFilesGet<TData = Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>, TError = ErrorType<HTTPValidationError>>(
+ docId: string,
+    params?: ReadDocumentFilesApiV1DocumentsDocIdFilesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Read Document Files
+ */
+
+export function useReadDocumentFilesApiV1DocumentsDocIdFilesGet<TData = Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>, TError = ErrorType<HTTPValidationError>>(
+ docId: string,
+    params?: ReadDocumentFilesApiV1DocumentsDocIdFilesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readDocumentFilesApiV1DocumentsDocIdFilesGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getReadDocumentFilesApiV1DocumentsDocIdFilesGetQueryOptions(docId,params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+/**
+ * @summary Create Document File
+ */
+export const createDocumentFileApiV1DocumentsDocIdFilesPost = (
+    docId: string,
+    bodyCreateDocumentFileApiV1DocumentsDocIdFilesPost: BodyType<BodyCreateDocumentFileApiV1DocumentsDocIdFilesPost>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+      const formData = new FormData();
+formData.append(`file`, bodyCreateDocumentFileApiV1DocumentsDocIdFilesPost.file);
+
+      return customInstance<DocumentFilePublic>(
+      {url: `/api/v1/documents/${docId}/files`, method: 'POST',
+      headers: {'Content-Type': 'multipart/form-data', },
+       data: formData, signal
+    },
+      options);
+    }
+
+
+
+export const getCreateDocumentFileApiV1DocumentsDocIdFilesPostMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createDocumentFileApiV1DocumentsDocIdFilesPost>>, TError,{docId: string;data: BodyType<BodyCreateDocumentFileApiV1DocumentsDocIdFilesPost>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof createDocumentFileApiV1DocumentsDocIdFilesPost>>, TError,{docId: string;data: BodyType<BodyCreateDocumentFileApiV1DocumentsDocIdFilesPost>}, TContext> => {
+
+const mutationKey = ['createDocumentFileApiV1DocumentsDocIdFilesPost'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createDocumentFileApiV1DocumentsDocIdFilesPost>>, {docId: string;data: BodyType<BodyCreateDocumentFileApiV1DocumentsDocIdFilesPost>}> = (props) => {
+          const {docId,data} = props ?? {};
+
+          return  createDocumentFileApiV1DocumentsDocIdFilesPost(docId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateDocumentFileApiV1DocumentsDocIdFilesPostMutationResult = NonNullable<Awaited<ReturnType<typeof createDocumentFileApiV1DocumentsDocIdFilesPost>>>
+    export type CreateDocumentFileApiV1DocumentsDocIdFilesPostMutationBody = BodyType<BodyCreateDocumentFileApiV1DocumentsDocIdFilesPost>
+    export type CreateDocumentFileApiV1DocumentsDocIdFilesPostMutationError = ErrorType<HTTPValidationError>
+
+    /**
+ * @summary Create Document File
+ */
+export const useCreateDocumentFileApiV1DocumentsDocIdFilesPost = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createDocumentFileApiV1DocumentsDocIdFilesPost>>, TError,{docId: string;data: BodyType<BodyCreateDocumentFileApiV1DocumentsDocIdFilesPost>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createDocumentFileApiV1DocumentsDocIdFilesPost>>,
+        TError,
+        {docId: string;data: BodyType<BodyCreateDocumentFileApiV1DocumentsDocIdFilesPost>},
+        TContext
+      > => {
+      return useMutation(getCreateDocumentFileApiV1DocumentsDocIdFilesPostMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary Update Document File
+ */
+export const updateDocumentFileApiV1DocumentsFilesFileIdPut = (
+    fileId: string,
+    documentFileUpdate: BodyType<DocumentFileUpdate>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<DocumentFilePublic>(
+      {url: `/api/v1/documents/files/${fileId}`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: documentFileUpdate, signal
+    },
+      options);
+    }
+
+
+
+export const getUpdateDocumentFileApiV1DocumentsFilesFileIdPutMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateDocumentFileApiV1DocumentsFilesFileIdPut>>, TError,{fileId: string;data: BodyType<DocumentFileUpdate>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateDocumentFileApiV1DocumentsFilesFileIdPut>>, TError,{fileId: string;data: BodyType<DocumentFileUpdate>}, TContext> => {
+
+const mutationKey = ['updateDocumentFileApiV1DocumentsFilesFileIdPut'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateDocumentFileApiV1DocumentsFilesFileIdPut>>, {fileId: string;data: BodyType<DocumentFileUpdate>}> = (props) => {
+          const {fileId,data} = props ?? {};
+
+          return  updateDocumentFileApiV1DocumentsFilesFileIdPut(fileId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateDocumentFileApiV1DocumentsFilesFileIdPutMutationResult = NonNullable<Awaited<ReturnType<typeof updateDocumentFileApiV1DocumentsFilesFileIdPut>>>
+    export type UpdateDocumentFileApiV1DocumentsFilesFileIdPutMutationBody = BodyType<DocumentFileUpdate>
+    export type UpdateDocumentFileApiV1DocumentsFilesFileIdPutMutationError = ErrorType<HTTPValidationError>
+
+    /**
+ * @summary Update Document File
+ */
+export const useUpdateDocumentFileApiV1DocumentsFilesFileIdPut = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateDocumentFileApiV1DocumentsFilesFileIdPut>>, TError,{fileId: string;data: BodyType<DocumentFileUpdate>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateDocumentFileApiV1DocumentsFilesFileIdPut>>,
+        TError,
+        {fileId: string;data: BodyType<DocumentFileUpdate>},
+        TContext
+      > => {
+      return useMutation(getUpdateDocumentFileApiV1DocumentsFilesFileIdPutMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary Delete Document
+ */
+export const deleteDocumentApiV1DocumentsFilesFileIdDelete = (
+    fileId: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<unknown>(
+      {url: `/api/v1/documents/files/${fileId}`, method: 'DELETE', signal
+    },
+      options);
+    }
+
+
+
+export const getDeleteDocumentApiV1DocumentsFilesFileIdDeleteMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteDocumentApiV1DocumentsFilesFileIdDelete>>, TError,{fileId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteDocumentApiV1DocumentsFilesFileIdDelete>>, TError,{fileId: string}, TContext> => {
+
+const mutationKey = ['deleteDocumentApiV1DocumentsFilesFileIdDelete'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteDocumentApiV1DocumentsFilesFileIdDelete>>, {fileId: string}> = (props) => {
+          const {fileId} = props ?? {};
+
+          return  deleteDocumentApiV1DocumentsFilesFileIdDelete(fileId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteDocumentApiV1DocumentsFilesFileIdDeleteMutationResult = NonNullable<Awaited<ReturnType<typeof deleteDocumentApiV1DocumentsFilesFileIdDelete>>>
+
+    export type DeleteDocumentApiV1DocumentsFilesFileIdDeleteMutationError = ErrorType<HTTPValidationError>
+
+    /**
+ * @summary Delete Document
+ */
+export const useDeleteDocumentApiV1DocumentsFilesFileIdDelete = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteDocumentApiV1DocumentsFilesFileIdDelete>>, TError,{fileId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteDocumentApiV1DocumentsFilesFileIdDelete>>,
+        TError,
+        {fileId: string},
+        TContext
+      > => {
+      return useMutation(getDeleteDocumentApiV1DocumentsFilesFileIdDeleteMutationOptions(options), queryClient);
     }

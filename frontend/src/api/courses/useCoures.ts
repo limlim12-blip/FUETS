@@ -15,7 +15,7 @@ export const useCourseActions = (params?: ReadCoursesApiV1CoursesGetParams) => {
             data: data
         }, {
             onSuccess: () => {
-                queryClient.invalidateQueries({ queryKey: ['read_chats_api_v1_chats__get'] });
+                queryClient.invalidateQueries({ queryKey: getReadCoursesApiV1CoursesGetQueryKey() });
             }
         });
     };

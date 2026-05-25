@@ -12,6 +12,17 @@ module.exports = {
                     path: './src/api/axios-custom.ts',
                     name: 'customInstance',
                 },
+                query: {
+                    useInfinite: true,
+                    useInfiniteQueryParam: 'page',
+                },
+                operations: {
+                    download_file_api_v1_r2_storage_download__filename__get: {
+                        axios: {
+                            responseType: 'blob',
+                        },
+                    },
+                },
             },
         },
     },

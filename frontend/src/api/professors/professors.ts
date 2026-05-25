@@ -5,18 +5,23 @@
  * OpenAPI spec version: 0.1.0
  */
 import {
+  useInfiniteQuery,
   useMutation,
   useQuery
 } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
+  DefinedUseInfiniteQueryResult,
   DefinedUseQueryResult,
+  InfiniteData,
   MutationFunction,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
+  UseInfiniteQueryOptions,
+  UseInfiniteQueryResult,
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
@@ -59,11 +64,84 @@ export const readProfsApiV1ProfsGet = (
 
 
 
+export const getReadProfsApiV1ProfsGetInfiniteQueryKey = (params?: ReadProfsApiV1ProfsGetParams,) => {
+    return [
+    'infinite', `/api/v1/profs/`, ...(params ? [params] : [])
+    ] as const;
+    }
+
 export const getReadProfsApiV1ProfsGetQueryKey = (params?: ReadProfsApiV1ProfsGetParams,) => {
     return [
     `/api/v1/profs/`, ...(params ? [params] : [])
     ] as const;
     }
+
+
+export const getReadProfsApiV1ProfsGetInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>, ReadProfsApiV1ProfsGetParams['page']>, TError = ErrorType<HTTPValidationError>>(params?: ReadProfsApiV1ProfsGetParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>, TError, TData, QueryKey, ReadProfsApiV1ProfsGetParams['page']>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getReadProfsApiV1ProfsGetInfiniteQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>, QueryKey, ReadProfsApiV1ProfsGetParams['page']> = ({ signal, pageParam }) => readProfsApiV1ProfsGet({...params, 'page': pageParam || params?.['page']}, requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>, TError, TData, QueryKey, ReadProfsApiV1ProfsGetParams['page']> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ReadProfsApiV1ProfsGetInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>>
+export type ReadProfsApiV1ProfsGetInfiniteQueryError = ErrorType<HTTPValidationError>
+
+
+export function useReadProfsApiV1ProfsGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>, ReadProfsApiV1ProfsGetParams['page']>, TError = ErrorType<HTTPValidationError>>(
+ params: undefined |  ReadProfsApiV1ProfsGetParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>, TError, TData, QueryKey, ReadProfsApiV1ProfsGetParams['page']>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>,
+          TError,
+          Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReadProfsApiV1ProfsGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>, ReadProfsApiV1ProfsGetParams['page']>, TError = ErrorType<HTTPValidationError>>(
+ params?: ReadProfsApiV1ProfsGetParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>, TError, TData, QueryKey, ReadProfsApiV1ProfsGetParams['page']>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>,
+          TError,
+          Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>, QueryKey
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReadProfsApiV1ProfsGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>, ReadProfsApiV1ProfsGetParams['page']>, TError = ErrorType<HTTPValidationError>>(
+ params?: ReadProfsApiV1ProfsGetParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>, TError, TData, QueryKey, ReadProfsApiV1ProfsGetParams['page']>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Read Profs
+ */
+
+export function useReadProfsApiV1ProfsGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>, ReadProfsApiV1ProfsGetParams['page']>, TError = ErrorType<HTTPValidationError>>(
+ params?: ReadProfsApiV1ProfsGetParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>, TError, TData, QueryKey, ReadProfsApiV1ProfsGetParams['page']>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getReadProfsApiV1ProfsGetInfiniteQueryOptions(params,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
 
 
 export const getReadProfsApiV1ProfsGetQueryOptions = <TData = Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>, TError = ErrorType<HTTPValidationError>>(params?: ReadProfsApiV1ProfsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readProfsApiV1ProfsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
@@ -214,11 +292,84 @@ export const readProfApiV1ProfsIdGet = (
 
 
 
+export const getReadProfApiV1ProfsIdGetInfiniteQueryKey = (id: string,) => {
+    return [
+    'infinite', `/api/v1/profs/${id}`
+    ] as const;
+    }
+
 export const getReadProfApiV1ProfsIdGetQueryKey = (id: string,) => {
     return [
     `/api/v1/profs/${id}`
     ] as const;
     }
+
+
+export const getReadProfApiV1ProfsIdGetInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>>, TError = ErrorType<HTTPValidationError>>(id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getReadProfApiV1ProfsIdGetInfiniteQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>> = ({ signal }) => readProfApiV1ProfsIdGet(id, requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ReadProfApiV1ProfsIdGetInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>>
+export type ReadProfApiV1ProfsIdGetInfiniteQueryError = ErrorType<HTTPValidationError>
+
+
+export function useReadProfApiV1ProfsIdGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>>, TError = ErrorType<HTTPValidationError>>(
+ id: string, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>,
+          TError,
+          Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReadProfApiV1ProfsIdGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>>, TError = ErrorType<HTTPValidationError>>(
+ id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>,
+          TError,
+          Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReadProfApiV1ProfsIdGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>>, TError = ErrorType<HTTPValidationError>>(
+ id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Read Prof
+ */
+
+export function useReadProfApiV1ProfsIdGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>>, TError = ErrorType<HTTPValidationError>>(
+ id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getReadProfApiV1ProfsIdGetInfiniteQueryOptions(id,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
 
 
 export const getReadProfApiV1ProfsIdGetQueryOptions = <TData = Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>, TError = ErrorType<HTTPValidationError>>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readProfApiV1ProfsIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}

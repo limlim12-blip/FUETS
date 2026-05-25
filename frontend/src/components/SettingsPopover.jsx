@@ -6,11 +6,13 @@ import { useState } from "react"
 import { LogOut, Settings } from "lucide-react"
 import { useQueryClient } from '@tanstack/react-query';
 import { Popover, PopoverContent, PopoverTrigger } from "@/src/components/ui/popover"
+import { useUserActions } from '../api/user/useUser';
 
 export default function SettingsPopover({ children }) {
     const [open, setOpen] = useState(false)
     const router = useRouter()
     const queryClient = useQueryClient();
+    const { data } = useUserActions()
     const handleLogOut = () => {
         localStorage.removeItem('token');
         router.push("/login")
@@ -21,7 +23,7 @@ export default function SettingsPopover({ children }) {
             <PopoverTrigger asChild>{children}</PopoverTrigger>
             <PopoverContent className="w-72 p-0" align="start" side="top">
                 <div className="p-3">
-                    <div className="text-sm text-zinc-500 dark:text-zinc-400 mb-3">user@example.com</div>
+                    <div className="text-sm text-zinc-500 dark:text-zinc-400 mb-3">{data?.email}</div>
 
                     <div className="flex items-center gap-3 p-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 mb-3">
                         <div className="flex items-center justify-center h-8 w-8 rounded-md bg-zinc-200 dark:bg-zinc-700 text-xs font-bold">

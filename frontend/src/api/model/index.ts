@@ -5,6 +5,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './bodyCreateDocumentFileApiV1DocumentsDocIdFilesPost';
 export * from './bodyLoginAccessTokenApiV1LoginAccessTokenPost';
 export * from './chatCreate';
 export * from './chatPublic';
@@ -15,6 +16,9 @@ export * from './coursePublic';
 export * from './coursesPublic';
 export * from './courseUpdate';
 export * from './documentCreate';
+export * from './documentFilePublic';
+export * from './documentFilespublic';
+export * from './documentFileUpdate';
 export * from './documentPublic';
 export * from './documentspublic';
 export * from './documentUpdate';
@@ -29,6 +33,7 @@ export * from './profsPublic';
 export * from './profUpdate';
 export * from './readChatsApiV1ChatsGetParams';
 export * from './readCoursesApiV1CoursesGetParams';
+export * from './readDocumentFilesApiV1DocumentsDocIdFilesGetParams';
 export * from './readDocumentsApiV1DocumentsGetParams';
 export * from './readMessagesApiV1ChatsIdMessagesGetParams';
 export * from './readProfsApiV1ProfsGetParams';

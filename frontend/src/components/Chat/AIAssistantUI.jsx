@@ -37,12 +37,7 @@ export default function AIAssistantUI() {
         conversations = [],
         isCreating: isCreatingChat,
         isLoading: isLoadingChat,
-        isUpdating: isUpdatingChat
-    } = useChatActions()
-    const {
-        handleCreate: handleCreateMessage,
-        isCreating: isCreatingMessage,
-    } = useMessageActions(selectedId)
+        isUpdating: isUpdatingChat } = useChatActions()
     const handleTogglePin = useCallback(async (id, newPinnedState) => {
         if (isUpdatingChat) return;
         await handleUpdateChat(id, { pinned: newPinnedState }).catch((error) => {
@@ -60,31 +55,28 @@ export default function AIAssistantUI() {
         });
     }, [isCreatingChat, handleCreateChat, setSelectedId]);
 
-    const handleSendMessage = useCallback(async (selectedId, content) => {
-        if (!selectedId) {
-            console.error("No chat is selected!.");
-            return;
-        }
+    const {
+        handleCreate: handleCreateMessage,
+        isCreating: isCreatingMessage,
+    } = useMessageActions(selectedId)
+    const handleSendMessage = useCallback(async (text) => {
+        if (!text || !selectedId) return;
 
-        if (isCreatingMessage?.isPending) return;
+        setIsThinking(true);
+        setThinkingConvId(selectedId);
 
         try {
-            setIsThinking(true);
-            setThinkingConvId(selectedId);
-
-            await handleCreateMessage(selectedId, { content: content });
+            await handleCreateMessage({
+                content: text,
+                role: "user"
+            });
+        } catch (error) {
+            console.error("Failed to send message:", error);
+        } finally {
             setIsThinking(false);
             setThinkingConvId(null);
-
-        } catch (error) {
-            setTimeout(() => {
-                setIsThinking(false);
-                setThinkingConvId(null);
-            }, 2);
-            console.error("Error sending message", error);
         }
-    }, [handleCreateMessage]);
-
+    }, [selectedId, handleCreateMessage, setIsThinking, setThinkingConvId]);
     const [isMounted, setIsMounted] = useState(false)
     const [query, setQuery] = useState("")
     const searchRef = useRef(null)
@@ -184,7 +176,7 @@ export default function AIAssistantUI() {
                     <ChatPane
                         ref={composerRef}
                         conversation={selected}
-                        onSend={(content) => selected && handleSendMessage(selected.id, content)}
+                        onSend={(content) => selected && handleSendMessage(content)}
                         isThinking={isThinking && thinkingConvId === selected?.id}
                         onPauseThinking={pauseThinking}
                     />

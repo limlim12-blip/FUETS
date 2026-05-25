@@ -4,10 +4,10 @@
  * FastAPI
  * OpenAPI spec version: 0.1.0
  */
-import type { MessagePublic } from './messagePublic';
+import type { DocumentFilePublic } from './documentFilePublic';
 
-export interface MessagesPublic {
-  data: MessagePublic[];
+export interface DocumentFilespublic {
+  data: DocumentFilePublic[];
   count: number | null;
   page: number | null;
   page_size: number | null;

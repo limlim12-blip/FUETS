@@ -8,7 +8,7 @@ import { useReviewActions } from "@/src/api/reviews/useReviews"
 import { useUserStore } from "@/src/stores/userStore"
 import { FileText, AngryIcon } from "lucide-react"
 import SettingsPopover from "@/src/components/SettingsPopover"
-
+import { useUserActions } from '@/src/api/user/useUser';
 export default function Review() {
     const { role, setRole } = useUserStore()
 
@@ -22,6 +22,8 @@ export default function Review() {
         setFilters(newFilters)
     }
 
+    const { data: user } = useUserActions()
+    const name = user?.email.split("@")[0];
     const { reviews, error, total } = useReviewActions({
         page_size: 30,
         page: page,
@@ -81,7 +83,7 @@ export default function Review() {
                                         JD
                                     </div>
                                     <div className="hidden sm:block min-w-0 text-left">
-                                        <div className="truncate text-sm font-semibold">John Doe</div>
+                                        <div className="truncate text-sm font-semibold">{name}</div>
                                         <div className="truncate text-[10px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                                             Pro workspace
                                         </div>

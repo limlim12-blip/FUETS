@@ -10,4 +10,5 @@ export interface MessagePublic {
   content: string;
   role?: MessageRole;
   id: string;
+  created_at?: string | null;
 }

@@ -8,8 +8,8 @@ import type { ReviewPublic } from './reviewPublic';
 
 export interface ReviewsPublic {
   data: ReviewPublic[];
-  count: number;
-  page: number;
-  page_size: number;
-  total_pages: number;
+  count: number | null;
+  page: number | null;
+  page_size: number | null;
+  total_pages: number | null;
 }

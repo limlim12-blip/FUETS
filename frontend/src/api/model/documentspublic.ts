@@ -8,8 +8,8 @@ import type { DocumentPublic } from './documentPublic';
 
 export interface Documentspublic {
   data: DocumentPublic[];
-  count: number;
-  page: number;
-  page_size: number;
-  total_pages: number;
+  count: number | null;
+  page: number | null;
+  page_size: number | null;
+  total_pages: number | null;
 }

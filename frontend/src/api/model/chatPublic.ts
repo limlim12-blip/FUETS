@@ -14,4 +14,5 @@ export interface ChatPublic {
   id: string;
   pinned: boolean;
   created_at?: string | null;
+  total_messages?: number;
 }

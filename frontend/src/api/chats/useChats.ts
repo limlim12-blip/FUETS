@@ -33,6 +33,9 @@ export const useChatActions = (params?: ReadChatsApiV1ChatsGetParams) => {
     };
     const handleDelete = (id: string) => {
         deleteMutation.mutateAsync({ id }, {
+            onError: async () => {
+                await queryClient.invalidateQueries({ queryKey: getReadChatsApiV1ChatsGetQueryKey(params) });
+            },
             onSuccess: async () => {
                 await queryClient.invalidateQueries({ queryKey: getReadChatsApiV1ChatsGetQueryKey(params) });
             }

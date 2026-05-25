@@ -1,5 +1,5 @@
 import Axios, { AxiosRequestConfig, AxiosError } from 'axios';
-import { useQueryClient } from '@tanstack/react-query';
+import { QueryClient } from '@tanstack/react-query';
 
 export const AXIOS_INSTANCE = Axios.create({
     baseURL: process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000"
@@ -25,7 +25,7 @@ AXIOS_INSTANCE.interceptors.response.use(
         if (error.response?.status === 401) {
             localStorage.removeItem('token');
             window.location.href = '/login';
-            const queryClient = useQueryClient();
+            const queryClient = new QueryClient();
             queryClient.clear();
 
         }
@@ -40,7 +40,12 @@ export const customInstance = <T>(
     return AXIOS_INSTANCE({
         ...config,
         ...options,
-    }).then(({ data }) => data);
+    }).then((response) => {
+        if (response.config.responseType === 'blob') {
+            return response as unknown as T;
+        }
+        return response.data;
+    });
 };
 
 export type ErrorType<Error> = AxiosError<Error>;

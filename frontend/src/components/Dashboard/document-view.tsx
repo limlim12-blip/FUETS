@@ -1,12 +1,16 @@
 "use client"
-
 import { useState } from "react"
 import { Button } from "@/src/components/ui/button"
 import { Badge } from "@/src/components/ui/badge"
 import { Separator } from "@/src/components/ui/separator"
 import { ScrollArea } from "@/src/components/ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/src/components/ui/sheet"
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/src/components/ui/sheet"
+import DocumentFileList from "@/src/components/Dashboard/document-view-filelist"
+import { useDocumentActions } from "@/src/api/documents/useDocuments"
+import { useStorageActions } from "@/src/api/storage/useStorage"
+import { getFileIcon } from "@/src/components/Dashboard/virtualized-data-table"
+
 import {
     Download,
     Share2,
@@ -16,73 +20,75 @@ import {
     FileSpreadsheet,
     Calendar,
     Tag,
-    Clock,
+    Plus,
     Eye,
     Settings,
     ExternalLink,
+    Loader2,
 } from "lucide-react"
-import type { DocumentData } from "@/src/api/documents"
 import { DocumentPublic } from "@/src/api/model"
+import { toast } from "sonner"
 
 interface DocumentViewProps {
     document: DocumentPublic | null
     isOpen: boolean
     onClose: () => void
-    onEdit?: (document: DocumentData) => void
-    onDelete?: (id: string) => void
-    onShare?: (document: DocumentData) => void
-}
-
-const getFileIcon = (type: string, size: "sm" | "md" | "lg" = "md") => {
-    const sizeClasses = {
-        sm: "h-4 w-4",
-        md: "h-6 w-6",
-        lg: "h-8 w-8",
-    }
-
-    const iconProps = { className: sizeClasses[size] }
-
-    switch (type) {
-        case "pdf":
-        case "docx":
-        case "md":
-            return <FileText {...iconProps} className={`${sizeClasses[size]} text-blue-600`} />
-        case "xlsx":
-        case "csv":
-            return <FileSpreadsheet {...iconProps} className={`${sizeClasses[size]} text-green-600`} />
-        case "png":
-        case "figma":
-            return <ImageIcon {...iconProps} className={`${sizeClasses[size]} text-purple-600`} />
-        default:
-            return <FileText {...iconProps} className={`${sizeClasses[size]} text-gray-600`} />
-    }
 }
 
 
-export function DocumentView({ document, isOpen, onClose, onEdit, onDelete, onShare }: DocumentViewProps) {
+export function DocumentView({ document, isOpen, onClose }: DocumentViewProps) {
     const [activeTab, setActiveTab] = useState("overview")
+    const [isDownloading, setIsDownloading] = useState(false)
+
+    const {
+        handleDelete: handleDeleteDocument,
+        handleUpdate: handleUpdateDocument,
+    } = useDocumentActions({})
+
+    const { handleDownload } = useStorageActions()
+
+    const onCreateFile = async () => {
+        // Trigger file creation logic
+    }
 
     if (!document) return null
 
-    const handleEdit = () => {
-        onEdit?.(document)
-    }
-
-    const handleDelete = () => {
+    const onDeleteDocument = async () => {
         if (confirm("Are you sure you want to delete this document?")) {
-            onDelete?.(document.id)
-            onClose()
+            try {
+                await handleDeleteDocument(document.id)
+                toast.success("DELETE FILE SUCCESFULLY!!", {
+                    description: "DELELELELELELTLETELTETE",
+                    icon: "🎉",
+                })
+            }
+            catch (error) {
+                toast.error("DELETE FILE FAILED SUCCESFULLY!!", {
+                    description: "DELELELELELELTLETELTETE",
+                    icon: "🎉",
+                })
+            }
         }
     }
 
-    const handleShare = () => {
-        onShare?.(document)
+    const onEditDocument = async () => {
+        const newName = prompt(`Rename document "${document.title}" to:`, document.title)
+        if (newName && newName.trim() && newName !== document.title) {
+            await handleUpdateDocument(document.id, { title: newName }).catch((error) => {
+                console.error("Error updating doc", error);
+            });
+        }
     }
 
-    const handleDownload = () => {
-        // Simulate download
-        console.log("Downloading document:", document.name)
+    const onDownloadDocument = async () => {
+        setIsDownloading(true)
+        try {
+            await handleDownload(`documents/${document.title}`);
+        } finally {
+            setIsDownloading(false)
+        }
     }
+    const onShareDocument = () => { }
 
     return (
         <Sheet open={isOpen} onOpenChange={onClose}>
@@ -91,41 +97,43 @@ export function DocumentView({ document, isOpen, onClose, onEdit, onDelete, onSh
                     {/* Header */}
                     <SheetHeader className="px-6 py-4 border-b border-border bg-card">
                         <div className="flex items-start space-x-4 flex-1 min-w-0">
-
                             <div className="p-3 bg-secondary rounded-lg flex-shrink-0 mt-1">
-                                {getFileIcon(document.type, "lg")}
+                                {getFileIcon(document.id)}
                             </div>
-
                             <div className="flex-1 min-w-0">
-                                {/* 2. Removed 'truncate', added 'whitespace-normal' and 'break-words' */}
                                 <SheetTitle className="text-xl font-semibold text-foreground whitespace-normal break-words text-left">
                                     {document.title}
                                 </SheetTitle>
                             </div>
-
                         </div>
-                        {/* <Button variant="ghost" size="icon" onClick={onClose} className="flex-shrink-0"> */}
-                        {/*     <X className="h-4 w-4" /> */}
-                        {/* </Button> */}
 
                         {/* Action Buttons */}
                         <div className="flex items-center space-x-2 mt-4">
-                            {/* <Button size="sm" className="button-primary" onClick={handleDownload}> */}
-                            {/*     <Download className="h-4 w-4 mr-2" /> */}
-                            {/*     Download */}
-                            {/* </Button> */}
-                            <Button variant="outline" size="sm" onClick={handleShare}>
+                            <Button
+                                size="sm"
+                                className="button-primary"
+                                onClick={onDownloadDocument}
+                                disabled={isDownloading}
+                            >
+                                {isDownloading ? (
+                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                ) : (
+                                    <Download className="h-4 w-4 mr-2" />
+                                )}
+                                {isDownloading ? "Downloading..." : "Download"}
+                            </Button>
+                            <Button variant="outline" size="sm" onClick={onShareDocument}>
                                 <Share2 className="h-4 w-4 mr-2" />
                                 Share
                             </Button>
-                            {/* <Button variant="outline" size="sm"> */}
-                            {/*     <ExternalLink className="h-4 w-4 mr-2" /> */}
-                            {/*     Open */}
-                            {/* </Button> */}
+                            <Button variant="outline" size="sm" onClick={onEditDocument}>
+                                <ExternalLink className="h-4 w-4 mr-2" />
+                                Edit
+                            </Button>
                             <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={handleDelete}
+                                onClick={onDeleteDocument}
                                 className="text-destructive hover:text-destructive"
                             >
                                 <Trash2 className="h-4 w-4" />
@@ -183,22 +191,9 @@ export function DocumentView({ document, isOpen, onClose, onEdit, onDelete, onSh
                                                     <div className="space-y-3">
                                                         <div>
                                                             <Badge variant="secondary" className="bg-secondary text-secondary-foreground">
-                                                                {document.category}
+                                                                {document.category || "Uncategorized"}
                                                             </Badge>
                                                         </div>
-                                                        {document.tags && document.tags.length > 0 && (
-                                                            <div>
-                                                                <p className="text-sm font-medium text-foreground mb-2">Tags</p>
-                                                                <div className="flex flex-wrap gap-2">
-                                                                    {document.tags.map((tag, index) => (
-                                                                        <Badge key={index} variant="outline" className="text-xs">
-                                                                            <Tag className="h-3 w-3 mr-1" />
-                                                                            {tag}
-                                                                        </Badge>
-                                                                    ))}
-                                                                </div>
-                                                            </div>
-                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
@@ -209,22 +204,30 @@ export function DocumentView({ document, isOpen, onClose, onEdit, onDelete, onSh
                                             <div>
                                                 <h3 className="text-lg font-medium text-foreground mb-3">Description</h3>
                                                 <div className="bg-muted/50 rounded-lg p-4">
-                                                    <p className="text-sm text-muted-foreground">
+                                                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">
                                                         {document.content || "No description available for this document."}
                                                     </p>
                                                 </div>
                                             </div>
 
-                                            {/* Recent Activity */}
+                                            {/* Recent Activity (Files List) */}
                                             <div>
-                                                <h3 className="text-lg font-medium text-foreground mb-3">Content Details </h3>
+                                                <div className="flex items-center justify-between mb-3">
+                                                    <h3 className="text-lg font-medium text-foreground">Attached Files</h3>
+                                                    <button
+                                                        onClick={onCreateFile}
+                                                        className="p-2 rounded-lg bg-secondary/50 hover:bg-green-500 hover:text-white text-muted-foreground transition-all"
+                                                    >
+                                                        <Plus className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+
                                                 <div className="space-y-3">
                                                     <div className="flex items-center space-x-3 p-3 bg-muted/30 rounded-lg">
-                                                        <div className="w-2 h-2 bg-primary rounded-full"></div>
-                                                        <div className="flex-1">
-                                                            <p className="text-sm text-foreground">Document was last modified</p>
-                                                            <p className="text-xs text-muted-foreground">{document.lastModified}</p>
-                                                        </div>
+                                                        <DocumentFileList
+                                                            documentId={document.id}
+                                                            handleDownload={handleDownload}
+                                                        />
                                                     </div>
                                                 </div>
                                             </div>
@@ -235,7 +238,7 @@ export function DocumentView({ document, isOpen, onClose, onEdit, onDelete, onSh
                         </Tabs>
                     </div>
                 </div>
-            </SheetContent >
-        </Sheet >
+            </SheetContent>
+        </Sheet>
     )
 }

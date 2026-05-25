@@ -56,6 +56,7 @@ class ChatPublic(ChatBase):
     id: uuid.UUID
     pinned: bool
     created_at: datetime | None = None
+    total_messages: int = 0
 
 
 class ChatsPublic(SQLModel):
@@ -109,8 +110,12 @@ class Message(MessageBase, table=True):
 # Properties to return via API, id is always required
 class MessagePublic(MessageBase):
     id: uuid.UUID
+    created_at: datetime | None = None
 
 
 class MessagesPublic(SQLModel):
     data: list[MessagePublic]
-    count: int
+    count: int | None
+    page: int | None
+    page_size: int | None
+    total_pages: int | None

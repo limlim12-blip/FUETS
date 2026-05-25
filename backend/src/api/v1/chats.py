@@ -1,9 +1,11 @@
 import uuid
 from typing import Annotated
+import math
 
 from typing import Any
+from src.core.llm import invoke
 
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func
 from sqlmodel import col, select
 from src.api.deps import CurrentUser, SessionDep
@@ -106,17 +108,19 @@ def read_messages(
     session: SessionDep,
     current_user: CurrentUser,
     id: uuid.UUID,
-    skip: int = 0,
-    limit: int = 20,
+    page: int = Query(1, ge=1),
+    page_size: int = Query(15, ge=1, le=100),
 ) -> Any:
+    offset = (page - 1) * page_size
+
     if current_user.is_superuser:
         count_statement = select(func.count()).select_from(Message)
         count = session.exec(count_statement).one()
         statement = (
             select(Message)
             .order_by(col(Message.created_at).desc())
-            .offset(skip)
-            .limit(limit)
+            .offset(offset)
+            .limit(page_size)
         )
         items = session.exec(statement).all()
     else:
@@ -127,14 +131,22 @@ def read_messages(
         statement = (
             select(Message)
             .where(Message.chat_id == id)
-            .order_by(col(Message.created_at).asc())
-            .offset(skip)
-            .limit(limit)
+            .order_by(col(Message.created_at).desc())
+            .offset(offset)
+            .limit(page_size)
         )
         items = session.exec(statement).all()
 
     items_public = [MessagePublic.model_validate(item) for item in items]
-    return MessagesPublic(data=items_public, count=count)
+    total_pages = math.ceil(count / page_size) if count > 0 else 1
+
+    return MessagesPublic(
+        data=items_public,
+        count=count,
+        page=page,
+        page_size=page_size,
+        total_pages=total_pages,
+    )
 
 
 @router.post("/{id}", response_model=MessagePublic)
@@ -149,7 +161,18 @@ def create_message(
     session.add(message)
     session.commit()
     session.refresh(message)
-    ai_text = "This is a placeholder AI response"
+    past_messages = session.exec(
+        select(Message)
+        .where(Message.chat_id == id)
+        .where(Message.id != message.id)
+        .order_by(col(Message.created_at).asc())
+        .limit(10)
+    ).all()
+    history_str = ""
+    for m in past_messages:
+        role_name = "User" if m.role == MessageRole.USER else "FETUS (UET Assistant)"
+        history_str += f"{role_name}: {m.content}\n"
+    ai_text = invoke(user_question=message.content, history=history_str)
 
     ai_message = Message(content=ai_text, role=MessageRole.ASSISTANT, chat_id=id)
     session.add(ai_message)

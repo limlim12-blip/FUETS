@@ -20,8 +20,9 @@ import SearchModal from "./SearchModal"
 import SettingsPopover from "../SettingsPopover"
 import { cls } from "@/src/components/utils"
 import { useState, useEffect } from "react"
-
+import { useUserActions } from '@/src/api/user/useUser';
 export default function Sidebar({
+
     open = false,
     onClose = () => { },
     collapsed = { pinned: true, recent: false },
@@ -39,6 +40,8 @@ export default function Sidebar({
     const [showSearchModal, setShowSearchModal] = useState(false)
     const [mounted, setMounted] = useState(false)
 
+    const { data: user } = useUserActions()
+    const name = user?.email.split("@")[0];
     useEffect(() => {
         setMounted(true)
     }, [])
@@ -287,7 +290,7 @@ export default function Sidebar({
                                             JD
                                         </div>
                                         <div className="min-w-0 flex-1">
-                                            <div className="truncate text-sm font-medium">John Doe</div>
+                                            <div className="truncate text-sm font-medium">{name}</div>
                                             <div className="truncate text-xs text-zinc-500 dark:text-zinc-400">Pro workspace</div>
                                         </div>
                                     </div>

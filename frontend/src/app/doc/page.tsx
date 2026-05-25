@@ -7,6 +7,7 @@ import { LoadingScreen } from "@/src/components/Dashboard/loading-screen"
 import { DashboardContent } from "@/src/components/Dashboard/dashboard-content"
 import { BarChart3, FileText, AngryIcon } from "lucide-react"
 import { useUserStore } from "@/src/stores/userStore"
+import { useUserActions } from "@/src/api/user/useUser"
 
 const getViewInfo = (activeTab: string) => {
     switch (activeTab) {
@@ -38,7 +39,8 @@ function AdminDashboardContent() {
 
     const viewInfo = getViewInfo(activeTab)
     const Icon = viewInfo.icon
-
+    const { data } = useUserActions()
+    const name = data?.email.split("@")[0];
     return (
         <div className="flex h-screen bg-background overflow-hidden">
 
@@ -90,7 +92,7 @@ function AdminDashboardContent() {
                                             JD
                                         </div>
                                         <div className="hidden sm:block min-w-0 text-left">
-                                            <div className="truncate text-sm font-semibold">John Doe</div>
+                                            <div className="truncate text-sm font-semibold">{name}</div>
                                             <div className="truncate text-[10px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                                                 Pro workspace
                                             </div>

@@ -22,7 +22,6 @@ export function DocumentManagementContainer() {
 
     const {
         handleSync,
-        handleDelete: handleDeleteDocument,
         isFetching,
         error,
     } = useDocumentActions({})
@@ -35,11 +34,6 @@ export function DocumentManagementContainer() {
     //     total_pages: number;
     // }
 
-    const handleDelete = async (id: string) => {
-        if (confirm("Are you sure you want to delete this document?")) {
-            await handleDeleteDocument(id)
-        }
-    }
 
     const handleRowClick = (document: DocumentPublic) => {
         setSelectedDocument(document as any)
@@ -51,11 +45,6 @@ export function DocumentManagementContainer() {
         setSelectedDocument(null)
     }
 
-    const handleEditDocument = (document: DocumentPublic) => {
-    }
-
-    const handleShareDocument = (document: DocumentPublic) => {
-    }
 
 
     if (error) {
@@ -119,11 +108,6 @@ export function DocumentManagementContainer() {
                 document={selectedDocument}
                 isOpen={isDocumentViewOpen}
                 onClose={handleCloseDocumentView}
-                onEdit={handleEditDocument}
-                onDelete={(id: string) => {
-                    handleDelete(id)
-                }}
-                onShare={handleShareDocument}
             />
         </>
     )

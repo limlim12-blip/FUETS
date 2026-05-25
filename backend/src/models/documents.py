@@ -56,6 +56,14 @@ class DocumentFileBase(SQLModel):
     size: str = Field(default="0 KB")
 
 
+class DocumentFileCreate(DocumentFileBase):
+    pass
+
+
+class DocumentFileUpdate(SQLModel):
+    filename: str | None = Field(default=None, min_length=1, max_length=255)
+
+
 class DocumentFile(DocumentFileBase, table=True):
     id: uuid.UUID = Field(
         default_factory=uuid.uuid4,
@@ -64,17 +72,15 @@ class DocumentFile(DocumentFileBase, table=True):
         sa_column_kwargs={"server_default": text("gen_random_uuid()")},
     )
     group_id: uuid.UUID = Field(foreign_key="documents.id", ondelete="CASCADE")
-
     group: Documents = Relationship(back_populates="files")
 
 
-class DocumentFilePublic(DocumentBase):
+class DocumentFilePublic(DocumentFileBase):
     id: uuid.UUID
-    created_at: datetime
 
 
 class DocumentFilespublic(SQLModel):
-    data: List[DocumentPublic]
+    data: List[DocumentFilePublic]
     count: int | None
     page: int | None
     page_size: int | None

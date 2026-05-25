@@ -5,7 +5,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type ReadMessagesApiV1ChatsIdMessagesGetParams = {
+export type ReadDocumentFilesApiV1DocumentsDocIdFilesGetParams = {
 /**
  * @minimum 1
  */
