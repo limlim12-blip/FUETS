@@ -16,7 +16,7 @@ router = APIRouter(prefix="/courses", dependencies=[Depends(get_current_user)])
 
 
 @router.get("/", response_model=CoursesPublic)
-def read_courses(session: SessionDep, offset: int = 0, limit: int = 100) -> Any:
+async def read_courses(session: SessionDep, offset: int = 0, limit: int = 100) -> Any:
     count = session.exec(select(func.count()).select_from(Course)).one()
     courses = session.exec(
         select(Course).order_by(col(Course.name)).offset(offset).limit(limit)
@@ -26,7 +26,7 @@ def read_courses(session: SessionDep, offset: int = 0, limit: int = 100) -> Any:
 
 
 @router.get("/{id}", response_model=CoursePublic)
-def read_course(session: SessionDep, id: uuid.UUID) -> Any:
+async def read_course(session: SessionDep, id: uuid.UUID) -> Any:
     course = session.get(Course, id)
     if not course:
         raise HTTPException(status_code=404, detail="Item not found")
@@ -34,7 +34,7 @@ def read_course(session: SessionDep, id: uuid.UUID) -> Any:
 
 
 @router.post("/", response_model=CoursePublic)
-def create_course(
+async def create_course(
     *, session: SessionDep, current_user: CurrentUser, item_in: CourseCreate
 ) -> Any:
     if not current_user.is_superuser:
@@ -48,7 +48,7 @@ def create_course(
 
 
 @router.put("/{id}", response_model=CoursePublic)
-def update_course(
+async def update_course(
     *,
     session: SessionDep,
     current_user: CurrentUser,
@@ -69,7 +69,9 @@ def update_course(
 
 
 @router.delete("/{id}")
-def delete_course(session: SessionDep, current_user: CurrentUser, id: uuid.UUID) -> Any:
+async def delete_course(
+    session: SessionDep, current_user: CurrentUser, id: uuid.UUID
+) -> Any:
     course = session.get(Course, id)
     if not course:
         raise HTTPException(status_code=404, detail="Item not found")

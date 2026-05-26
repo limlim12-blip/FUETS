@@ -1,6 +1,9 @@
 import React, { useState, forwardRef, useImperativeHandle, useRef, useCallback, useMemo } from "react";
+import ReactMarkdown from 'react-markdown';
+import { useStorageActions } from "@/src/api/storage/useStorage"
 import { VirtuosoMessageList, VirtuosoMessageListLicense } from '@virtuoso.dev/message-list';
 import Message from "./Message";
+import PdfView from "./pdfView";
 import Composer from "./Composer"; import { timeAgo } from "../utils";
 import { useMessageActions } from "@/src/api/chats/useMessages";
 import { Sparkles, Bot } from "lucide-react";
@@ -67,17 +70,85 @@ const FloatingThinkingIndicator = ({ isThinking, onPause }) => {
     );
 };
 
-const ItemContent = ({ data: m, context }) => (
-    <div className="py-2 flex flex-col gap-2">
-        <Message role={m.role}>
-            <div className="whitespace-pre-wrap flow-root">{m.content}</div>
-            {m.role === "user" && (
-                <div className="mt-1 flex gap-2 text-[11px] text-zinc-500">
-                </div>
-            )}
-        </Message>
-    </div>
-);
+const preprocessText = (text) => {
+    if (!text || typeof text !== "string") return text;
+
+    const sourceMap = new Map();
+    let nextSourceNumber = 1;
+
+    return text.replace(/\[Source:\s*([^\]]+)\]/g, (match, url) => {
+        const source = url.trim();
+        let sourcePath = source.replace("r2://docs/", "");
+
+        let currentSourceNumber;
+        if (sourceMap.has(sourcePath)) {
+            currentSourceNumber = sourceMap.get(sourcePath);
+        } else {
+            currentSourceNumber = nextSourceNumber++;
+            sourceMap.set(sourcePath, currentSourceNumber);
+        }
+
+        // BÍ QUYẾT LÀ ĐÂY: Dùng encodeURI để bọc đường link lại
+        // Nó sẽ biến dấu cách thành %20, ngoặc thành %28, %29... giúp Markdown không bị lỗi
+        return `[${currentSourceNumber}](CITATION:${encodeURI(sourcePath)})`;
+    });
+};
+
+const ItemContent = ({ data: m, context }) => {
+    const processedContent = m.role === "user" ? m.content : preprocessText(m.content);
+
+    return (
+        <div className="w-full py-4 flex flex-col gap-2 overflow-hidden">
+            <Message role={m.role}>
+                {m.role === "user" ? (
+                    <div className="whitespace-pre-wrap flow-root">
+                        {m.content}
+                    </div>
+                ) : (
+                    <div className="text-zinc-800 dark:text-zinc-200 text-sm whitespace-normal break-words leading-normal">
+                        <ReactMarkdown
+                            urlTransform={(value) => value}
+
+                            components={{
+                                // Ép thẻ <p> chỉ cách nhau một chút xíu (mb-2)
+                                p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                                // Ép danh sách <ul> và <ol> lề trái 20px (pl-5)
+                                ul: ({ children }) => <ul className="list-disc pl-5 mb-2 space-y-1">{children}</ul>,
+                                ol: ({ children }) => <ol className="list-decimal pl-5 mb-2 space-y-1">{children}</ol>,
+                                // Xóa toàn bộ margin thừa của <li>
+                                li: ({ children }) => <li className="m-0 p-0">{children}</li>,
+                                a: ({ node, href, children, ...props }) => {
+                                    if (href && href.startsWith("CITATION:")) {
+                                        const sourcePath = decodeURI(href.replace("CITATION:", ""));
+                                        return (
+                                            <button
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    context.SetIsOpenPDFview(true);
+                                                }}
+                                                title={sourcePath}
+                                                className="inline-flex items-center justify-center rounded-sm bg-zinc-200/60 px-[5px] py-0 mx-[2px] text-[10px] font-semibold text-zinc-600 hover:bg-zinc-300 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700 transition-colors align-super"
+                                            >
+                                                {children}
+                                            </button>
+                                        );
+                                    }
+                                    return (
+                                        <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline" {...props}>
+                                            {children}
+                                        </a>
+                                    );
+                                }
+                            }}
+                        >
+                            {processedContent}
+                        </ReactMarkdown>
+                    </div>
+                )}
+            </Message>
+        </div>
+    );
+};
 
 const listComponents = {
     Header: ({ context }) => (
@@ -107,14 +178,19 @@ const listComponents = {
     ),
 };
 
-// ── MAIN COMPONENT ────────────────────────────────────────────────
 const ChatPane = forwardRef(function ChatPane(
     { conversation, onSend, onResendMessage, isThinking, onPauseThinking },
     ref
 ) {
     const composerRef = useRef(null);
     const [isForceSnapping, setIsForceSnapping] = useState(false);
+    const [document, setDocument] = useState("");
+    const [isOpenPDFview, SetIsOpenPDFview] = useState(false);
 
+    const handleClosePDFView = () => {
+        SetIsOpenPDFview(false)
+        setDocument(null)
+    }
     const {
         messages,
         fetchOlderMessages,
@@ -170,12 +246,18 @@ const ChatPane = forwardRef(function ChatPane(
                             className="h-full w-full px-4 sm:px-8 lg:px-12"
                             data={{ data: messages, scrollModifier }}
                             onScroll={handleScroll}
+                            initialLocation={{ index: 'LAST', align: 'end' }}
+
                             computeItemKey={({ data }) => data.id}
+
                             ItemContent={ItemContent}
                             components={listComponents}
                             context={{
                                 isLoadingHistory,
+                                SetIsOpenPDFview,
+                                isOpenPDFview,
                                 onResendMessage,
+                                onPromptClick: handleSend,
                                 title: conversation.title,
                                 updatedAt: conversation.updatedAt,
                                 count: messages.length || conversation.messageCount || 0,
@@ -191,6 +273,11 @@ const ChatPane = forwardRef(function ChatPane(
                 ref={composerRef}
                 onSend={handleSend}
                 busy={isThinking || isForceSnapping}
+            />
+            <PdfView
+                document={"documents/Đề thi Toán học rời rạc đề số 1 kỳ 2 năm học 2022-2023 – UET/gdrive_file_3019ac94ccff46e8a1235ee1f5ac0698.pdf"}
+                isOpen={isOpenPDFview}
+                onClose={handleClosePDFView}
             />
         </div>
     );

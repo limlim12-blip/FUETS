@@ -29,8 +29,8 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  BodyCreateDocumentApiV1DocumentsPost,
   BodyCreateDocumentFileApiV1DocumentsDocIdFilesPost,
-  DocumentCreate,
   DocumentFilePublic,
   DocumentFileUpdate,
   DocumentFilespublic,
@@ -220,15 +220,20 @@ export function useReadDocumentsApiV1DocumentsGet<TData = Awaited<ReturnType<typ
  * @summary Create Document
  */
 export const createDocumentApiV1DocumentsPost = (
-    documentCreate: BodyType<DocumentCreate>,
+    bodyCreateDocumentApiV1DocumentsPost: BodyType<BodyCreateDocumentApiV1DocumentsPost>,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
 
+      const formData = new FormData();
+if(bodyCreateDocumentApiV1DocumentsPost.files !== undefined) {
+ bodyCreateDocumentApiV1DocumentsPost.files.forEach(value => formData.append(`files`, value));
+ }
+formData.append(`item_in`, bodyCreateDocumentApiV1DocumentsPost.item_in);
 
       return customInstance<DocumentPublic>(
       {url: `/api/v1/documents/`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: documentCreate, signal
+      headers: {'Content-Type': 'multipart/form-data', },
+       data: formData, signal
     },
       options);
     }
@@ -236,8 +241,8 @@ export const createDocumentApiV1DocumentsPost = (
 
 
 export const getCreateDocumentApiV1DocumentsPostMutationOptions = <TError = ErrorType<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createDocumentApiV1DocumentsPost>>, TError,{data: BodyType<DocumentCreate>}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof createDocumentApiV1DocumentsPost>>, TError,{data: BodyType<DocumentCreate>}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createDocumentApiV1DocumentsPost>>, TError,{data: BodyType<BodyCreateDocumentApiV1DocumentsPost>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof createDocumentApiV1DocumentsPost>>, TError,{data: BodyType<BodyCreateDocumentApiV1DocumentsPost>}, TContext> => {
 
 const mutationKey = ['createDocumentApiV1DocumentsPost'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -249,7 +254,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createDocumentApiV1DocumentsPost>>, {data: BodyType<DocumentCreate>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createDocumentApiV1DocumentsPost>>, {data: BodyType<BodyCreateDocumentApiV1DocumentsPost>}> = (props) => {
           const {data} = props ?? {};
 
           return  createDocumentApiV1DocumentsPost(data,requestOptions)
@@ -263,18 +268,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type CreateDocumentApiV1DocumentsPostMutationResult = NonNullable<Awaited<ReturnType<typeof createDocumentApiV1DocumentsPost>>>
-    export type CreateDocumentApiV1DocumentsPostMutationBody = BodyType<DocumentCreate>
+    export type CreateDocumentApiV1DocumentsPostMutationBody = BodyType<BodyCreateDocumentApiV1DocumentsPost>
     export type CreateDocumentApiV1DocumentsPostMutationError = ErrorType<HTTPValidationError>
 
     /**
  * @summary Create Document
  */
 export const useCreateDocumentApiV1DocumentsPost = <TError = ErrorType<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createDocumentApiV1DocumentsPost>>, TError,{data: BodyType<DocumentCreate>}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createDocumentApiV1DocumentsPost>>, TError,{data: BodyType<BodyCreateDocumentApiV1DocumentsPost>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof createDocumentApiV1DocumentsPost>>,
         TError,
-        {data: BodyType<DocumentCreate>},
+        {data: BodyType<BodyCreateDocumentApiV1DocumentsPost>},
         TContext
       > => {
       return useMutation(getCreateDocumentApiV1DocumentsPostMutationOptions(options), queryClient);
@@ -753,14 +758,16 @@ export function useReadDocumentFilesApiV1DocumentsDocIdFilesGet<TData = Awaited<
  */
 export const createDocumentFileApiV1DocumentsDocIdFilesPost = (
     docId: string,
-    bodyCreateDocumentFileApiV1DocumentsDocIdFilesPost: BodyType<BodyCreateDocumentFileApiV1DocumentsDocIdFilesPost>,
+    bodyCreateDocumentFileApiV1DocumentsDocIdFilesPost?: BodyType<BodyCreateDocumentFileApiV1DocumentsDocIdFilesPost>,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
 
       const formData = new FormData();
-formData.append(`file`, bodyCreateDocumentFileApiV1DocumentsDocIdFilesPost.file);
+if(bodyCreateDocumentFileApiV1DocumentsDocIdFilesPost?.files !== undefined) {
+ bodyCreateDocumentFileApiV1DocumentsDocIdFilesPost?.files.forEach(value => formData.append(`files`, value));
+ }
 
-      return customInstance<DocumentFilePublic>(
+      return customInstance<DocumentFilespublic>(
       {url: `/api/v1/documents/${docId}/files`, method: 'POST',
       headers: {'Content-Type': 'multipart/form-data', },
        data: formData, signal
@@ -771,8 +778,8 @@ formData.append(`file`, bodyCreateDocumentFileApiV1DocumentsDocIdFilesPost.file)
 
 
 export const getCreateDocumentFileApiV1DocumentsDocIdFilesPostMutationOptions = <TError = ErrorType<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createDocumentFileApiV1DocumentsDocIdFilesPost>>, TError,{docId: string;data: BodyType<BodyCreateDocumentFileApiV1DocumentsDocIdFilesPost>}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof createDocumentFileApiV1DocumentsDocIdFilesPost>>, TError,{docId: string;data: BodyType<BodyCreateDocumentFileApiV1DocumentsDocIdFilesPost>}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createDocumentFileApiV1DocumentsDocIdFilesPost>>, TError,{docId: string;data?: BodyType<BodyCreateDocumentFileApiV1DocumentsDocIdFilesPost>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof createDocumentFileApiV1DocumentsDocIdFilesPost>>, TError,{docId: string;data?: BodyType<BodyCreateDocumentFileApiV1DocumentsDocIdFilesPost>}, TContext> => {
 
 const mutationKey = ['createDocumentFileApiV1DocumentsDocIdFilesPost'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -784,7 +791,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createDocumentFileApiV1DocumentsDocIdFilesPost>>, {docId: string;data: BodyType<BodyCreateDocumentFileApiV1DocumentsDocIdFilesPost>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createDocumentFileApiV1DocumentsDocIdFilesPost>>, {docId: string;data?: BodyType<BodyCreateDocumentFileApiV1DocumentsDocIdFilesPost>}> = (props) => {
           const {docId,data} = props ?? {};
 
           return  createDocumentFileApiV1DocumentsDocIdFilesPost(docId,data,requestOptions)
@@ -798,18 +805,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type CreateDocumentFileApiV1DocumentsDocIdFilesPostMutationResult = NonNullable<Awaited<ReturnType<typeof createDocumentFileApiV1DocumentsDocIdFilesPost>>>
-    export type CreateDocumentFileApiV1DocumentsDocIdFilesPostMutationBody = BodyType<BodyCreateDocumentFileApiV1DocumentsDocIdFilesPost>
+    export type CreateDocumentFileApiV1DocumentsDocIdFilesPostMutationBody = BodyType<BodyCreateDocumentFileApiV1DocumentsDocIdFilesPost> | undefined
     export type CreateDocumentFileApiV1DocumentsDocIdFilesPostMutationError = ErrorType<HTTPValidationError>
 
     /**
  * @summary Create Document File
  */
 export const useCreateDocumentFileApiV1DocumentsDocIdFilesPost = <TError = ErrorType<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createDocumentFileApiV1DocumentsDocIdFilesPost>>, TError,{docId: string;data: BodyType<BodyCreateDocumentFileApiV1DocumentsDocIdFilesPost>}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createDocumentFileApiV1DocumentsDocIdFilesPost>>, TError,{docId: string;data?: BodyType<BodyCreateDocumentFileApiV1DocumentsDocIdFilesPost>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof createDocumentFileApiV1DocumentsDocIdFilesPost>>,
         TError,
-        {docId: string;data: BodyType<BodyCreateDocumentFileApiV1DocumentsDocIdFilesPost>},
+        {docId: string;data?: BodyType<BodyCreateDocumentFileApiV1DocumentsDocIdFilesPost>},
         TContext
       > => {
       return useMutation(getCreateDocumentFileApiV1DocumentsDocIdFilesPostMutationOptions(options), queryClient);

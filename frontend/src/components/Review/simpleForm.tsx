@@ -33,7 +33,11 @@ export function ComboboxBasic({
             placeholder={placeholder}
             className="w-full bg-slate-50 dark:bg-slate-950/50 h-12 rounded-xl border border-slate-200 dark:border-slate-800 focus-visible:ring-1 focus-visible:ring-blue-500"
         />
-        <ComboboxContent>
+        <ComboboxContent
+            className="w-[--radix-combobox-trigger-width] z-[9999] max-h-[300px]"
+            side="bottom"
+            align="start"
+        >
             <ComboboxEmpty>No items found.</ComboboxEmpty>
             <ComboboxList>
                 {(item) => (

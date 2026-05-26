@@ -1,9 +1,18 @@
-from fastapi import APIRouter, HTTPException, Query, Depends
+from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Query, Depends
+from pydantic import ValidationError
+import urllib.parse
+import os
+from typing import List, Optional
+from src.models.documents import DocumentFileBase, DocumentFile, DocumentBase, Documents
+
 from sqlalchemy import asc, desc
 import uuid
 from sqlmodel import col, select
 from sqlalchemy import func
 from typing import Any, Optional
+from src.api.v1.r2_client import get_s3_client, BUCKET_NAME, download_file
+from src.models.user import Message
+from src.api.v1.r2_client import get_current_user
 import math
 
 from src.models.documents import (
@@ -19,7 +28,7 @@ router = APIRouter(prefix="/documents", dependencies=[Depends(get_current_user)]
 
 
 @router.get("/", response_model=Documentspublic)
-def read_documents(
+async def read_documents(
     session: SessionDep,
     page: int = Query(1, ge=1),
     page_size: int = Query(15, ge=1, le=100),
@@ -56,29 +65,79 @@ def read_documents(
 
 
 @router.get("/{id}", response_model=DocumentPublic)
-def read_document(session: SessionDep, id: uuid.UUID) -> Any:
+async def read_document(session: SessionDep, id: uuid.UUID) -> Any:
     document = session.get(Documents, id)
     if not document:
         raise HTTPException(status_code=404, detail="Item not found")
     return document
 
 
+def checker(item_in: str = Form(...)):
+    try:
+        return DocumentCreate.model_validate_json(item_in)
+    except ValidationError as e:
+        raise HTTPException(status_code=422, detail=e.errors())
+
+
 @router.post("/", response_model=DocumentPublic)
-def create_document(
-    *, session: SessionDep, current_user: CurrentUser, item_in: DocumentCreate
+async def create_document(
+    *,
+    session: SessionDep,
+    current_user: CurrentUser,
+    item_in: DocumentCreate = Depends(checker),
+    files: List[UploadFile] = File(default=[]),
+    s3=Depends(get_s3_client),
 ) -> Any:
     if not current_user.is_superuser:
         raise HTTPException(status_code=403, detail="Not enough permissions")
+    if not files:
+        return Message(message="Document with empty content")
 
     document = Documents.model_validate(item_in)
     session.add(document)
-    session.commit()
-    session.refresh(document)
-    return document
+    session.flush()
+    dir_name = document.obj_title
+    encoded_title = urllib.parse.quote(str(dir_name))
+    try:
+        for file in files:
+            file_name = file.filename or "unknown.pdf"
+            r2_key = f"documents/{dir_name}/{file_name}"
+            ext = file_name.split(".")[-1] if "." in file_name else "unknown"
+            content = await file.read()
+            s3.put_object(
+                Bucket="docs",
+                Key=r2_key,
+                Body=content,
+                ContentType="application/octet-stream",
+                Metadata={
+                    "type": ext,
+                    "category": item_in.category or "uncategorized",
+                    "original_title": encoded_title,
+                },
+            )
+            file_size_bytes = len(content)
+            size_str = f"{round(file_size_bytes / 1024)} KB"
+
+            doc = DocumentFileBase(
+                filename=file_name,
+                type=ext,
+                size=size_str,
+                url_obj=r2_key,
+            )
+            doc = DocumentFile.model_validate(doc, update={"group_id": document.id})
+
+            session.add(doc)
+        session.commit()
+        session.refresh(document)
+
+        return document
+    except Exception as e:
+        session.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.put("/{id}", response_model=DocumentPublic)
-def update_document(
+async def update_document(
     *,
     session: SessionDep,
     current_user: CurrentUser,
@@ -102,8 +161,11 @@ def update_document(
 
 
 @router.delete("/{id}")
-def delete_document(
-    session: SessionDep, current_user: CurrentUser, id: uuid.UUID
+async def delete_document(
+    session: SessionDep,
+    current_user: CurrentUser,
+    id: uuid.UUID,
+    s3=Depends(get_s3_client),
 ) -> Any:
     document = session.get(Documents, id)
     if not document:
@@ -111,6 +173,11 @@ def delete_document(
     if not current_user.is_superuser:
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
+    for object in s3.list_objects_v2(
+        Bucket=BUCKET_NAME, Prefix=f"documents/{document.obj_title}"
+    )["Contents"]:
+        file_delete = object["Key"]
+        s3.delete_object(Bucket=BUCKET_NAME, Key=file_delete)
     session.delete(document)
     session.commit()
     return {"status": "success"}

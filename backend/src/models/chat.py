@@ -13,7 +13,7 @@ from src.models.user import User
 # NOTE: CHAT
 # Shared properties
 class ChatBase(SQLModel):
-    title: str = Field(min_length=1, max_length=255)
+    title: str = Field(min_length=1)
 
 
 # Properties to receive on item creation
@@ -23,7 +23,7 @@ class ChatCreate(ChatBase):
 
 # Properties to receive on item update
 class ChatUpdate(ChatBase):
-    title: str | None = Field(default=None, min_length=1, max_length=255)  # type: ignore
+    title: str | None = Field(default=None, min_length=1)  # type: ignore
     pinned: bool | None = Field(default=None)
 
 
@@ -86,7 +86,7 @@ class MessageCreate(MessageBase):
 
 # Properties to receive on item update
 class MessageUpdate(MessageBase):
-    content: str | None = Field(default=None, min_length=1, max_length=255)  # type: ignore
+    content: str | None = Field(default=None, min_length=1)  # type: ignore
 
 
 # Database model, database table inferred from class name

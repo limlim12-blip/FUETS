@@ -1,4 +1,5 @@
 from langchain_google_genai import ChatGoogleGenerativeAI
+from pydantic import BaseModel, Field
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
 from langchain_core.runnables import (
     RunnableParallel,
@@ -11,17 +12,18 @@ from src.core.vector_db import vectorstore
 from langchain_groq import ChatGroq
 from src.core.config import config
 
+
 # llm = ChatGroq(
 #     model="llama-3.3-70b-versatile",
 #     temperature=0,
 #     api_key=SecretStr(config.GROQ_API_KEY),
 # )
 llm = ChatGoogleGenerativeAI(
-    model="gemini-3.1-flash-lite",
+    model="gemini-2.5-flash-lite",
     temperature=0,
     google_api_key=SecretStr(config.GOOGLE_API_KEY),
 )
-
+#
 retriever = vectorstore.as_retriever(
     search_type="mmr", search_kwargs={"k": 10, "lambda_mult": 0.25, "fetch_k": 30}
 )
@@ -116,18 +118,36 @@ def invoke(user_question: str, history: str = ""):
     return final_chain.invoke({"question": user_question, "history": history})
 
 
+class Title(BaseModel):
+    title: str = Field(default="New Chat")
+
+
+def change_chat_title(message: str):
+    prompt = f"""Dựa vào tin nhắn sau, hãy tạo một tiêu đề thật ngắn gọn (tối đa 5-6 từ) để đặt tên cho cuộc trò chuyện.
+        QUY TẮC BẮT BUỘC (Nếu vi phạm hệ thống sẽ lỗi):
+        1. CHỈ IN RA ĐÚNG TIÊU ĐỀ.
+        2. KHÔNG giải thích, KHÔNG dạ vâng, KHÔNG dùng dấu ngoặc kép ("").
+        3. Nếu tin nhắn là lời chào vô nghĩa (VD: 'hi', 'alo', 'chào') hoặc quá ngắn để biết chủ đề, HÃY TRẢ VỀ CHÍNH XÁC CHUỖI SAU: New Chat
+
+        Tin nhắn: {message}"""
+    title_llm = llm.with_structured_output(Title)
+    text = str(title_llm.invoke(prompt))
+    return text.split("'")[1]
+
+
 if __name__ == "__main__":
     user_question = "đề giải tích hay các năm gần đây"
-
-    print(f"Original User Question: {user_question}")
-    rewritten_query = query_rewriter.invoke({"question": user_question})
-    print(f"Rewritten Query: {rewritten_query}")
-    print("-" * 50)
-
-    response = invoke(user_question=user_question)
-    for i, doc in enumerate(retrieved_docs):
-        print(f"\nDocument {i + 1}:")
-        print(f"Content: {doc}")
-
-    print("Final AI Response:")
-    print(response)
+    text = str(change_chat_title(user_question))
+    print(text.split("'")[1])
+    # print(f"Original User Question: {user_question}")
+    # rewritten_query = query_rewriter.invoke({"question": user_question})
+    # print(f"Rewritten Query: {rewritten_query}")
+    # print("-" * 50)
+    #
+    # response = invoke(user_question=user_question)
+    # for i, doc in enumerate(retrieved_docs):
+    #     print(f"\nDocument {i + 1}:")
+    #     print(f"Content: {doc}")
+    #
+    # print("Final AI Response:")
+    # print(response)

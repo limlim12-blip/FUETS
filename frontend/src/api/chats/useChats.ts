@@ -5,7 +5,7 @@ import type { ReadChatsApiV1ChatsGetParams } from "../model";
 
 export const useChatActions = (params?: ReadChatsApiV1ChatsGetParams) => {
     const queryClient = useQueryClient();
-    const { data, isLoading, isError } = useReadChatsApiV1ChatsGet(params);
+    const { data, isLoading, isError, refetch } = useReadChatsApiV1ChatsGet(params);
 
     const createMutation = useCreateChatApiV1ChatsPost();
     const deleteMutation = useDeleteChatApiV1ChatsIdDelete();
@@ -49,6 +49,7 @@ export const useChatActions = (params?: ReadChatsApiV1ChatsGetParams) => {
         conversations: data?.data ?? [],
         error: isError,
         isLoading,
+        refetch,
         isCreating: createMutation.isPending,
         isDeleting: deleteMutation.isPending,
         isUpdating: updateMutation.isPending,

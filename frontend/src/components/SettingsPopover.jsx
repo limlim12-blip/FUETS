@@ -7,10 +7,12 @@ import { LogOut, Settings } from "lucide-react"
 import { useQueryClient } from '@tanstack/react-query';
 import { Popover, PopoverContent, PopoverTrigger } from "@/src/components/ui/popover"
 import { useUserActions } from '../api/user/useUser';
+import { useUserStore } from "@/src/stores/userStore"
 
 export default function SettingsPopover({ children }) {
     const [open, setOpen] = useState(false)
     const router = useRouter()
+    const { role } = useUserStore()
     const queryClient = useQueryClient();
     const { data } = useUserActions()
     const handleLogOut = () => {
@@ -27,11 +29,11 @@ export default function SettingsPopover({ children }) {
 
                     <div className="flex items-center gap-3 p-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 mb-3">
                         <div className="flex items-center justify-center h-8 w-8 rounded-md bg-zinc-200 dark:bg-zinc-700 text-xs font-bold">
-                            ID
+                            {data?.email.slice(0, 2)}
                         </div>
                         <div className="flex-1 min-w-0">
-                            <div className="text-sm font-medium">Personal</div>
-                            <div className="text-xs text-zinc-500 dark:text-zinc-400">Pro plan</div>
+                            <div className="text-sm font-medium">Role: {role.toUpperCase()}</div>
+                            <div className="text-xs text-zinc-500 dark:text-zinc-400">Pro Planto </div>
                         </div>
                         <div className="text-blue-500">
                             <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">

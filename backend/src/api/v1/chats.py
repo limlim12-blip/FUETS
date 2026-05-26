@@ -3,7 +3,7 @@ from typing import Annotated
 import math
 
 from typing import Any
-from src.core.llm import invoke
+from src.core.llm import invoke, change_chat_title
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func
@@ -26,42 +26,44 @@ router = APIRouter(prefix="/chats")
 
 
 @router.get("/", response_model=ChatsPublic)
-def read_chats(
+async def read_chats(
     session: SessionDep, current_user: CurrentUser, offset: int = 0, limit: int = 20
 ) -> Any:
-    if current_user.is_superuser:
-        count = session.exec(select(func.count()).select_from(Chat)).one()
-        chats = session.exec(
-            select(Chat).order_by(col(Chat.created_at)).offset(offset).limit(limit)
-        ).all()
-
-    else:
-        count = session.exec(
-            select(func.count())
-            .select_from(Chat)
-            .where(Chat.user_id == current_user.id)
-        ).one()
-        chats = session.exec(
-            select(Chat)
-            .where(Chat.user_id == current_user.id)
-            .order_by(col(Chat.created_at).desc())
-            .offset(offset)
-            .limit(limit)
-        ).all()
+    # if current_user.is_superuser:
+    #     count = session.exec(select(func.count()).select_from(Chat)).one()
+    #     chats = session.exec(
+    #         select(Chat).order_by(col(Chat.created_at)).offset(offset).limit(limit)
+    #     ).all()
+    #
+    # else:
+    count = session.exec(
+        select(func.count()).select_from(Chat).where(Chat.user_id == current_user.id)
+    ).one()
+    chats = session.exec(
+        select(Chat)
+        .where(Chat.user_id == current_user.id)
+        .order_by(col(Chat.created_at).desc())
+        .offset(offset)
+        .limit(limit)
+    ).all()
     courses_public = [ChatPublic.model_validate(chat) for chat in chats]
     return ChatsPublic(data=courses_public, count=count)
 
 
 @router.get("/{id}", response_model=ChatPublic)
-def read_chat(session: SessionDep, id: uuid.UUID) -> Any:
+async def read_chat(
+    session: SessionDep, current_user: CurrentUser, id: uuid.UUID
+) -> Any:
     chat = session.get(Chat, id)
     if not chat:
-        raise HTTPException(status_code=404, detail="Message not found")
+        raise HTTPException(status_code=404, detail="Chat not found")
+    if not current_user.is_superuser and chat.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Cút!")
     return chat
 
 
 @router.post("/", response_model=ChatPublic)
-def create_chat(
+async def create_chat(
     *, session: SessionDep, current_user: CurrentUser, item_in: ChatCreate
 ) -> Any:
     chat = Chat.model_validate(item_in, update={"user_id": current_user.id})
@@ -72,7 +74,7 @@ def create_chat(
 
 
 @router.put("/{id}", response_model=ChatPublic)
-def update_chat(
+async def update_chat(
     *,
     session: SessionDep,
     current_user: CurrentUser,
@@ -93,7 +95,9 @@ def update_chat(
 
 
 @router.delete("/{id}")
-def delete_chat(session: SessionDep, current_user: CurrentUser, id: uuid.UUID) -> Any:
+async def delete_chat(
+    session: SessionDep, current_user: CurrentUser, id: uuid.UUID
+) -> Any:
     chat = session.get(Chat, id)
     if not chat:
         raise HTTPException(status_code=404, detail="Message not found")
@@ -104,7 +108,7 @@ def delete_chat(session: SessionDep, current_user: CurrentUser, id: uuid.UUID) -
 
 
 @router.get("/{id}/messages", response_model=MessagesPublic)
-def read_messages(
+async def read_messages(
     session: SessionDep,
     current_user: CurrentUser,
     id: uuid.UUID,
@@ -113,29 +117,18 @@ def read_messages(
 ) -> Any:
     offset = (page - 1) * page_size
 
-    if current_user.is_superuser:
-        count_statement = select(func.count()).select_from(Message)
-        count = session.exec(count_statement).one()
-        statement = (
-            select(Message)
-            .order_by(col(Message.created_at).desc())
-            .offset(offset)
-            .limit(page_size)
-        )
-        items = session.exec(statement).all()
-    else:
-        count_statement = (
-            select(func.count()).select_from(Message).where(Message.chat_id == id)
-        )
-        count = session.exec(count_statement).one()
-        statement = (
-            select(Message)
-            .where(Message.chat_id == id)
-            .order_by(col(Message.created_at).desc())
-            .offset(offset)
-            .limit(page_size)
-        )
-        items = session.exec(statement).all()
+    count_statement = (
+        select(func.count()).select_from(Message).where(Message.chat_id == id)
+    )
+    count = session.exec(count_statement).one()
+    statement = (
+        select(Message)
+        .where(Message.chat_id == id)
+        .order_by(col(Message.created_at).desc())
+        .offset(offset)
+        .limit(page_size)
+    )
+    items = session.exec(statement).all()
 
     items_public = [MessagePublic.model_validate(item) for item in items]
     total_pages = math.ceil(count / page_size) if count > 0 else 1
@@ -150,14 +143,27 @@ def read_messages(
 
 
 @router.post("/{id}", response_model=MessagePublic)
-def create_message(
+async def create_message(
     *,
     session: SessionDep,
     current_user: CurrentUser,
     item_in: MessageCreate,
     id: uuid.UUID,
 ) -> Any:
+    chat = session.get(Chat, id)
+    if not chat or (not current_user.is_superuser and chat.user_id != current_user.id):
+        raise HTTPException(status_code=403, detail="Not enough permissions")
     message = Message.model_validate(item_in, update={"chat_id": id})
+    if len(chat.messages) == 0:
+        first_chat_title = str(change_chat_title(message=str(message.content)))
+        if not first_chat_title:
+            first_chat_title = "New Chat"
+
+        chat.title = first_chat_title
+        session.add(chat)
+        session.commit()
+        session.refresh(chat)
+
     session.add(message)
     session.commit()
     session.refresh(message)
@@ -170,7 +176,7 @@ def create_message(
     ).all()
     history_str = ""
     for m in past_messages:
-        role_name = "User" if m.role == MessageRole.USER else "FETUS (UET Assistant)"
+        role_name = "User" if m.role == MessageRole.USER else MessageRole.ASSISTANT
         history_str += f"{role_name}: {m.content}\n"
     ai_text = invoke(user_question=message.content, history=history_str)
 

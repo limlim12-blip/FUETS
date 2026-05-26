@@ -3,12 +3,20 @@ from sqlalchemy import text
 from datetime import datetime, timezone
 from typing import List, Optional
 from sqlmodel import Field, SQLModel, Relationship
+from pydantic import model_validator
 
 
 class DocumentBase(SQLModel):
     title: str = Field(min_length=1, max_length=255, index=True)
     category: Optional[str] = Field(default=None, index=True)
-    original_link: str = Field(default="/")
+    original_link: Optional[str] = Field(default="/")
+    obj_title: str | None = Field(default=None, min_length=1, max_length=255)
+
+    @model_validator(mode="after")
+    def sync_obj_title(self) -> "DocumentBase":
+        if self.title and not self.obj_title:
+            self.obj_title = self.title
+        return self
 
 
 class DocumentCreate(DocumentBase):

@@ -35,6 +35,7 @@ export default function AIAssistantUI() {
         handleCreate: handleCreateChat,
         handleUpdate: handleUpdateChat,
         conversations = [],
+        refetch,
         isCreating: isCreatingChat,
         isLoading: isLoadingChat,
         isUpdating: isUpdatingChat } = useChatActions()
@@ -70,6 +71,9 @@ export default function AIAssistantUI() {
                 content: text,
                 role: "user"
             });
+            if (selected.total_messages == 0) {
+                refetch()
+            }
         } catch (error) {
             console.error("Failed to send message:", error);
         } finally {
@@ -96,7 +100,7 @@ export default function AIAssistantUI() {
             }
             else if (conversations.length > 0 && !selectedId) {
                 hasInitialized.current = true;
-                setSelectedId(conversations[0].id);
+                setSelectedId(conversations[conversations.length - 1].id);
             }
         }
     }, [!isLoadingChat, conversations.length, isMounted, selectedId, handleCreateNewChat, setSelectedId]);

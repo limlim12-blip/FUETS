@@ -6,7 +6,6 @@ import { useState, useEffect } from "react"
 import { LoadingScreen } from "@/src/components/Dashboard/loading-screen"
 import { DashboardContent } from "@/src/components/Dashboard/dashboard-content"
 import { BarChart3, FileText, AngryIcon } from "lucide-react"
-import { useUserStore } from "@/src/stores/userStore"
 import { useUserActions } from "@/src/api/user/useUser"
 
 const getViewInfo = (activeTab: string) => {
@@ -23,7 +22,9 @@ const getViewInfo = (activeTab: string) => {
 function AdminDashboardContent() {
     const [isLoading, setIsLoading] = useState(true)
     const [activeTab, setActiveTab] = useState("dashboard")
-    const { role, setRole } = useUserStore()
+    const { data } = useUserActions()
+
+    const name = data?.email.split("@")[0];
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -39,8 +40,6 @@ function AdminDashboardContent() {
 
     const viewInfo = getViewInfo(activeTab)
     const Icon = viewInfo.icon
-    const { data } = useUserActions()
-    const name = data?.email.split("@")[0];
     return (
         <div className="flex h-screen bg-background overflow-hidden">
 
@@ -73,23 +72,12 @@ function AdminDashboardContent() {
 
                         </div>
 
-                        <div className="flex items-center gap-2">
-                            <select
-                                value={role}
-                                onChange={(e) => setRole(e.target.value as any)}
-                                className="text-xs bg-zinc-100 dark:bg-zinc-800 rounded px-2 py-1 border-none outline-none"
-                            >
-                                <option value="student">REMEMBER TO DELETE THIS</option>
-                                <option value="admin">Admin View</option>
-                            </select>
-                        </div>
-
                         <div className="flex items-center">
                             <SettingsPopover>
                                 <button className="rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">
                                     <div className="flex items-center gap-3 rounded-xl p-1.5 transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800">
                                         <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-zinc-900 text-xs font-bold text-white dark:bg-white dark:text-zinc-900">
-                                            JD
+                                            {data?.email.slice(0, 2)}
                                         </div>
                                         <div className="hidden sm:block min-w-0 text-left">
                                             <div className="truncate text-sm font-semibold">{name}</div>

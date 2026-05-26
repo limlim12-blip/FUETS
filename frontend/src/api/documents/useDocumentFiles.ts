@@ -6,20 +6,21 @@ import {
     useDeleteDocumentApiV1DocumentsFilesFileIdDelete,
     getReadDocumentFilesApiV1DocumentsDocIdFilesGetQueryKey
 } from "./documents";
-import type { DocumentFileCreate, DocumentFileUpdate, ReadDocumentFilesApiV1DocumentsDocIdFilesGetParams } from "../model";
+import type { BodyCreateDocumentFileApiV1DocumentsDocIdFilesPost, DocumentFileUpdate, ReadDocumentFilesApiV1DocumentsDocIdFilesGetParams } from "../model";
 
-export const useDocumentFileActions = (doc_id: string, params: ReadDocumentFilesApiV1DocumentsDocIdFilesGetParams = {}) => {
+export const useDocumentFileActions = (doc_id?: string, params: ReadDocumentFilesApiV1DocumentsDocIdFilesGetParams = {}) => {
     const queryClient = useQueryClient();
 
     const { data, isLoading, isError, refetch, isFetching } = useReadDocumentFilesApiV1DocumentsDocIdFilesGet(doc_id, params);
+    console.log(data)
 
     const createMutation = useCreateDocumentFileApiV1DocumentsDocIdFilesPost();
     const updateMutation = useUpdateDocumentFileApiV1DocumentsFilesFileIdPut();
     const deleteMutation = useDeleteDocumentApiV1DocumentsFilesFileIdDelete();
 
-    const handleCreate = async (docData: DocumentFileCreate) => {
+    const handleCreate = async (docId: string, data: BodyCreateDocumentFileApiV1DocumentsDocIdFilesPost) => {
         return await createMutation.mutateAsync(
-            { docId: doc_id, data: docData },
+            { docId: docId, data: data },
             {
                 onSuccess: (response) => {
                     console.log(response)

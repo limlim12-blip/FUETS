@@ -19,7 +19,7 @@ router = APIRouter(tags=["login"])
 
 
 @router.post("/login/access-token")
-def login_access_token(
+async def login_access_token(
     session: SessionDep, form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
 ) -> Token:
     """
@@ -41,7 +41,7 @@ def login_access_token(
 
 
 @router.post("/signup", response_model=UserPublic)
-def register_user(session: SessionDep, user_in: UserRegister) -> Any:
+async def register_user(session: SessionDep, user_in: UserRegister) -> Any:
     """
     Create new user without the need to be logged in.
     """

@@ -6,5 +6,5 @@
  */
 
 export interface BodyCreateDocumentFileApiV1DocumentsDocIdFilesPost {
-  file: Blob;
+  files?: Blob[];
 }

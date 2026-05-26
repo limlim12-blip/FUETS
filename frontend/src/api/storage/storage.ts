@@ -45,8 +45,9 @@ export const downloadFileApiV1R2StorageDownloadFilepathGet = (
 ) => {
 
 
-      return customInstance<unknown>(
-      {url: `/api/v1/r2_storage/download/${filepath}`, method: 'GET', signal
+      return customInstance<unknown | Blob>(
+      {url: `/api/v1/r2_storage/download/${filepath}`, method: 'GET',
+        responseType: 'blob', signal
     },
       options);
     }
@@ -520,6 +521,171 @@ export function useGetBucketUsageApiV1R2StorageUsageGet<TData = Awaited<ReturnTy
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetBucketUsageApiV1R2StorageUsageGetQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+/**
+ * @summary Get Document File Url
+ */
+export const getDocumentFileUrlApiV1R2StorageFilePathUrlGet = (
+    filePath: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<unknown>(
+      {url: `/api/v1/r2_storage${filePath}/url`, method: 'GET', signal
+    },
+      options);
+    }
+
+
+
+
+export const getGetDocumentFileUrlApiV1R2StorageFilePathUrlGetInfiniteQueryKey = (filePath: string,) => {
+    return [
+    'infinite', `/api/v1/r2_storage${filePath}/url`
+    ] as const;
+    }
+
+export const getGetDocumentFileUrlApiV1R2StorageFilePathUrlGetQueryKey = (filePath: string,) => {
+    return [
+    `/api/v1/r2_storage${filePath}/url`
+    ] as const;
+    }
+
+
+export const getGetDocumentFileUrlApiV1R2StorageFilePathUrlGetInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>>, TError = ErrorType<HTTPValidationError>>(filePath: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetDocumentFileUrlApiV1R2StorageFilePathUrlGetInfiniteQueryKey(filePath);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>> = ({ signal }) => getDocumentFileUrlApiV1R2StorageFilePathUrlGet(filePath, requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: filePath !== null && filePath !== undefined, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetDocumentFileUrlApiV1R2StorageFilePathUrlGetInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>>
+export type GetDocumentFileUrlApiV1R2StorageFilePathUrlGetInfiniteQueryError = ErrorType<HTTPValidationError>
+
+
+export function useGetDocumentFileUrlApiV1R2StorageFilePathUrlGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>>, TError = ErrorType<HTTPValidationError>>(
+ filePath: string, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>,
+          TError,
+          Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetDocumentFileUrlApiV1R2StorageFilePathUrlGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>>, TError = ErrorType<HTTPValidationError>>(
+ filePath: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>,
+          TError,
+          Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetDocumentFileUrlApiV1R2StorageFilePathUrlGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>>, TError = ErrorType<HTTPValidationError>>(
+ filePath: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Document File Url
+ */
+
+export function useGetDocumentFileUrlApiV1R2StorageFilePathUrlGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>>, TError = ErrorType<HTTPValidationError>>(
+ filePath: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetDocumentFileUrlApiV1R2StorageFilePathUrlGetInfiniteQueryOptions(filePath,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+export const getGetDocumentFileUrlApiV1R2StorageFilePathUrlGetQueryOptions = <TData = Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>, TError = ErrorType<HTTPValidationError>>(filePath: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetDocumentFileUrlApiV1R2StorageFilePathUrlGetQueryKey(filePath);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>> = ({ signal }) => getDocumentFileUrlApiV1R2StorageFilePathUrlGet(filePath, requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: filePath !== null && filePath !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetDocumentFileUrlApiV1R2StorageFilePathUrlGetQueryResult = NonNullable<Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>>
+export type GetDocumentFileUrlApiV1R2StorageFilePathUrlGetQueryError = ErrorType<HTTPValidationError>
+
+
+export function useGetDocumentFileUrlApiV1R2StorageFilePathUrlGet<TData = Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>, TError = ErrorType<HTTPValidationError>>(
+ filePath: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>,
+          TError,
+          Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetDocumentFileUrlApiV1R2StorageFilePathUrlGet<TData = Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>, TError = ErrorType<HTTPValidationError>>(
+ filePath: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>,
+          TError,
+          Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetDocumentFileUrlApiV1R2StorageFilePathUrlGet<TData = Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>, TError = ErrorType<HTTPValidationError>>(
+ filePath: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Document File Url
+ */
+
+export function useGetDocumentFileUrlApiV1R2StorageFilePathUrlGet<TData = Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>, TError = ErrorType<HTTPValidationError>>(
+ filePath: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDocumentFileUrlApiV1R2StorageFilePathUrlGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetDocumentFileUrlApiV1R2StorageFilePathUrlGetQueryOptions(filePath,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

@@ -20,7 +20,7 @@ router = APIRouter(prefix="/reviews", dependencies=[Depends(get_current_user)])
 
 
 @router.get("/", response_model=ReviewsPublic)
-def read_reviews(
+async def read_reviews(
     session: SessionDep,
     page: int = Query(1, ge=1),
     page_size: int = Query(15, ge=1, le=100),
@@ -79,7 +79,7 @@ def read_reviews(
 
 
 @router.get("/{id}", response_model=ReviewPublic)
-def read_review(session: SessionDep, id: uuid.UUID) -> Any:
+async def read_review(session: SessionDep, id: uuid.UUID) -> Any:
     statement = (
         select(Review)
         .where(Review.id == id)
@@ -103,7 +103,7 @@ def read_review(session: SessionDep, id: uuid.UUID) -> Any:
 
 
 @router.post("/", response_model=ReviewPublic)
-def create_review(
+async def create_review(
     *, session: SessionDep, current_user: CurrentUser, item_in: ReviewCreate
 ) -> Any:
     if not current_user.is_superuser:
@@ -117,7 +117,7 @@ def create_review(
 
 
 @router.put("/{id}", response_model=ReviewPublic)
-def update_review(
+async def update_review(
     *,
     session: SessionDep,
     current_user: CurrentUser,
@@ -141,7 +141,9 @@ def update_review(
 
 
 @router.delete("/{id}")
-def delete_review(session: SessionDep, current_user: CurrentUser, id: uuid.UUID) -> Any:
+async def delete_review(
+    session: SessionDep, current_user: CurrentUser, id: uuid.UUID
+) -> Any:
     review = session.get(Review, id)
     if not review:
         raise HTTPException(status_code=404, detail="Item not found")

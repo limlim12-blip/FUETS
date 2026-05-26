@@ -6,9 +6,9 @@ import {
     useDeleteDocumentApiV1DocumentsIdDelete,
     getReadDocumentsApiV1DocumentsGetQueryKey
 } from "./documents";
-import type { DocumentCreate, DocumentUpdate, ReadDocumentsApiV1DocumentsGetParams } from "../model";
+import type { BodyCreateDocumentApiV1DocumentsPost, DocumentCreate, DocumentUpdate, ReadDocumentsApiV1DocumentsGetParams } from "../model";
 
-export const useDocumentActions = (params: ReadDocumentsApiV1DocumentsGetParams = { page: 1, page_size: 30, sort_by: "create_at" }) => {
+export const useDocumentActions = (params: ReadDocumentsApiV1DocumentsGetParams = { page: 1, page_size: 30, sort_by: "created_at" }) => {
     const queryClient = useQueryClient();
 
     const { data, isLoading, isError, refetch, isFetching } = useReadDocumentsApiV1DocumentsGet(params);
@@ -17,7 +17,7 @@ export const useDocumentActions = (params: ReadDocumentsApiV1DocumentsGetParams 
     const updateMutation = useUpdateDocumentApiV1DocumentsIdPut();
     const deleteMutation = useDeleteDocumentApiV1DocumentsIdDelete();
 
-    const handleCreate = async (docData: DocumentCreate) => {
+    const handleCreate = async (docData: BodyCreateDocumentApiV1DocumentsPost) => {
         return await createMutation.mutateAsync(
             { data: docData },
             {

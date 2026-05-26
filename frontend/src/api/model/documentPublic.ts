@@ -12,7 +12,8 @@ export interface DocumentPublic {
      */
   title: string;
   category?: string | null;
-  original_link?: string;
+  original_link?: string | null;
+  obj_title?: string | null;
   id: string;
   created_at: string;
 }

@@ -6,10 +6,7 @@
  */
 
 export interface ChatPublic {
-  /**
-     * @minLength 1
-     * @maxLength 255
-     */
+  /** @minLength 1 */
   title: string;
   id: string;
   pinned: boolean;

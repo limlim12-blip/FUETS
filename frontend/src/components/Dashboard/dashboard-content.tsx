@@ -3,6 +3,8 @@ import { UserSummaryCard } from "./user-summary-card"
 import { useUserStore } from "@/src/stores/userStore"
 import { Plus } from "lucide-react"
 import { Button } from "@/src/components/ui/button"
+import UploadDocumentView from "./upload-form"
+import { useState } from "react"
 
 export function DashboardContent() {
     const { role } = useUserStore()
@@ -21,16 +23,16 @@ export function DashboardContent() {
                         </div>
 
                         {role === 'admin' && (
-                            <div className="mt-4">
-                                <Button className="w-full button-primary flex items-center justify-center py-6">
-                                    <Plus className="h-4 w-4 mr-2" />
-                                    <span className="font-semibold">New Document</span>
-                                </Button>
-                            </div>
+                            <>
+                                <div> <br /> </div>
+                                <UploadDocumentView />
+                            </>
                         )}
                     </div>
                 </div>
             </div>
         </div>
+
+
     )
 }

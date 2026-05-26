@@ -19,7 +19,7 @@ export default function Message({ role, children }) {
 
             <div
                 className={cls(
-                    "max-w-[80%] min-w-0 rounded-2xl px-3 py-2 text-sm shadow-sm break-words whitespace-pre-wrap",
+                    "max-w-[100%] min-w-0 rounded-2xl px-3 py-2 text-sm shadow-sm break-words whitespace-pre-wrap",
                     isUser
                         ? "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900"
                         : "bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-800"

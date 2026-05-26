@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, List
 import urllib.parse
 from botocore.exceptions import ClientError
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Query
@@ -10,12 +10,13 @@ from sqlmodel import select
 from sqlalchemy import func
 from typing import Any
 import math
-from src.api.v1.r2_client import get_s3_client
+from src.api.v1.r2_client import get_s3_client, BUCKET_NAME
 
 from src.models.documents import (
     Documents,
     DocumentFile,
     DocumentFileCreate,
+    DocumentFileBase,
     DocumentFilePublic,
     DocumentFilespublic,
     DocumentFileUpdate,
@@ -26,7 +27,7 @@ router = APIRouter(prefix="/documents", dependencies=[Depends(get_current_user)]
 
 
 @router.get("/{doc_id}/files", response_model=DocumentFilespublic)
-def read_document_files(
+async def read_document_files(
     doc_id: uuid.UUID,
     session: SessionDep,
     page: int = Query(1, ge=1),
@@ -47,78 +48,76 @@ def read_document_files(
     )
 
 
-@router.post("/{doc_id}/files", response_model=DocumentFilePublic)
-def create_document_file(
+@router.post("/{doc_id}/files", response_model=DocumentFilespublic)
+async def create_document_file(
     *,
     s3=Depends(get_s3_client),
     session: SessionDep,
     current_user: CurrentUser,
     doc_id: uuid.UUID,
-    file: UploadFile,
+    files: List[UploadFile] = File(default=[]),
 ) -> Any:
-    if not current_user.is_superuser:
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+    try:
+        uploaded_docs = []
+        if not current_user.is_superuser:
+            raise HTTPException(status_code=403, detail="Not enough permissions")
 
-    doc = session.get(Documents, doc_id)
-    if not doc:
-        raise HTTPException(status_code=404, detail=f"Not found {doc_id}")
+        document = session.get(Documents, doc_id)
+        if not document:
+            raise HTTPException(status_code=404, detail=f"Not found {doc_id}")
 
-    doc_name = doc.title
-    category = doc.category
+        dir_name = document.obj_title
+        encoded_title = urllib.parse.quote(str(dir_name))
+        for file in files:
+            file_name = file.filename or "unknown.pdf"
+            r2_key = f"documents/{dir_name}/{file_name}"
+            ext = file_name.split(".")[-1] if "." in file_name else "unknown"
+            content = await file.read()
+            s3.put_object(
+                Bucket="docs",
+                Key=r2_key,
+                Body=content,
+                ContentType="application/octet-stream",
+                Metadata={
+                    "type": ext,
+                    "category": urllib.parse.quote(str(document.category))
+                    or "uncategorized",
+                    "original_title": encoded_title,
+                },
+            )
+            file_size_bytes = len(content)
+            size_str = f"{round(file_size_bytes / 1024)} KB"
 
-    original_file_name = file.filename
-    path = Path(original_file_name)
-    stem = path.stem
-    ext = path.suffix
-    prefix = f"documents/{doc_name}"
+            doc = DocumentFileBase(
+                filename=file_name,
+                type=ext,
+                size=size_str,
+                url_obj=r2_key,
+            )
+            doc = DocumentFile.model_validate(doc, update={"group_id": document.id})
+            session.add(doc)
+            uploaded_docs.append(doc)
+        session.commit()
+        docs = DocumentFilespublic(
+            data=uploaded_docs,
+            count=len(uploaded_docs),
+            page=1,
+            page_size=len(uploaded_docs),
+            total_pages=1,
+        )
+        return docs
+    except Exception as e:
+        import traceback
 
-    r2_key = f"{prefix}/{original_file_name}"
-    final_file_name = original_file_name
-    counter = 1
-
-    while True:
-        try:
-            s3.head_object(Bucket="docs", Key=r2_key)
-            final_file_name = f"{stem} ({counter}){ext}"
-            r2_key = f"{prefix}/{final_file_name}"
-            counter += 1
-        except ClientError as e:
-            if e.response["Error"]["Code"] == "404":
-                print(f"The object does not exist.{final_file_name}")
-                break
-            else:
-                raise e
-
-    content_type = file.content_type or "application/octet-stream"
-    encoded_title = urllib.parse.quote(doc_name)
-
-    s3.put_object(
-        Bucket="docs",
-        Key=r2_key,
-        Body=file.file,
-        ContentType=content_type,
-        Metadata={
-            "type": ext.lstrip("."),
-            "category": category,
-            "original_title": encoded_title,
-        },
-    )
-    doc_file = DocumentFileCreate(
-        filename=final_file_name,
-        url_obj=r2_key,
-        type=ext.lstrip("."),
-    )
-
-    doc_file_db = DocumentFile.model_validate(doc_file, update={"group_id": doc_id})
-    session.add(doc_file_db)
-    session.commit()
-    session.refresh(doc_file_db)
-
-    return doc_file_db
+        print("=" * 50)
+        traceback.print_exc()
+        print(f"Error: {str(e)}")
+        session.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.put("/files/{file_id}", response_model=DocumentFilePublic)
-def update_document_file(
+async def update_document_file(
     *,
     session: SessionDep,
     current_user: CurrentUser,
@@ -142,10 +141,11 @@ def update_document_file(
 
 
 @router.delete("/files/{file_id}")
-def delete_document(
+async def delete_document(
     session: SessionDep,
     current_user: CurrentUser,
     file_id: uuid.UUID,
+    s3=Depends(get_s3_client),
 ) -> Any:
     document = session.get(DocumentFile, file_id)
     if not document:
@@ -154,5 +154,7 @@ def delete_document(
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     session.delete(document)
+
     session.commit()
+    s3.delete_object(Bucket=BUCKET_NAME, Key=document.url_obj)
     return {"status": "success"}

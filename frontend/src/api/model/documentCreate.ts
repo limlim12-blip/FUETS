@@ -12,5 +12,6 @@ export interface DocumentCreate {
      */
   title: string;
   category?: string | null;
-  original_link?: string;
+  original_link?: string | null;
+  obj_title?: string | null;
 }

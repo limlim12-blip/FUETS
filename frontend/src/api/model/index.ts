@@ -5,6 +5,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './bodyCreateDocumentApiV1DocumentsPost';
 export * from './bodyCreateDocumentFileApiV1DocumentsDocIdFilesPost';
 export * from './bodyLoginAccessTokenApiV1LoginAccessTokenPost';
 export * from './chatCreate';
@@ -15,7 +16,6 @@ export * from './courseCreate';
 export * from './coursePublic';
 export * from './coursesPublic';
 export * from './courseUpdate';
-export * from './documentCreate';
 export * from './documentFilePublic';
 export * from './documentFilespublic';
 export * from './documentFileUpdate';

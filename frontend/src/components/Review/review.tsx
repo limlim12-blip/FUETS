@@ -5,12 +5,10 @@ import InfiniteScroll from "react-infinite-scroll-component"
 import SimpleForm from "./simpleForm"
 import ReviewCard from "./ReviewCard"
 import { useReviewActions } from "@/src/api/reviews/useReviews"
-import { useUserStore } from "@/src/stores/userStore"
 import { FileText, AngryIcon } from "lucide-react"
 import SettingsPopover from "@/src/components/SettingsPopover"
 import { useUserActions } from '@/src/api/user/useUser';
 export default function Review() {
-    const { role, setRole } = useUserStore()
 
     const [page, setPage] = useState(1);
     const [reviewsList, setReviews] = useState<any[]>([]);
@@ -65,16 +63,6 @@ export default function Review() {
                         </Link>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                        <select
-                            value={role}
-                            onChange={(e) => setRole(e.target.value as any)}
-                            className="text-xs bg-zinc-100 dark:bg-zinc-800 rounded px-2 py-1 border-none outline-none"
-                        >
-                            <option value="student">REMEMBER TO DELETE THIS</option>
-                            <option value="admin">Admin View</option>
-                        </select>
-                    </div>
                     <div className="flex items-center">
                         <SettingsPopover>
                             <button className="rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">

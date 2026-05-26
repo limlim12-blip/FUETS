@@ -17,7 +17,7 @@ router = APIRouter(prefix="/profs", dependencies=[Depends(get_current_user)])
 
 
 @router.get("/", response_model=ProfsPublic)
-def read_profs(session: SessionDep, offset: int = 0, limit: int = 100) -> Any:
+async def read_profs(session: SessionDep, offset: int = 0, limit: int = 100) -> Any:
     count = session.exec(select(func.count()).select_from(Professor)).one()
     profs = session.exec(
         select(Professor).order_by(col(Professor.name)).offset(offset).limit(limit)
@@ -27,7 +27,7 @@ def read_profs(session: SessionDep, offset: int = 0, limit: int = 100) -> Any:
 
 
 @router.get("/{id}", response_model=ProfPublic)
-def read_prof(session: SessionDep, id: uuid.UUID) -> Any:
+async def read_prof(session: SessionDep, id: uuid.UUID) -> Any:
     prof = session.get(Professor, id)
     if not prof:
         raise HTTPException(status_code=404, detail="Item not found")
@@ -35,7 +35,7 @@ def read_prof(session: SessionDep, id: uuid.UUID) -> Any:
 
 
 @router.post("/", response_model=ProfPublic)
-def create_prof(
+async def create_prof(
     *, session: SessionDep, current_user: CurrentUser, item_in: ProfCreate
 ) -> Any:
     if not current_user.is_superuser:
@@ -49,7 +49,7 @@ def create_prof(
 
 
 @router.put("/{id}", response_model=ProfPublic)
-def update_prof(
+async def update_prof(
     *,
     session: SessionDep,
     current_user: CurrentUser,
@@ -70,7 +70,9 @@ def update_prof(
 
 
 @router.delete("/{id}")
-def delete_prof(session: SessionDep, current_user: CurrentUser, id: uuid.UUID) -> Any:
+async def delete_prof(
+    session: SessionDep, current_user: CurrentUser, id: uuid.UUID
+) -> Any:
     prof = session.get(Professor, id)
     if not prof:
         raise HTTPException(status_code=404, detail="Item not found")

@@ -2,7 +2,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import {
     useCreateMessageApiV1ChatsIdPost,
     useReadMessagesApiV1ChatsIdMessagesGetInfinite,
-    getReadMessagesApiV1ChatsIdMessagesGetInfiniteQueryKey
+    getReadMessagesApiV1ChatsIdMessagesGetInfiniteQueryKey,
+    getReadChatsApiV1ChatsGetQueryKey
 } from "./chats";
 import { MessageCreate, ReadMessagesApiV1ChatsIdMessagesGetParams } from "../model";
 
@@ -15,6 +16,9 @@ export const useMessageActions = (chatId: string, params: Partial<ReadMessagesAp
             onMutate: async (variables) => {
                 await queryClient.cancelQueries({ queryKey });
                 const previousData = queryClient.getQueryData(queryKey);
+                await queryClient.invalidateQueries({ queryKey: getReadChatsApiV1ChatsGetQueryKey() });
+
+                await queryClient.invalidateQueries({ queryKey });
 
                 queryClient.setQueryData(queryKey, (old: any) => {
                     if (!old?.pages?.length) return old;

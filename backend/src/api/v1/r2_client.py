@@ -25,18 +25,26 @@ def get_s3_client():
     return s3
 
 
-@router.get("/download/{filepath:path}")
+@router.get(
+    "/download/{filepath:path}",
+    # why? idk
+    responses={
+        200: {
+            "content": {"application/octet-stream": {}},
+            "description": "Returns the requested file or folder zip archive.",
+        }
+    },
+)
 async def download_file(filepath: str, s3=Depends(get_s3_client)):
     base_name = filepath.split("/")[-1]
     encoded_filename = quote(base_name)
 
     file_list = get_all_objects_under_prefix(s3, filepath)
+    print("dbu:", encoded_filename, file_list)
     try:
-        if not file_list:
-            print(file_list)
+        if len(file_list) == 1 and file_list[0] == filepath:
             response = s3.get_object(Bucket=BUCKET_NAME, Key=filepath)
             file_content = response["Body"].read()
-
             return Response(
                 content=file_content,
                 media_type=response.get("ContentType", "application/octet-stream"),
@@ -46,18 +54,18 @@ async def download_file(filepath: str, s3=Depends(get_s3_client)):
             )
         else:
             zip_buffer = io.BytesIO()
-            for file in file_list:
-                with zipfile.ZipFile(
-                    zip_buffer, "a", zipfile.ZIP_DEFLATED, False
-                ) as zip_file:
-                    response = s3.get_object(Bucket=BUCKET_NAME, Key=file)
-                    zip_file.writestr(file.split("/")[-1], response["Body"].read())
+            with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
+                for file_key in file_list:
+                    if file_key.endswith("/"):
+                        continue
+                    response = s3.get_object(Bucket=BUCKET_NAME, Key=file_key)
+                    zip_file.writestr(file_key.split("/")[-1], response["Body"].read())
             zip_buffer.seek(0)
             return StreamingResponse(
                 zip_buffer,
                 media_type="application/zip",
                 headers={
-                    "Content-Disposition": f"attachment; filename={encoded_filename}.zip"
+                    "Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}.zip"
                 },
             )
 
@@ -78,7 +86,7 @@ def get_all_objects_under_prefix(s3_client, prefix: str) -> list[str]:
 
 @router.get("/list-files/{prefix:path}")
 async def list_files(prefix: str, s3=Depends(get_s3_client)):
-    return get_all_objects_under_prefix(s3, prefix)
+    return get_all_objects_under_prefix(s3, quote(prefix))
 
 
 """ 
@@ -112,3 +120,24 @@ async def get_bucket_usage():
             )
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("{file_path:path}/url")
+async def get_document_file_url(
+    *,
+    s3=Depends(get_s3_client),
+    file_path: str,
+):
+
+    try:
+        presigned_url = s3.generate_presigned_url(
+            "get_object",
+            Params={
+                "Bucket": "docs",
+                "Key": file_path,
+            },
+            ExpiresIn=3600,
+        )
+        return {"url": presigned_url}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
