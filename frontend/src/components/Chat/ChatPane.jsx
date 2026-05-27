@@ -1,7 +1,7 @@
-import React, { useState, forwardRef, useImperativeHandle, useRef, useCallback } from "react";
+import React, { useState, forwardRef, useImperativeHandle, useRef, useCallback, useEffect } from "react";
 import ReactMarkdown from 'react-markdown';
 import { useStorageActions } from "@/src/api/storage/useStorage";
-import { Virtuoso } from 'react-virtuoso'; // 🌟 USING THE FREE VERSION
+import { Virtuoso } from 'react-virtuoso';
 import Message from "./Message";
 import UniversalMediaView from "./pdfView";
 import Composer from "./Composer";
@@ -167,14 +167,15 @@ const ChatPane = forwardRef(function ChatPane(
     ref
 ) {
     const composerRef = useRef(null);
-    const virtuosoRef = useRef(null); // 🌟 Added ref for native Virtuoso scrolling
-    const [isForceSnapping, setIsForceSnapping] = useState(false);
+    const virtuosoRef = useRef(null);
     const [document, setDocument] = useState("");
     const [isOpenPDFview, SetIsOpenPDFview] = useState(false);
+    const lastMessageCountRef = useRef(0);
 
     const handleClosePDFView = () => {
         SetIsOpenPDFview(false);
     };
+
 
     const {
         messages,
@@ -186,46 +187,42 @@ const ChatPane = forwardRef(function ChatPane(
         error
     } = useMessageActions(conversation?.id ?? "");
 
+    // Auto-scroll to bottom when new messages arrive
+    useEffect(() => {
+        if (messages.length > 0) {
+            const timerId = setTimeout(() => {
+                virtuosoRef.current?.scrollToIndex({
+                    index: messages.length - 1,
+                    align: 'end',
+                    behavior: 'smooth'
+                });
+            }, 100);
+            return () => clearTimeout(timerId);
+        }
+        lastMessageCountRef.current = messages.length;
+    }, [messages.length, isThinking]);
     useImperativeHandle(ref, () => ({
         insertTemplate: (content) => composerRef.current?.insertTemplate(content),
         scrollToBottom: () => {
             virtuosoRef.current?.scrollToIndex({
                 index: 'LAST',
-                behavior: 'auto'
+                align: 'end',
+                behavior: 'smooth'
             });
         },
     }), []);
 
     const handleSend = useCallback(async (text) => {
         if (!text.trim()) return;
-        setIsForceSnapping(true);
-
-        try {
-            await onSend?.(text);
-        } finally {
-            setTimeout(() => setIsForceSnapping(false), 150);
-        }
+        await onSend?.(text);
     }, [onSend]);
-    const hasInitialScrolled = useRef(false);
 
-    React.useEffect(() => {
-        hasInitialScrolled.current = false;
-    }, [conversation?.id]);
-
-    React.useEffect(() => {
-        if (!isLoading && messages.length > 0 && !hasInitialScrolled.current) {
-            // Đợi 50ms cho Markdown render xong xuôi chiều cao
-            const timeoutId = setTimeout(() => {
-                virtuosoRef.current?.scrollToIndex({
-                    index: 'LAST',
-                    align: 'end',
-                    behavior: 'auto' // Cuộn tức thì, không tạo hiệu ứng mượt gây khó chịu lúc mới load
-                });
-                hasInitialScrolled.current = true;
-            }, 50);
-            return () => clearTimeout(timeoutId);
+    const handleStartReached = useCallback(() => {
+        if (hasMoreHistory && !isLoadingHistory && !isLoading) {
+            fetchOlderMessages();
         }
-    }, [messages, isLoading]);
+    }, [hasMoreHistory, isLoadingHistory, isLoading, fetchOlderMessages]);
+
     if (!conversation) return null;
     if (messages.length === 0 && isLoading) return <div className="p-4 text-center text-zinc-500">Loading messages…</div>;
     if (error) return <div className="p-4 text-center text-red-500 bg-red-50/50">Failed to load chat.</div>;
@@ -253,7 +250,6 @@ const ChatPane = forwardRef(function ChatPane(
                     </div>
                 </div>
 
-                {/* Đường kẻ phân cách Gradient */}
                 <div className="w-full max-w-6xl px-4 sm:px-6 mt-3">
                     <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-zinc-200 dark:via-zinc-800 to-transparent" />
                 </div>
@@ -262,20 +258,16 @@ const ChatPane = forwardRef(function ChatPane(
                 {messages.length === 0 ? (
                     <EmptyChatState onPromptClick={handleSend} />
                 ) : (
-                    // 🌟 FREE VIRTUOSO IMPLEMENTATION
                     <Virtuoso
                         ref={virtuosoRef}
-                        className="h-full w-full overscroll-y-none"
+                        className="h-full w-full"
                         data={messages}
-
-                        alignToBottom={true}
-                        followOutput="auto"
-
-                        startReached={() => {
-                            if (hasMoreHistory && !isLoadingHistory && !isLoading) {
-                                fetchOlderMessages();
-                            }
-                        }}
+                        initialTopMostItemIndex={messages.length > 0 ? messages.length - 1 : 0}
+                        alignToBottom={false}
+                        followOutput="smooth"
+                        increaseViewportBy={{ top: 300, bottom: 300 }}
+                        overscan={5}
+                        startReached={handleStartReached}
                         computeItemKey={(index, message) => message?.id || index}
                         context={{
                             isLoadingHistory,
@@ -301,7 +293,7 @@ const ChatPane = forwardRef(function ChatPane(
             <Composer
                 ref={composerRef}
                 onSend={handleSend}
-                busy={isThinking || isForceSnapping}
+                busy={isThinking}
             />
             <UniversalMediaView
                 document={document}
