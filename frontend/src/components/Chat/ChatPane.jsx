@@ -92,7 +92,7 @@ const ItemContent = ({ data: m, context }) => {
     const processedContent = m.role === "user" ? m.content : preprocessText(m.content);
 
     return (
-        <div className="w-full py-4 flex justify-center">
+        <div className="w-full py-4 flex justify-center overflow-x-hidden">
             <div className="w-full max-w-6xl px-4 sm:px-6 flex flex-col gap-2 overflow-hidden">
                 <Message role={m.role}>
                     {m.role === "user" ? (
@@ -143,39 +143,22 @@ const ItemContent = ({ data: m, context }) => {
     );
 };
 
-const listComponents = {
-    Header: ({ context }) => (
-        <div className="pt-6 pb-2">
-            <div className="h-[40px] flex items-center justify-center">
-                {context.isLoadingHistory && (
-                    <span className="text-sm text-zinc-500">Loading older messages…</span>
-                )}
-            </div>
-        </div>
-    ),
-    EmptyPlaceholder: () => (
-        <div className="flex h-full items-start pt-10">
-            <div className="max-w-3xl w-full rounded-xl border border-dashed border-zinc-300 p-6 text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
-                No messages yet. Say hello to start.
-            </div>
-        </div>
-    ),
-};
 
 const ChatPane = forwardRef(function ChatPane(
     { conversation, onSend, onResendMessage, isThinking, onPauseThinking },
     ref
 ) {
     const composerRef = useRef(null);
-    const virtuosoRef = useRef(null);
+    const scrollContainerRef = useRef(null);
+    const bottomRef = useRef(null);
+
     const [document, setDocument] = useState("");
     const [isOpenPDFview, SetIsOpenPDFview] = useState(false);
-    const lastMessageCountRef = useRef(0);
 
-    const handleClosePDFView = () => {
-        SetIsOpenPDFview(false);
-    };
+    // We use this to know if the user manually scrolled up
+    const [isAutoScrollActive, setIsAutoScrollActive] = useState(true);
 
+    const handleClosePDFView = () => SetIsOpenPDFview(false);
 
     const {
         messages,
@@ -187,104 +170,94 @@ const ChatPane = forwardRef(function ChatPane(
         error
     } = useMessageActions(conversation?.id ?? "");
 
-    // Auto-scroll to bottom when new messages arrive
+    const scrollToBottom = useCallback((behavior = "smooth") => {
+        bottomRef.current?.scrollIntoView({ behavior, block: "end" });
+    }, []);
+
     useEffect(() => {
-        if (messages.length > 0) {
-            const timerId = setTimeout(() => {
-                virtuosoRef.current?.scrollToIndex({
-                    index: messages.length - 1,
-                    align: 'end',
-                    behavior: 'smooth'
-                });
-            }, 100);
-            return () => clearTimeout(timerId);
+        if (isAutoScrollActive && messages.length > 0) {
+            setTimeout(() => scrollToBottom("smooth"), 50);
         }
-        lastMessageCountRef.current = messages.length;
-    }, [messages.length, isThinking]);
-    useImperativeHandle(ref, () => ({
-        insertTemplate: (content) => composerRef.current?.insertTemplate(content),
-        scrollToBottom: () => {
-            virtuosoRef.current?.scrollToIndex({
-                index: 'LAST',
-                align: 'end',
-                behavior: 'smooth'
-            });
-        },
-    }), []);
+    }, [messages, isThinking, isAutoScrollActive, scrollToBottom]);
 
-    const handleSend = useCallback(async (text) => {
-        if (!text.trim()) return;
-        await onSend?.(text);
-    }, [onSend]);
+    const handleScroll = useCallback(() => {
+        const container = scrollContainerRef.current;
+        if (!container) return;
+        const isAtBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+        setIsAutoScrollActive(isAtBottom);
 
-    const handleStartReached = useCallback(() => {
-        if (hasMoreHistory && !isLoadingHistory && !isLoading) {
+        if (container.scrollTop === 0 && hasMoreHistory && !isLoadingHistory && !isLoading) {
             fetchOlderMessages();
         }
     }, [hasMoreHistory, isLoadingHistory, isLoading, fetchOlderMessages]);
+
+    useImperativeHandle(ref, () => ({
+        insertTemplate: (content) => composerRef.current?.insertTemplate(content),
+        scrollToBottom: () => {
+            setIsAutoScrollActive(true);
+            scrollToBottom("smooth");
+        },
+    }), [scrollToBottom]);
+
+    const handleSend = useCallback(async (text) => {
+        if (!text.trim()) return;
+        setIsAutoScrollActive(true); // Force scroll lock on
+        await onSend?.(text);
+    }, [onSend]);
 
     if (!conversation) return null;
     if (messages.length === 0 && isLoading) return <div className="p-4 text-center text-zinc-500">Loading messages…</div>;
     if (error) return <div className="p-4 text-center text-red-500 bg-red-50/50">Failed to load chat.</div>;
 
+    const context = {
+        isLoadingHistory, SetIsOpenPDFview, isOpenPDFview,
+        setDocument, onResendMessage, onPromptClick: handleSend,
+        title: conversation.title, updatedAt: conversation.updatedAt,
+        count: messages.length || conversation.messageCount || 0,
+    };
+
     return (
         <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden relative">
+            {/* Header Area (Unchanged) */}
             <div className="z-10 flex shrink-0 flex-col items-center justify-center w-full bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md pt-4 pb-2">
                 <div className="w-full max-w-6xl px-4 sm:px-6 flex flex-col items-center text-center">
-                    <h1
-                        className="max-w-[85%] sm:max-w-[70%] truncate text-lg sm:text-xl font-semibold text-zinc-800 dark:text-zinc-200 tracking-tight"
-                        title={conversation?.title || "New Chat"}
-                    >
+                    <h1 className="max-w-[85%] sm:max-w-[70%] truncate text-lg sm:text-xl font-semibold text-zinc-800 dark:text-zinc-200 tracking-tight">
                         {conversation?.title || "New Chat"}
                     </h1>
                     <div className="flex items-center gap-2 mt-1 text-[11px] sm:text-xs font-medium text-zinc-500 dark:text-zinc-400">
-                        <span className="flex items-center gap-1.5">
-                            <span className="relative flex h-1.5 w-1.5">
-                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
-                                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-                            </span>
-                            Active
-                        </span>
-                        <span>&middot;</span>
-                        <span>{messageCount || 0} messages</span>
+                        Active &middot; {messageCount || 0} messages
                     </div>
                 </div>
-
                 <div className="w-full max-w-6xl px-4 sm:px-6 mt-3">
                     <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-zinc-200 dark:via-zinc-800 to-transparent" />
                 </div>
             </div>
-            <div className="flex-1 flex flex-col overflow-hidden relative">
+
+            <div
+                ref={scrollContainerRef}
+                onScroll={handleScroll}
+                className="flex-1 overflow-y-auto overflow-x-hidden scroll-smooth relative"
+            >
                 {messages.length === 0 ? (
                     <EmptyChatState onPromptClick={handleSend} />
                 ) : (
-                    <Virtuoso
-                        ref={virtuosoRef}
-                        className="h-full w-full"
-                        data={messages}
-                        initialTopMostItemIndex={messages.length > 0 ? messages.length - 1 : 0}
-                        alignToBottom={false}
-                        followOutput="smooth"
-                        increaseViewportBy={{ top: 300, bottom: 300 }}
-                        overscan={5}
-                        startReached={handleStartReached}
-                        computeItemKey={(index, message) => message?.id || index}
-                        context={{
-                            isLoadingHistory,
-                            SetIsOpenPDFview,
-                            isOpenPDFview,
-                            setDocument,
-                            onResendMessage,
-                            onPromptClick: handleSend,
-                            title: conversation.title,
-                            updatedAt: conversation.updatedAt,
-                            count: messages.length || conversation.messageCount || 0,
-                        }}
-                        itemContent={(index, message, context) => (
-                            <ItemContent data={message} context={context} />
+                    <div className="flex flex-col min-h-full pb-4">
+                        {isLoadingHistory && (
+                            <div className="py-4 text-center text-sm text-zinc-500">
+                                Loading older messages…
+                            </div>
                         )}
-                        components={listComponents}
-                    />
+
+                        {messages.map((message) => (
+                            <ItemContent
+                                key={message.id || message.createdAt || Math.random()}
+                                data={message}
+                                context={context}
+                            />
+                        ))}
+
+                        <div ref={bottomRef} className="h-6 w-full shrink-0" />
+                    </div>
                 )}
 
                 <FloatingThinkingIndicator isThinking={isThinking} onPause={onPauseThinking} />
@@ -295,6 +268,7 @@ const ChatPane = forwardRef(function ChatPane(
                 onSend={handleSend}
                 busy={isThinking}
             />
+
             <UniversalMediaView
                 document={document}
                 isOpen={isOpenPDFview}

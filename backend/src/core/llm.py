@@ -25,7 +25,7 @@ llm = ChatGoogleGenerativeAI(
 )
 #
 retriever = vectorstore.as_retriever(
-    search_type="mmr", search_kwargs={"k": 10, "lambda_mult": 0.25, "fetch_k": 30}
+    search_type="mmr", search_kwargs={"k": 20, "lambda_mult": 0.25, "fetch_k": 30}
 )
 
 
