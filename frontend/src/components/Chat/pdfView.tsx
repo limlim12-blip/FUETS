@@ -5,6 +5,7 @@ import { Download } from "lucide-react";
 
 export default function UniversalMediaView({ document, isOpen, onClose }) {
 
+    console.log(document)
     const { cleanPath, pageNumber } = useMemo(() => {
         if (!document) return { cleanPath: "", pageNumber: null };
         const [path, pageHash] = document.split("#page=");

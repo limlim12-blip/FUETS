@@ -74,7 +74,7 @@ const preprocessText = (text) => {
         if (source.startsWith("reviews")) {
             return ""
         }
-        let sourcePath = source.replace("r2://docs", "");
+        let sourcePath = source.replace("r2://docs/", "");
 
         let currentSourceNumber;
         if (sourceMap.has(sourcePath)) {
