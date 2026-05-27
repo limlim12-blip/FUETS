@@ -11,9 +11,9 @@ import { Sparkles, Bot } from "lucide-react";
 
 const EmptyChatState = ({ onPromptClick }) => {
     const suggestions = [
-        "Câu gì đấy nịnh anh",
-        "Câu gì đấy hỏi về anh",
-        "Câu gì đấy",
+        "Hãy cho tôi nhận xét về Thầy Phạm Minh Hoàng",
+        "Các đề Giải Tích trong các năm gần đây",
+        "Đánh giá về cô Yến dạy CSDL",
     ];
 
     return (

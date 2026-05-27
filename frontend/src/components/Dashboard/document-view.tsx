@@ -28,6 +28,7 @@ import {
 import { DocumentPublic } from "@/src/api/model"
 import { toast } from "sonner"
 import { useDocumentFileActions } from "@/src/api/documents/useDocumentFiles"
+import { useUserStore } from "@/src/stores/userStore"
 
 interface DocumentViewProps {
     document: DocumentPublic | null
@@ -43,7 +44,7 @@ export function DocumentView({ document, isOpen, onClose }: DocumentViewProps) {
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const { handleCreate: createDoc } = useDocumentFileActions(document?.id)
-
+    const { role } = useUserStore()
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             processFiles(Array.from(e.target.files));
@@ -334,21 +335,22 @@ export function DocumentView({ document, isOpen, onClose }: DocumentViewProps) {
                                                 <div className="flex items-center justify-between mb-3">
                                                     <h3 className="text-lg font-medium text-foreground">Attached Files</h3>
 
-                                                    <button
-                                                        onClick={() => fileInputRef.current?.click()}
-                                                        className="p-2 rounded-lg bg-secondary/50 hover:bg-green-500 hover:text-white text-muted-foreground transition-all"
-                                                    >
-                                                        <input
-                                                            type="file"
-                                                            ref={fileInputRef}
-                                                            className="hidden"
-                                                            onChange={handleFileChange}
-                                                            multiple
-                                                        />
+                                                    {role === 'admin' && (
+                                                        <button
+                                                            onClick={() => fileInputRef.current?.click()}
+                                                            className="p-2 rounded-lg bg-secondary/50 hover:bg-green-500 hover:text-white text-muted-foreground transition-all"
+                                                        >
+                                                            <input
+                                                                type="file"
+                                                                ref={fileInputRef}
+                                                                className="hidden"
+                                                                onChange={handleFileChange}
+                                                                multiple
+                                                            />
 
 
-                                                        <Plus className="w-4 h-4" />
-                                                    </button>
+                                                            <Plus className="w-4 h-4" />
+                                                        </button>)}
                                                 </div>
 
                                                 {selectedFiles.length > 0 && (
