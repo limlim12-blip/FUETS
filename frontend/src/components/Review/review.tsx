@@ -13,7 +13,7 @@ export default function Review() {
     const [page, setPage] = useState(1);
     const [reviewsList, setReviews] = useState<any[]>([]);
     const [filters, setFilters] = useState({ search: "", professor_name: "", course_name: "" })
-
+    const { data } = useUserActions()
     const handleSearchSubmit = (newFilters: typeof filters) => {
         setReviews([])
         setPage(1)
@@ -68,12 +68,12 @@ export default function Review() {
                             <button className="rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">
                                 <div className="flex items-center gap-3 rounded-xl p-1.5 transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800">
                                     <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-zinc-900 text-xs font-bold text-white dark:bg-white dark:text-zinc-900">
-                                        JD
+                                        {data?.email.slice(0, 2)}
                                     </div>
                                     <div className="hidden sm:block min-w-0 text-left">
                                         <div className="truncate text-sm font-semibold">{name}</div>
-                                        <div className="truncate text-[10px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-                                            Pro workspace
+                                        <div className="truncate text-[10px] uppercase tracking-wider text-purple-500 dark:purple-zinc-400">
+                                            Review
                                         </div>
                                     </div>
                                 </div>

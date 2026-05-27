@@ -126,13 +126,15 @@ export default function UploadDocumentView() {
             return;
         }
         try {
-            await createDoc({
-                item_in: {
+            const payload = {
+                item_in: JSON.stringify({
                     title: title,
                     category: format_category(chosenCourse, chosenUni)
-                },
+                }),
                 files: selectedFiles
-            });
+            };
+
+            await createDoc(payload as any);
             toast.success("Upload thành công!");
         } catch (error) {
             toast.error("Có lỗi xảy ra khi tạo document.");

@@ -152,6 +152,7 @@ export function DocumentView({ document, isOpen, onClose }: DocumentViewProps) {
             if (fileInputRef.current) {
                 fileInputRef.current.value = "";
             }
+            console.log(fileInputRef)
 
         } catch (error) {
             toast.error("Có lỗi xảy ra khi tạo document.");

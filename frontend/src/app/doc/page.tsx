@@ -5,7 +5,7 @@ import Link from "next/link"
 import { useState, useEffect } from "react"
 import { LoadingScreen } from "@/src/components/Dashboard/loading-screen"
 import { DashboardContent } from "@/src/components/Dashboard/dashboard-content"
-import { BarChart3, FileText, AngryIcon } from "lucide-react"
+import { BarChart3, FileText, AngryIcon, SquareDashedKanban } from "lucide-react"
 import { useUserActions } from "@/src/api/user/useUser"
 
 const getViewInfo = (activeTab: string) => {
@@ -67,7 +67,7 @@ function AdminDashboardContent() {
                                 className="flex items-center gap-2.5 rounded-full bg-gradient-to-b from-white to-zinc-50 px-5 py-2 text-sm font-semibold text-zinc-900 border border-zinc-200/80 shadow-[0_4px_12px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.08)] transition-all hover:scale-105 hover:shadow-[0_6px_20px_rgba(0,0,0,0.1)] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 dark:from-zinc-900 dark:to-zinc-950 dark:text-white dark:border-zinc-800"
                             >
                                 Reviews
-                                <FileText className="h-5 w-5 text-zinc-500 dark:text-zinc-400" />
+                                <SquareDashedKanban className="h-5 w-5 text-zinc-500 dark:text-zinc-400" />
                             </Link>
 
                         </div>
@@ -81,8 +81,8 @@ function AdminDashboardContent() {
                                         </div>
                                         <div className="hidden sm:block min-w-0 text-left">
                                             <div className="truncate text-sm font-semibold">{name}</div>
-                                            <div className="truncate text-[10px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-                                                Pro workspace
+                                            <div className="truncate text-[10px] uppercase tracking-wider text-blue-500 dark:text-blue-400">
+                                                Document space
                                             </div>
                                         </div>
                                     </div>

@@ -7,25 +7,11 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-    title: 'v0 App',
-    description: 'Created with v0',
-    generator: 'v0.app',
+    title: 'Login',
+    description: 'FUET',
     icons: {
-        icon: [
-            {
-                url: '/icon-light-32x32.png',
-                media: '(prefers-color-scheme: light)',
-            },
-            {
-                url: '/icon-dark-32x32.png',
-                media: '(prefers-color-scheme: dark)',
-            },
-            {
-                url: '/icon.svg',
-                type: 'image/svg+xml',
-            },
-        ],
-        apple: '/apple-icon.png',
+        icon: '/original-839a9a2a679b62ec44f80405f24cca70.webp',
+        apple: '/original-839a9a2a679b62ec44f80405f24cca70.webp',
     },
 }
 

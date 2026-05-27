@@ -25,6 +25,9 @@ export const useDocumentActions = (params: ReadDocumentsApiV1DocumentsGetParams 
                     queryClient.invalidateQueries({
                         queryKey: getReadDocumentsApiV1DocumentsGetQueryKey()
                     });
+                },
+                onError: () => {
+                    console.log(docData.item_in)
                 }
             }
         );

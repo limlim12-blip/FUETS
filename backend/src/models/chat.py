@@ -36,7 +36,8 @@ class Chat(ChatBase, table=True):
         sa_column_kwargs={"server_default": text("gen_random_uuid()")},
     )
     user_id: uuid.UUID = Field(
-        foreign_key="user.id", nullable=False, ondelete="CASCADE"
+        foreign_key="user.id",
+        ondelete="CASCADE",
     )
     created_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc),

@@ -6,6 +6,7 @@
  */
 import {
   useInfiniteQuery,
+  useMutation,
   useQuery
 } from '@tanstack/react-query';
 import type {
@@ -14,22 +15,29 @@ import type {
   DefinedUseInfiniteQueryResult,
   DefinedUseQueryResult,
   InfiniteData,
+  MutationFunction,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
   UseInfiniteQueryOptions,
   UseInfiniteQueryResult,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult
 } from '@tanstack/react-query';
 
 import type {
-  UserPublic
+  HTTPValidationError,
+  UserCreate,
+  UserPublic,
+  UserUpdate,
+  UsersPublic
 } from '../model';
 
 import { customInstance } from '.././axios-custom';
-import type { ErrorType } from '.././axios-custom';
+import type { ErrorType , BodyType } from '.././axios-custom';
 
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
@@ -201,3 +209,356 @@ export function useGetCurrentUserApiV1UserMeGet<TData = Awaited<ReturnType<typeo
 
 
 
+/**
+ * @summary Read Users
+ */
+export const readUsersApiV1UserGet = (
+
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<UsersPublic>(
+      {url: `/api/v1/user/`, method: 'GET', signal
+    },
+      options);
+    }
+
+
+
+
+export const getReadUsersApiV1UserGetInfiniteQueryKey = () => {
+    return [
+    'infinite', `/api/v1/user/`
+    ] as const;
+    }
+
+export const getReadUsersApiV1UserGetQueryKey = () => {
+    return [
+    `/api/v1/user/`
+    ] as const;
+    }
+
+
+export const getReadUsersApiV1UserGetInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof readUsersApiV1UserGet>>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readUsersApiV1UserGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getReadUsersApiV1UserGetInfiniteQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof readUsersApiV1UserGet>>> = ({ signal }) => readUsersApiV1UserGet(requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof readUsersApiV1UserGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ReadUsersApiV1UserGetInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof readUsersApiV1UserGet>>>
+export type ReadUsersApiV1UserGetInfiniteQueryError = ErrorType<unknown>
+
+
+export function useReadUsersApiV1UserGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readUsersApiV1UserGet>>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readUsersApiV1UserGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof readUsersApiV1UserGet>>,
+          TError,
+          Awaited<ReturnType<typeof readUsersApiV1UserGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReadUsersApiV1UserGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readUsersApiV1UserGet>>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readUsersApiV1UserGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof readUsersApiV1UserGet>>,
+          TError,
+          Awaited<ReturnType<typeof readUsersApiV1UserGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReadUsersApiV1UserGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readUsersApiV1UserGet>>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readUsersApiV1UserGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Read Users
+ */
+
+export function useReadUsersApiV1UserGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readUsersApiV1UserGet>>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readUsersApiV1UserGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getReadUsersApiV1UserGetInfiniteQueryOptions(options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+export const getReadUsersApiV1UserGetQueryOptions = <TData = Awaited<ReturnType<typeof readUsersApiV1UserGet>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readUsersApiV1UserGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getReadUsersApiV1UserGetQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof readUsersApiV1UserGet>>> = ({ signal }) => readUsersApiV1UserGet(requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof readUsersApiV1UserGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ReadUsersApiV1UserGetQueryResult = NonNullable<Awaited<ReturnType<typeof readUsersApiV1UserGet>>>
+export type ReadUsersApiV1UserGetQueryError = ErrorType<unknown>
+
+
+export function useReadUsersApiV1UserGet<TData = Awaited<ReturnType<typeof readUsersApiV1UserGet>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof readUsersApiV1UserGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof readUsersApiV1UserGet>>,
+          TError,
+          Awaited<ReturnType<typeof readUsersApiV1UserGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReadUsersApiV1UserGet<TData = Awaited<ReturnType<typeof readUsersApiV1UserGet>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readUsersApiV1UserGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof readUsersApiV1UserGet>>,
+          TError,
+          Awaited<ReturnType<typeof readUsersApiV1UserGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReadUsersApiV1UserGet<TData = Awaited<ReturnType<typeof readUsersApiV1UserGet>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readUsersApiV1UserGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Read Users
+ */
+
+export function useReadUsersApiV1UserGet<TData = Awaited<ReturnType<typeof readUsersApiV1UserGet>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readUsersApiV1UserGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getReadUsersApiV1UserGetQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+/**
+ * @summary Create User
+ */
+export const createUserApiV1UserPost = (
+    userCreate: BodyType<UserCreate>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<UsersPublic>(
+      {url: `/api/v1/user/`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: userCreate, signal
+    },
+      options);
+    }
+
+
+
+export const getCreateUserApiV1UserPostMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createUserApiV1UserPost>>, TError,{data: BodyType<UserCreate>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof createUserApiV1UserPost>>, TError,{data: BodyType<UserCreate>}, TContext> => {
+
+const mutationKey = ['createUserApiV1UserPost'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createUserApiV1UserPost>>, {data: BodyType<UserCreate>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createUserApiV1UserPost(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateUserApiV1UserPostMutationResult = NonNullable<Awaited<ReturnType<typeof createUserApiV1UserPost>>>
+    export type CreateUserApiV1UserPostMutationBody = BodyType<UserCreate>
+    export type CreateUserApiV1UserPostMutationError = ErrorType<HTTPValidationError>
+
+    /**
+ * @summary Create User
+ */
+export const useCreateUserApiV1UserPost = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createUserApiV1UserPost>>, TError,{data: BodyType<UserCreate>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createUserApiV1UserPost>>,
+        TError,
+        {data: BodyType<UserCreate>},
+        TContext
+      > => {
+      return useMutation(getCreateUserApiV1UserPostMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary Update User
+ */
+export const updateUserApiV1UserIdPut = (
+    id: string,
+    userUpdate: BodyType<UserUpdate>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<UserPublic>(
+      {url: `/api/v1/user/${id}`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: userUpdate, signal
+    },
+      options);
+    }
+
+
+
+export const getUpdateUserApiV1UserIdPutMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateUserApiV1UserIdPut>>, TError,{id: string;data: BodyType<UserUpdate>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateUserApiV1UserIdPut>>, TError,{id: string;data: BodyType<UserUpdate>}, TContext> => {
+
+const mutationKey = ['updateUserApiV1UserIdPut'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateUserApiV1UserIdPut>>, {id: string;data: BodyType<UserUpdate>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateUserApiV1UserIdPut(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateUserApiV1UserIdPutMutationResult = NonNullable<Awaited<ReturnType<typeof updateUserApiV1UserIdPut>>>
+    export type UpdateUserApiV1UserIdPutMutationBody = BodyType<UserUpdate>
+    export type UpdateUserApiV1UserIdPutMutationError = ErrorType<HTTPValidationError>
+
+    /**
+ * @summary Update User
+ */
+export const useUpdateUserApiV1UserIdPut = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateUserApiV1UserIdPut>>, TError,{id: string;data: BodyType<UserUpdate>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateUserApiV1UserIdPut>>,
+        TError,
+        {id: string;data: BodyType<UserUpdate>},
+        TContext
+      > => {
+      return useMutation(getUpdateUserApiV1UserIdPutMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary Delete User
+ */
+export const deleteUserApiV1UserIdDelete = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<unknown>(
+      {url: `/api/v1/user/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
+
+
+
+export const getDeleteUserApiV1UserIdDeleteMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteUserApiV1UserIdDelete>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteUserApiV1UserIdDelete>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['deleteUserApiV1UserIdDelete'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteUserApiV1UserIdDelete>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteUserApiV1UserIdDelete(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteUserApiV1UserIdDeleteMutationResult = NonNullable<Awaited<ReturnType<typeof deleteUserApiV1UserIdDelete>>>
+
+    export type DeleteUserApiV1UserIdDeleteMutationError = ErrorType<HTTPValidationError>
+
+    /**
+ * @summary Delete User
+ */
+export const useDeleteUserApiV1UserIdDelete = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteUserApiV1UserIdDelete>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteUserApiV1UserIdDelete>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+      return useMutation(getDeleteUserApiV1UserIdDeleteMutationOptions(options), queryClient);
+    }

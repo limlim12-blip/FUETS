@@ -542,7 +542,7 @@ export const getDocumentFileUrlApiV1R2StorageFilePathUrlGet = (
 
 
       return customInstance<unknown>(
-      {url: `/api/v1/r2_storage${filePath}/url`, method: 'GET', signal
+      {url: `/api/v1/r2_storage/${filePath}/url`, method: 'GET', signal
     },
       options);
     }
@@ -552,13 +552,13 @@ export const getDocumentFileUrlApiV1R2StorageFilePathUrlGet = (
 
 export const getGetDocumentFileUrlApiV1R2StorageFilePathUrlGetInfiniteQueryKey = (filePath: string,) => {
     return [
-    'infinite', `/api/v1/r2_storage${filePath}/url`
+    'infinite', `/api/v1/r2_storage/${filePath}/url`
     ] as const;
     }
 
 export const getGetDocumentFileUrlApiV1R2StorageFilePathUrlGetQueryKey = (filePath: string,) => {
     return [
-    `/api/v1/r2_storage${filePath}/url`
+    `/api/v1/r2_storage/${filePath}/url`
     ] as const;
     }
 

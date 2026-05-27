@@ -76,7 +76,7 @@ def checker(item_in: str = Form(...)):
     try:
         return DocumentCreate.model_validate_json(item_in)
     except ValidationError as e:
-        raise HTTPException(status_code=422, detail=e.errors())
+        raise HTTPException(status_code=422, detail=f"{e.errors()}")
 
 
 @router.post("/", response_model=DocumentPublic)

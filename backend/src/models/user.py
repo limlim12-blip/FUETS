@@ -76,7 +76,9 @@ class User(UserBase, table=True):
         sa_column_kwargs={"server_default": text("CURRENT_TIMESTAMP")},
     )
 
-    chats: List["Chat"] = Relationship(back_populates="user")
+    chats: List["Chat"] = Relationship(
+        back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+    )
 
 
 # Properties to return via API, id is always required

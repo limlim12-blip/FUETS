@@ -12,7 +12,6 @@ export const useDocumentFileActions = (doc_id?: string, params: ReadDocumentFile
     const queryClient = useQueryClient();
 
     const { data, isLoading, isError, refetch, isFetching } = useReadDocumentFilesApiV1DocumentsDocIdFilesGet(doc_id, params);
-    console.log(data)
 
     const createMutation = useCreateDocumentFileApiV1DocumentsDocIdFilesPost();
     const updateMutation = useUpdateDocumentFileApiV1DocumentsFilesFileIdPut();
