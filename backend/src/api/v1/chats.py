@@ -171,11 +171,11 @@ async def create_message(
         select(Message)
         .where(Message.chat_id == id)
         .where(Message.id != message.id)
-        .order_by(col(Message.created_at).asc())
+        .order_by(col(Message.created_at).desc())
         .limit(10)
     ).all()
     history_str = ""
-    for m in past_messages:
+    for m in past_messages[::-1]:
         role_name = "User" if m.role == MessageRole.USER else MessageRole.ASSISTANT
         history_str += f"{role_name}: {m.content}\n"
     ai_text = invoke(user_question=message.content, history=history_str)

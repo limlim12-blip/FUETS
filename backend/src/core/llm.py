@@ -25,7 +25,12 @@ llm = ChatGoogleGenerativeAI(
 )
 #
 retriever = vectorstore.as_retriever(
-    search_type="mmr", search_kwargs={"k": 20, "lambda_mult": 0.25, "fetch_k": 30}
+    search_type="mmr",
+    search_kwargs={
+        "k": 10,
+        "fetch_k": 30,
+        "lambda_mult": 0.8,
+    },
 )
 
 
@@ -53,17 +58,17 @@ def format_doc(docs):
 
 rewrite_prompt = PromptTemplate.from_template("""
     Bạn là chuyên gia trợ lý tìm kiếm thông minh cho sinh viên.
+    Lịch sử trò chuyện gần đây: {history}
     Câu hỏi người dùng: {question}
+    
     Nhiệm vụ: 
-    Phân tích câu hỏi để xác định đối tượng chính (Giảng viên, Tài liệu, Đề thi, Quy trình,...) và các khía cạnh cần tìm kiếm (đánh giá, độ khó, nội dung, kinh nghiệm,...) 
+    Phân tích câu hỏi để xác định đối tượng chính cần tìm kiếm. 
+    
     Hãy tạo một câu truy vấn tìm kiếm tối ưu hóa cho cơ sở dữ liệu vector. Câu truy vấn cần:
-    1. Giữ lại các từ khóa gốc quan trọng (tên người, tên môn, loại tài liệu).
-    2. Mở rộng ngữ nghĩa để bao hàm các khía cạnh liên quan:
-    3. Hãy trích xuất câu truy vấn rút gọn, CHỈ giữ lại thực thể tên riêng và từ khóa cốt lõi nhất. Không thêm các từ như "đánh giá", "phong cách", "cách giảng dạy".
-    Chỉ xuất ra duy nhất câu truy vấn ngắn gọn.
-    4. Loại bỏ các từ dư thừa, câu cảm thán.
-    5. Nếu câu hỏi mang tính chất tra cứu thông tin chung (danh sách đề, tên tài liệu), hãy tập trung vào từ khóa "đề thi", "năm học". Đừng cố tìm kiếm chi tiết nội dung từng câu hỏi trong đề thi trừ khi người dùng hỏi rõ cụ thể câu đó
-
+    1. Giữ lại các từ khóa gốc quan trọng. Nếu người dùng dùng đại từ (như "thầy đấy", "môn này", "ông ấy"), BẮT BUỘC phải dựa vào Lịch sử trò chuyện để tìm tên đích danh và thay thế vào câu truy vấn.
+    2. Chỉ trích xuất câu truy vấn rút gọn, CHỈ giữ lại thực thể tên riêng (Tên giảng viên, tên môn học) và từ khóa cốt lõi.
+    3. Loại bỏ các từ dư thừa, câu cảm thán.
+    
     Chỉ xuất ra duy nhất câu truy vấn đã tối ưu hóa.
 
 """)
@@ -81,23 +86,25 @@ qa_prompt = ChatPromptTemplate.from_messages(
             - Bạn rất ghét những người tự cao, coi minh là giỏi.
             - Bạn tỏ ra rất gay gắt với sinh viên nhưng bạn rất thương sinh viên.
             - Và đặc biệt bạn rất ghét những thầy cô nào cho thuyết trình thảo luận, bắt học sinh tự học, bạn coi đó là lười biếng và thiếu chuyên nghiệp.
+            - Không tự tiện nói nhảm về bản thân nếu không đúng ngữ cảnh.
             
             QUY TẮC BẢO MẬT & TRẢ LỜI:
-            1. CHỈ TRẢ LỜI DỰA TRÊN NGỮ CẢNH: Nếu không có thông tin trong Context, hãy chê trách sự vô lý đó.
+            1. NGUỒN DỮ LIỆU ƯU TIÊN:
+                - Sử dụng thông tin từ [LỊCH SỬ TRÒ CHUYỆN] để duy trì mạch hội thoại.
+                - Sử dụng thông tin từ [CONTEXT] để làm căn cứ chuyên môn.
+                - Nếu câu hỏi nằm ngoài cả hai nguồn trên, hãy chê trách sự vô lý của người hỏi vì đã đặt câu hỏi không dựa trên tài liệu hay bối cảnh đã có.
             2. PHẢI TRÍCH DẪN NGUỒN: 
                 - Mọi thông tin lấy từ ngữ cảnh PHẢI được trích dẫn ngay lập tức theo định dạng: [Source: đường_dẫn_đầy_đủ#page=X].
                - TUYỆT ĐỐI KHÔNG được cắt ngắn hoặc sửa đổi đường dẫn nguồn. Phải giữ nguyên định dạng r2://...#page=X.
             3. QUY TẮC "CẤM TIẾT LỘ": 
                - TUYỆT ĐỐI KHÔNG tự động hiển thị phương trình, công thức toán học, hay nội dung đề thi nếu người dùng không yêu cầu trực tiếp.
                - Chỉ tóm tắt ý chính của tài liệu. Nếu nội dung liên quan đến đề thi, chỉ trả lời thông tin chung như "có đề thi năm X", "đề thi gồm Y phần", tuyệt đối không chép lại đề hay lời giải.
-               - Không được tự nhiên nói những lời vô nghĩa về bản thân nếu không đúng ngữ cảnh.
 
             LỊCH SỬ TRÒ CHUYỆN GẦN ĐÂY (Để hiểu bối cảnh câu hỏi hiện tại):
             {history}
 
             Context:
             {context}
-
 
             Hãy bắt đầu bằng cách thể hiện sự sẵn sàng hỗ trợ nhưng với tiêu chuẩn cao nhất của UET.
             """,
@@ -109,18 +116,33 @@ qa_prompt = ChatPromptTemplate.from_messages(
 # self explain
 query_rewriter = rewrite_prompt | llm | StrOutputParser()
 
+
+def print_and_return(x):
+    print("--- FULL PROMPT TO LLM ---")
+    print(x)
+    return x
+
+
 # NOTE: run parallel to return both context + question
 setup_and_retrieval = RunnableParallel(
     {
-        "context": RunnableLambda(lambda x: x["question"])
+        "context": RunnableLambda(
+            lambda x: {"question": x["question"], "history": x.get("history", "")}
+        )
         | query_rewriter
         | retriever
         | format_doc,
         "question": RunnableLambda(lambda x: x["question"]),
-        "history": RunnableLambda(lambda x: x["history"]),
+        "history": RunnableLambda(lambda x: x.get("history", "")),
     }
 )
-final_chain = setup_and_retrieval | qa_prompt | llm | StrOutputParser()
+final_chain = (
+    setup_and_retrieval
+    | qa_prompt
+    | RunnableLambda(print_and_return)
+    | llm
+    | StrOutputParser()
+)
 
 
 def invoke(user_question: str, history: str = ""):
