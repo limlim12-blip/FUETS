@@ -399,11 +399,7 @@ def download_doc(driver):
 
 
 if __name__ == "__main__":
-    dirs = glob.glob("./docs/*")
-    for dir in dirs:
-        try:
-            os.rmdir(dir)
-        except:
-            continue
-
+    scrape_review_vnu_hub()
+    scrape_from_dhqg_xyz()
+    scrape_from_vnu_doc()
     download_doc(driver)

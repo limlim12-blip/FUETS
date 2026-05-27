@@ -72,4 +72,7 @@ def doc_2_sql():
 
 
 if __name__ == "__main__":
+    course_2_sql()
+    doc_2_sql()
+    prof_2_sql()
     review_2_sql()

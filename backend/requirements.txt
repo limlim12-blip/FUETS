@@ -28,3 +28,8 @@ langchain_huggingface
 langchain_qdrant
 langchain_google_genai
 fastembed
+
+# if you want to scrape web on your own
+#undetected_chromedriver
+#selenium
+#pandas
