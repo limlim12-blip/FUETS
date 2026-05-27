@@ -9,6 +9,7 @@ from fastapi.responses import StreamingResponse
 from src.core.config import config
 from src.api.deps import CurrentUser, SessionDep, get_current_user
 from urllib.parse import quote
+from botocore.config import Config
 
 router = APIRouter(prefix="/r2_storage", dependencies=[])
 BUCKET_NAME = "docs"
@@ -20,6 +21,7 @@ def get_s3_client():
         endpoint_url=config.R2_URL,
         aws_access_key_id=config.R2_ACCESS_KEY,
         aws_secret_access_key=config.R2_SECRET_KEY,
+        config=Config(signature_version="s3v4"),
         region_name="auto",
     )
     return s3
@@ -122,7 +124,7 @@ async def get_bucket_usage():
             raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("{file_path:path}/url")
+@router.get("/{file_path:path}/url")
 async def get_document_file_url(
     *,
     s3=Depends(get_s3_client),
@@ -135,6 +137,7 @@ async def get_document_file_url(
             Params={
                 "Bucket": "docs",
                 "Key": file_path,
+                "ResponseContentDisposition": "inline",
             },
             ExpiresIn=3600,
         )

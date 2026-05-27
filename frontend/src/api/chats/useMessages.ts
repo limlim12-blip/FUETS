@@ -81,6 +81,7 @@ export const useMessageActions = (chatId: string, params: Partial<ReadMessagesAp
 
     return {
         messages,
+        messageCount: data?.pages?.[0]?.count ?? 0,
         error: isError,
         isLoading,
         fetchOlderMessages: fetchNextPage,

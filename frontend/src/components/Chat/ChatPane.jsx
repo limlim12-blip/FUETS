@@ -1,22 +1,14 @@
-import React, { useState, forwardRef, useImperativeHandle, useRef, useCallback, useMemo } from "react";
+import React, { useState, forwardRef, useImperativeHandle, useRef, useCallback } from "react";
 import ReactMarkdown from 'react-markdown';
-import { useStorageActions } from "@/src/api/storage/useStorage"
-import { VirtuosoMessageList, VirtuosoMessageListLicense } from '@virtuoso.dev/message-list';
+import { useStorageActions } from "@/src/api/storage/useStorage";
+import { Virtuoso } from 'react-virtuoso'; // 🌟 USING THE FREE VERSION
 import Message from "./Message";
-import PdfView from "./pdfView";
-import Composer from "./Composer"; import { timeAgo } from "../utils";
+import UniversalMediaView from "./pdfView";
+import Composer from "./Composer";
+import { timeAgo } from "../utils";
 import { useMessageActions } from "@/src/api/chats/useMessages";
 import { Sparkles, Bot } from "lucide-react";
 
-const SCROLL_SNAP_BOTTOM = {
-    type: 'auto-scroll-to-bottom',
-    autoScroll: ({ atBottom, scrollInProgress }) => ({
-        index: 'LAST',
-        align: 'end',
-        offset: 24,
-        behavior: atBottom || scrollInProgress ? 'smooth' : 'auto',
-    }),
-};
 const EmptyChatState = ({ onPromptClick }) => {
     const suggestions = [
         "Câu gì đấy nịnh anh",
@@ -52,6 +44,7 @@ const EmptyChatState = ({ onPromptClick }) => {
         </div>
     );
 };
+
 const FloatingThinkingIndicator = ({ isThinking, onPause }) => {
     return (
         <div
@@ -78,7 +71,10 @@ const preprocessText = (text) => {
 
     return text.replace(/\[Source:\s*([^\]]+)\]/g, (match, url) => {
         const source = url.trim();
-        let sourcePath = source.replace("r2://docs/", "");
+        if (source.startsWith("reviews")) {
+            return ""
+        }
+        let sourcePath = source.replace("r2://docs", "");
 
         let currentSourceNumber;
         if (sourceMap.has(sourcePath)) {
@@ -88,8 +84,6 @@ const preprocessText = (text) => {
             sourceMap.set(sourcePath, currentSourceNumber);
         }
 
-        // BÍ QUYẾT LÀ ĐÂY: Dùng encodeURI để bọc đường link lại
-        // Nó sẽ biến dấu cách thành %20, ngoặc thành %28, %29... giúp Markdown không bị lỗi
         return `[${currentSourceNumber}](CITATION:${encodeURI(sourcePath)})`;
     });
 };
@@ -98,54 +92,53 @@ const ItemContent = ({ data: m, context }) => {
     const processedContent = m.role === "user" ? m.content : preprocessText(m.content);
 
     return (
-        <div className="w-full py-4 flex flex-col gap-2 overflow-hidden">
-            <Message role={m.role}>
-                {m.role === "user" ? (
-                    <div className="whitespace-pre-wrap flow-root">
-                        {m.content}
-                    </div>
-                ) : (
-                    <div className="text-zinc-800 dark:text-zinc-200 text-sm whitespace-normal break-words leading-normal">
-                        <ReactMarkdown
-                            urlTransform={(value) => value}
-
-                            components={{
-                                // Ép thẻ <p> chỉ cách nhau một chút xíu (mb-2)
-                                p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
-                                // Ép danh sách <ul> và <ol> lề trái 20px (pl-5)
-                                ul: ({ children }) => <ul className="list-disc pl-5 mb-2 space-y-1">{children}</ul>,
-                                ol: ({ children }) => <ol className="list-decimal pl-5 mb-2 space-y-1">{children}</ol>,
-                                // Xóa toàn bộ margin thừa của <li>
-                                li: ({ children }) => <li className="m-0 p-0">{children}</li>,
-                                a: ({ node, href, children, ...props }) => {
-                                    if (href && href.startsWith("CITATION:")) {
-                                        const sourcePath = decodeURI(href.replace("CITATION:", ""));
+        <div className="w-full py-4 flex justify-center">
+            <div className="w-full max-w-6xl px-4 sm:px-6 flex flex-col gap-2 overflow-hidden">
+                <Message role={m.role}>
+                    {m.role === "user" ? (
+                        <div className="whitespace-pre-wrap flow-root text-base sm:text-lg">
+                            {m.content}
+                        </div>
+                    ) : (
+                        <div className="text-zinc-800 dark:text-zinc-200 text-base sm:text-lg whitespace-normal break-words leading-normal">
+                            <ReactMarkdown
+                                urlTransform={(value) => value}
+                                components={{
+                                    p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                                    ul: ({ children }) => <ul className="list-disc pl-5 mb-2 space-y-1">{children}</ul>,
+                                    ol: ({ children }) => <ol className="list-decimal pl-5 mb-2 space-y-1">{children}</ol>,
+                                    li: ({ children }) => <li className="m-0 p-0">{children}</li>,
+                                    a: ({ node, href, children, ...props }) => {
+                                        if (href && href.startsWith("CITATION:")) {
+                                            const sourcePath = decodeURI(href.replace("CITATION:", ""));
+                                            return (
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        context.setDocument(sourcePath);
+                                                        context.SetIsOpenPDFview(true);
+                                                    }}
+                                                    title={sourcePath}
+                                                    className="inline-flex items-center justify-center rounded-sm bg-zinc-200/60 px-[5px] py-0 mx-[2px] text-[10px] font-semibold text-zinc-600 hover:bg-zinc-300 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700 transition-colors align-super"
+                                                >
+                                                    {children}
+                                                </button>
+                                            );
+                                        }
                                         return (
-                                            <button
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    context.SetIsOpenPDFview(true);
-                                                }}
-                                                title={sourcePath}
-                                                className="inline-flex items-center justify-center rounded-sm bg-zinc-200/60 px-[5px] py-0 mx-[2px] text-[10px] font-semibold text-zinc-600 hover:bg-zinc-300 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700 transition-colors align-super"
-                                            >
+                                            <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline" {...props}>
                                                 {children}
-                                            </button>
+                                            </a>
                                         );
                                     }
-                                    return (
-                                        <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline" {...props}>
-                                            {children}
-                                        </a>
-                                    );
-                                }
-                            }}
-                        >
-                            {processedContent}
-                        </ReactMarkdown>
-                    </div>
-                )}
-            </Message>
+                                }}
+                            >
+                                {processedContent}
+                            </ReactMarkdown>
+                        </div>
+                    )}
+                </Message>
+            </div>
         </div>
     );
 };
@@ -153,14 +146,6 @@ const ItemContent = ({ data: m, context }) => {
 const listComponents = {
     Header: ({ context }) => (
         <div className="pt-6 pb-2">
-            <div className="mb-2 max-w-3xl">
-                <span className="block leading-[1.05] font-sans text-2xl sm:text-3xl">
-                    {context.title}
-                </span>
-            </div>
-            <div className="mb-4 max-w-3xl text-sm text-zinc-500 dark:text-zinc-400">
-                Updated {timeAgo(context.updatedAt)} · {context.count} messages
-            </div>
             <div className="h-[40px] flex items-center justify-center">
                 {context.isLoadingHistory && (
                     <span className="text-sm text-zinc-500">Loading older messages…</span>
@@ -168,7 +153,6 @@ const listComponents = {
             </div>
         </div>
     ),
-    Footer: () => <div className="h-6" />,
     EmptyPlaceholder: () => (
         <div className="flex h-full items-start pt-10">
             <div className="max-w-3xl w-full rounded-xl border border-dashed border-zinc-300 p-6 text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
@@ -183,16 +167,18 @@ const ChatPane = forwardRef(function ChatPane(
     ref
 ) {
     const composerRef = useRef(null);
+    const virtuosoRef = useRef(null); // 🌟 Added ref for native Virtuoso scrolling
     const [isForceSnapping, setIsForceSnapping] = useState(false);
     const [document, setDocument] = useState("");
     const [isOpenPDFview, SetIsOpenPDFview] = useState(false);
 
     const handleClosePDFView = () => {
-        SetIsOpenPDFview(false)
-        setDocument(null)
-    }
+        SetIsOpenPDFview(false);
+    };
+
     const {
         messages,
+        messageCount,
         fetchOlderMessages,
         hasMoreHistory,
         isLoadingHistory,
@@ -200,25 +186,15 @@ const ChatPane = forwardRef(function ChatPane(
         error
     } = useMessageActions(conversation?.id ?? "");
 
-    // Only force scroll when the user actively sends a message
-    const scrollModifier = useMemo(() => {
-        if (isForceSnapping) return SCROLL_SNAP_BOTTOM;
-        return undefined;
-    }, [isForceSnapping]);
-
     useImperativeHandle(ref, () => ({
         insertTemplate: (content) => composerRef.current?.insertTemplate(content),
         scrollToBottom: () => {
-            setIsForceSnapping(true);
-            setTimeout(() => setIsForceSnapping(false), 150);
+            virtuosoRef.current?.scrollToIndex({
+                index: 'LAST',
+                behavior: 'auto'
+            });
         },
     }), []);
-
-    const handleScroll = useCallback((location) => {
-        if (location.listOffset > -80 && hasMoreHistory && !isLoadingHistory && !isLoading) {
-            fetchOlderMessages();
-        }
-    }, [hasMoreHistory, isLoadingHistory, isLoading, fetchOlderMessages]);
 
     const handleSend = useCallback(async (text) => {
         if (!text.trim()) return;
@@ -230,40 +206,93 @@ const ChatPane = forwardRef(function ChatPane(
             setTimeout(() => setIsForceSnapping(false), 150);
         }
     }, [onSend]);
+    const hasInitialScrolled = useRef(false);
 
+    React.useEffect(() => {
+        hasInitialScrolled.current = false;
+    }, [conversation?.id]);
+
+    React.useEffect(() => {
+        if (!isLoading && messages.length > 0 && !hasInitialScrolled.current) {
+            // Đợi 50ms cho Markdown render xong xuôi chiều cao
+            const timeoutId = setTimeout(() => {
+                virtuosoRef.current?.scrollToIndex({
+                    index: 'LAST',
+                    align: 'end',
+                    behavior: 'auto' // Cuộn tức thì, không tạo hiệu ứng mượt gây khó chịu lúc mới load
+                });
+                hasInitialScrolled.current = true;
+            }, 50);
+            return () => clearTimeout(timeoutId);
+        }
+    }, [messages, isLoading]);
     if (!conversation) return null;
     if (messages.length === 0 && isLoading) return <div className="p-4 text-center text-zinc-500">Loading messages…</div>;
     if (error) return <div className="p-4 text-center text-red-500 bg-red-50/50">Failed to load chat.</div>;
 
     return (
         <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden relative">
+            <div className="z-10 flex shrink-0 flex-col items-center justify-center w-full bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md pt-4 pb-2">
+                <div className="w-full max-w-6xl px-4 sm:px-6 flex flex-col items-center text-center">
+                    <h1
+                        className="max-w-[85%] sm:max-w-[70%] truncate text-lg sm:text-xl font-semibold text-zinc-800 dark:text-zinc-200 tracking-tight"
+                        title={conversation?.title || "New Chat"}
+                    >
+                        {conversation?.title || "New Chat"}
+                    </h1>
+                    <div className="flex items-center gap-2 mt-1 text-[11px] sm:text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                        <span className="flex items-center gap-1.5">
+                            <span className="relative flex h-1.5 w-1.5">
+                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                            </span>
+                            Active
+                        </span>
+                        <span>&middot;</span>
+                        <span>{messageCount || 0} messages</span>
+                    </div>
+                </div>
+
+                {/* Đường kẻ phân cách Gradient */}
+                <div className="w-full max-w-6xl px-4 sm:px-6 mt-3">
+                    <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-zinc-200 dark:via-zinc-800 to-transparent" />
+                </div>
+            </div>
             <div className="flex-1 flex flex-col overflow-hidden relative">
                 {messages.length === 0 ? (
                     <EmptyChatState onPromptClick={handleSend} />
                 ) : (
-                    <VirtuosoMessageListLicense licenseKey={""}>
-                        <VirtuosoMessageList
-                            className="h-full w-full px-4 sm:px-8 lg:px-12"
-                            data={{ data: messages, scrollModifier }}
-                            onScroll={handleScroll}
-                            initialLocation={{ index: 'LAST', align: 'end' }}
+                    // 🌟 FREE VIRTUOSO IMPLEMENTATION
+                    <Virtuoso
+                        ref={virtuosoRef}
+                        className="h-full w-full overscroll-y-none"
+                        data={messages}
 
-                            computeItemKey={({ data }) => data.id}
+                        alignToBottom={true}
+                        followOutput="auto"
 
-                            ItemContent={ItemContent}
-                            components={listComponents}
-                            context={{
-                                isLoadingHistory,
-                                SetIsOpenPDFview,
-                                isOpenPDFview,
-                                onResendMessage,
-                                onPromptClick: handleSend,
-                                title: conversation.title,
-                                updatedAt: conversation.updatedAt,
-                                count: messages.length || conversation.messageCount || 0,
-                            }}
-                        />
-                    </VirtuosoMessageListLicense>
+                        startReached={() => {
+                            if (hasMoreHistory && !isLoadingHistory && !isLoading) {
+                                fetchOlderMessages();
+                            }
+                        }}
+                        computeItemKey={(index, message) => message?.id || index}
+                        context={{
+                            isLoadingHistory,
+                            SetIsOpenPDFview,
+                            isOpenPDFview,
+                            setDocument,
+                            onResendMessage,
+                            onPromptClick: handleSend,
+                            title: conversation.title,
+                            updatedAt: conversation.updatedAt,
+                            count: messages.length || conversation.messageCount || 0,
+                        }}
+                        itemContent={(index, message, context) => (
+                            <ItemContent data={message} context={context} />
+                        )}
+                        components={listComponents}
+                    />
                 )}
 
                 <FloatingThinkingIndicator isThinking={isThinking} onPause={onPauseThinking} />
@@ -274,8 +303,8 @@ const ChatPane = forwardRef(function ChatPane(
                 onSend={handleSend}
                 busy={isThinking || isForceSnapping}
             />
-            <PdfView
-                document={"documents/Đề thi Toán học rời rạc đề số 1 kỳ 2 năm học 2022-2023 – UET/gdrive_file_3019ac94ccff46e8a1235ee1f5ac0698.pdf"}
+            <UniversalMediaView
+                document={document}
                 isOpen={isOpenPDFview}
                 onClose={handleClosePDFView}
             />
