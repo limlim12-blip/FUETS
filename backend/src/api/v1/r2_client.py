@@ -138,6 +138,7 @@ async def get_document_file_url(
                 "Bucket": "docs",
                 "Key": file_path,
                 "ResponseContentDisposition": "inline",
+                "ResponseContentType": "application/pdf",
             },
             ExpiresIn=3600,
         )
