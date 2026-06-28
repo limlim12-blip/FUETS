@@ -1,94 +1,84 @@
-from concurrent.futures import process
 import io
 import zipfile
-import boto3
-import httpx
-import requests
-from fastapi import APIRouter, HTTPException, Depends, Response
+from fastapi import APIRouter, HTTPException, Response
 from fastapi.responses import StreamingResponse
-from src.core.config import config
-from src.api.deps import CurrentUser, SessionDep, get_current_user
+from src.repo.obj_store import IStorageRepo
 from urllib.parse import quote
-from botocore.config import Config
+from slowapi.util import get_remote_address
+from slowapi import Limiter
+from fastapi import (
+    Request,
+)
+from fastapi import Request, Depends
+from src.api.deps import StorageDep
 
 router = APIRouter(prefix="/r2_storage", dependencies=[])
-BUCKET_NAME = "docs"
-
-
-def get_s3_client():
-    s3 = boto3.client(
-        service_name="s3",
-        endpoint_url=config.R2_URL,
-        aws_access_key_id=config.R2_ACCESS_KEY,
-        aws_secret_access_key=config.R2_SECRET_KEY,
-        config=Config(signature_version="s3v4"),
-        region_name="auto",
-    )
-    return s3
+limiter = Limiter(
+    key_func=get_remote_address, strategy="fixed-window", storage_uri="memory://"
+)
 
 
 @router.get(
     "/download/{filepath:path}",
-    # why? idk
-    responses={
+    responses={  # why? idk
         200: {
             "content": {"application/octet-stream": {}},
             "description": "Returns the requested file or folder zip archive.",
         }
     },
 )
-async def download_file(filepath: str, s3=Depends(get_s3_client)):
+@limiter.limit("2/second", per_method=True)
+@limiter.limit("10/minute", per_method=True)
+@limiter.limit("30/day", per_method=True)
+async def download_file(
+    filepath: str,
+    request: Request,
+    repo: IStorageRepo = StorageDep,
+):
     base_name = filepath.split("/")[-1]
     encoded_filename = quote(base_name)
 
-    file_list = get_all_objects_under_prefix(s3, filepath)
-    print("dbu:", encoded_filename, file_list)
     try:
+        file_list = repo.list_files(filepath)
         if len(file_list) == 1 and file_list[0] == filepath:
-            response = s3.get_object(Bucket=BUCKET_NAME, Key=filepath)
-            file_content = response["Body"].read()
+            file_content = repo.get_file_bytes(filepath)
             return Response(
                 content=file_content,
-                media_type=response.get("ContentType", "application/octet-stream"),
+                media_type="application/octet-stream",
                 headers={
                     "Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"
                 },
             )
-        else:
-            zip_buffer = io.BytesIO()
-            with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
-                for file_key in file_list:
-                    if file_key.endswith("/"):
-                        continue
-                    response = s3.get_object(Bucket=BUCKET_NAME, Key=file_key)
-                    zip_file.writestr(file_key.split("/")[-1], response["Body"].read())
-            zip_buffer.seek(0)
-            return StreamingResponse(
-                zip_buffer,
-                media_type="application/zip",
-                headers={
-                    "Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}.zip"
-                },
-            )
+        if not file_list:
+            raise HTTPException(status_code=404, detail="File or directory not found")
 
-    except s3.exceptions.NoSuchKey:
+        zip_buffer = io.BytesIO()
+        with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
+            for file_key in file_list:
+                file_bytes = repo.get_file_bytes(file_key)
+                zip_filename = file_key.split("/")[-1]
+                zip_file.writestr(zip_filename, file_bytes)
+
+        zip_buffer.seek(0)
+        return StreamingResponse(
+            zip_buffer,
+            media_type="application/zip",
+            headers={
+                "Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}.zip"
+            },
+        )
+
+    except KeyError:
         raise HTTPException(status_code=404, detail="File not found")
     except Exception as e:
+        if "NoSuchKey" in str(type(e)):
+            raise HTTPException(status_code=404, detail="File not found")
         raise HTTPException(status_code=500, detail=str(e))
 
 
-def get_all_objects_under_prefix(s3_client, prefix: str) -> list[str]:
-    response = s3_client.list_objects_v2(Bucket=BUCKET_NAME, Prefix=prefix)
-    if "Contents" in response:
-        return [
-            obj["Key"] for obj in response["Contents"] if not obj["Key"].endswith("/")
-        ]
-    return []
-
-
 @router.get("/list-files/{prefix:path}")
-async def list_files(prefix: str, s3=Depends(get_s3_client)):
-    return get_all_objects_under_prefix(s3, quote(prefix))
+async def list_files(prefix: str, repo: IStorageRepo = StorageDep):
+    return repo.list_files(quote(prefix))
 
 
 """ 
@@ -103,45 +93,28 @@ async def list_files(prefix: str, s3=Depends(get_s3_client)):
 
 
 @router.get("/usage")
-async def get_bucket_usage():
-    url = f"https://api.cloudflare.com/client/v4/accounts/{config.R2_ACCOUNT_ID}/r2/buckets/docs/usage"
-    headers = {"Authorization": f"Bearer {config.R2_TOKEN}"}
-    async with httpx.AsyncClient() as client:
-        try:
-            response = await client.get(url, headers=headers)
-            response.raise_for_status()
-            data = response.json()
-
-            if not data.get("success"):
-                raise HTTPException(status_code=500, detail="Cloudflare API error")
-
-            return data
-        except httpx.HTTPStatusError as e:
-            raise HTTPException(
-                status_code=e.response.status_code, detail="Cloudflare API unreachable"
-            )
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+async def get_bucket_usage(repo: IStorageRepo = StorageDep):
+    try:
+        return repo.get_usage_metrics()
+    except ValueError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    except Exception:
+        raise HTTPException(status_code=500, detail="Cloudflare API unreachable")
 
 
 @router.get("/{file_path:path}/url")
-async def get_document_file_url(
-    *,
-    s3=Depends(get_s3_client),
-    file_path: str,
-):
-
+async def get_document_file_url(file_path: str, repo: IStorageRepo = StorageDep):
     try:
-        presigned_url = s3.generate_presigned_url(
-            "get_object",
-            Params={
-                "Bucket": "docs",
-                "Key": file_path,
-                "ResponseContentDisposition": "inline",
-                "ResponseContentType": "application/pdf",
-            },
-            ExpiresIn=3600,
-        )
-        return {"url": presigned_url}
+        url = repo.get_presigned_url(file_path)
+        return {"url": url}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.delete("/{key:path}")
+async def delete_obj(key: str, repo: IStorageRepo = StorageDep):
+    try:
+        repo.delete_prefix(f"documents/{key}")
+        return {"success": True, "message": "Deleted successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

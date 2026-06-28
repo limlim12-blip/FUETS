@@ -1,30 +1,36 @@
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Query, Depends
+import asyncio
 from pydantic import ValidationError
 import urllib.parse
-import os
 from typing import List, Optional
-from src.models.documents import DocumentFileBase, DocumentFile, DocumentBase, Documents
+from src.models.documents import DocumentFileBase, DocumentFile, Documents
 
 from sqlalchemy import asc, desc
 import uuid
 from sqlmodel import col, select
 from sqlalchemy import func
-from typing import Any, Optional
-from src.api.v1.r2_client import get_s3_client, BUCKET_NAME, download_file
+from typing import Any
 from src.models.user import Message
-from src.api.v1.r2_client import get_current_user
 import math
 
 from src.models.documents import (
-    Documents,
     DocumentCreate,
     DocumentPublic,
     Documentspublic,
     DocumentUpdate,
 )
-from src.api.deps import CurrentUser, SessionDep, get_current_user
+from src.repo.obj_store import IStorageRepo
+from src.api.deps import CurrentUser, SessionDep, get_current_user, StorageDep
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from fastapi import (
+    Request,
+)
 
 router = APIRouter(prefix="/documents", dependencies=[Depends(get_current_user)])
+limiter = Limiter(
+    key_func=get_remote_address, strategy="fixed-window", storage_uri="memory://"
+)
 
 
 @router.get("/", response_model=Documentspublic)
@@ -76,17 +82,22 @@ def checker(item_in: str = Form(...)):
     try:
         return DocumentCreate.model_validate_json(item_in)
     except ValidationError as e:
+        logger.error(f"Validation failed: {e.errors()}")
         raise HTTPException(status_code=422, detail=f"{e.errors()}")
 
 
 @router.post("/", response_model=DocumentPublic)
+@limiter.limit("2/second", per_method=True)
+@limiter.limit("10/minute", per_method=True)
+@limiter.limit("30/day", per_method=True)
 async def create_document(
     *,
+    request: Request,
     session: SessionDep,
     current_user: CurrentUser,
     item_in: DocumentCreate = Depends(checker),
     files: List[UploadFile] = File(default=[]),
-    s3=Depends(get_s3_client),
+    storage: IStorageRepo = StorageDep,
 ) -> Any:
     if not current_user.is_superuser:
         raise HTTPException(status_code=403, detail="Not enough permissions")
@@ -99,22 +110,25 @@ async def create_document(
     dir_name = document.obj_title
     encoded_title = urllib.parse.quote(str(dir_name))
     try:
+        tasks = []
         for file in files:
             file_name = file.filename or "unknown.pdf"
             r2_key = f"documents/{dir_name}/{file_name}"
             ext = file_name.split(".")[-1] if "." in file_name else "unknown"
             content = await file.read()
-            s3.put_object(
-                Bucket="docs",
-                Key=r2_key,
-                Body=content,
-                ContentType="application/octet-stream",
-                Metadata={
+            task = asyncio.to_thread(
+                storage.upload_file,
+                key=r2_key,
+                content=content,
+                content_type="application/octet-stream",
+                metadata={
                     "type": ext,
-                    "category": item_in.category or "uncategorized",
+                    "category": urllib.parse.quote(str(document.category))
+                    or "uncategorized",
                     "original_title": encoded_title,
                 },
             )
+            tasks.append(task)
             file_size_bytes = len(content)
             size_str = f"{round(file_size_bytes / 1024)} KB"
 
@@ -165,7 +179,7 @@ async def delete_document(
     session: SessionDep,
     current_user: CurrentUser,
     id: uuid.UUID,
-    s3=Depends(get_s3_client),
+    storage: IStorageRepo = StorageDep,
 ) -> Any:
     document = session.get(Documents, id)
     if not document:
@@ -173,11 +187,8 @@ async def delete_document(
     if not current_user.is_superuser:
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
-    for object in s3.list_objects_v2(
-        Bucket=BUCKET_NAME, Prefix=f"documents/{document.obj_title}"
-    )["Contents"]:
-        file_delete = object["Key"]
-        s3.delete_object(Bucket=BUCKET_NAME, Key=file_delete)
     session.delete(document)
     session.commit()
+    if document.obj_title:
+        storage.delete_prefix(prefix=document.obj_title)
     return {"status": "success"}

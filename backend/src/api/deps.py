@@ -5,6 +5,7 @@ from jwt.exceptions import InvalidTokenError
 from src.core import security
 from src.core.config import config
 from typing import Annotated
+from src.repo.obj_store import IStorageRepo, R2StorageRepo
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import ValidationError
@@ -60,3 +61,13 @@ def get_current_active_superuser(current_user: CurrentUser) -> User:
             status_code=403, detail="The user doesn't have enough privileges"
         )
     return current_user
+
+
+def get_storage_repository() -> IStorageRepo:
+    # if config.ENVIRONMENT == "testing":
+    #     return None
+
+    return R2StorageRepo()
+
+
+StorageDep = Depends(get_storage_repository)

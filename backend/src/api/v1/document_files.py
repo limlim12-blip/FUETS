@@ -1,29 +1,36 @@
 from typing import Any, List
+from fastapi import (
+    APIRouter,
+    HTTPException,
+    UploadFile,
+    File,
+    Query,
+    Depends,
+    Request,
+)
 import urllib.parse
-from botocore.exceptions import ClientError
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Query
-from pathlib import Path
-import mimetypes
 import uuid
-from sqlalchemy.engine import url
 from sqlmodel import select
 from sqlalchemy import func
-from typing import Any
 import math
-from src.api.v1.r2_client import get_s3_client, BUCKET_NAME
+from src.repo.obj_store import IStorageRepo
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 from src.models.documents import (
     Documents,
     DocumentFile,
-    DocumentFileCreate,
     DocumentFileBase,
     DocumentFilePublic,
     DocumentFilespublic,
     DocumentFileUpdate,
 )
-from src.api.deps import CurrentUser, SessionDep, get_current_user
+from src.api.deps import CurrentUser, SessionDep, get_current_user, StorageDep
 
 router = APIRouter(prefix="/documents", dependencies=[Depends(get_current_user)])
+limiter = Limiter(
+    key_func=get_remote_address, strategy="fixed-window", storage_uri="memory://"
+)
 
 
 @router.get("/{doc_id}/files", response_model=DocumentFilespublic)
@@ -49,23 +56,27 @@ async def read_document_files(
 
 
 @router.post("/{doc_id}/files", response_model=DocumentFilespublic)
+@limiter.limit("2/second", per_method=True)
+@limiter.limit("10/minute", per_method=True)
+@limiter.limit("30/day", per_method=True)
 async def create_document_file(
     *,
-    s3=Depends(get_s3_client),
+    request: Request,
+    storage: IStorageRepo = StorageDep,
     session: SessionDep,
     current_user: CurrentUser,
     doc_id: uuid.UUID,
     files: List[UploadFile] = File(default=[]),
 ) -> Any:
+    if not current_user.is_superuser:
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+
+    document = session.get(Documents, doc_id)
+    if not document:
+        raise HTTPException(status_code=404, detail=f"Not found {doc_id}")
+
     try:
         uploaded_docs = []
-        if not current_user.is_superuser:
-            raise HTTPException(status_code=403, detail="Not enough permissions")
-
-        document = session.get(Documents, doc_id)
-        if not document:
-            raise HTTPException(status_code=404, detail=f"Not found {doc_id}")
-
         dir_name = document.obj_title
         encoded_title = urllib.parse.quote(str(dir_name))
         for file in files:
@@ -73,12 +84,11 @@ async def create_document_file(
             r2_key = f"documents/{dir_name}/{file_name}"
             ext = file_name.split(".")[-1] if "." in file_name else "unknown"
             content = await file.read()
-            s3.put_object(
-                Bucket="docs",
-                Key=r2_key,
-                Body=content,
-                ContentType="application/octet-stream",
-                Metadata={
+            storage.upload_file(
+                key=r2_key,
+                content=content,
+                content_type="application/octet-stream",
+                metadata={
                     "type": ext,
                     "category": urllib.parse.quote(str(document.category))
                     or "uncategorized",
@@ -145,7 +155,7 @@ async def delete_document(
     session: SessionDep,
     current_user: CurrentUser,
     file_id: uuid.UUID,
-    s3=Depends(get_s3_client),
+    storage: IStorageRepo = StorageDep,
 ) -> Any:
     document = session.get(DocumentFile, file_id)
     if not document:
@@ -156,5 +166,5 @@ async def delete_document(
     session.delete(document)
 
     session.commit()
-    s3.delete_object(Bucket=BUCKET_NAME, Key=document.url_obj)
+    storage.delete_prefix(prefix=document.url_obj)
     return {"status": "success"}

@@ -5,44 +5,44 @@
  * OpenAPI spec version: 0.1.0
  */
 import {
-  useInfiniteQuery,
-  useMutation,
-  useQuery
+    useInfiniteQuery,
+    useMutation,
+    useQuery
 } from '@tanstack/react-query';
 import type {
-  DataTag,
-  DefinedInitialDataOptions,
-  DefinedUseInfiniteQueryResult,
-  DefinedUseQueryResult,
-  InfiniteData,
-  MutationFunction,
-  QueryClient,
-  QueryFunction,
-  QueryKey,
-  UndefinedInitialDataOptions,
-  UseInfiniteQueryOptions,
-  UseInfiniteQueryResult,
-  UseMutationOptions,
-  UseMutationResult,
-  UseQueryOptions,
-  UseQueryResult
+    DataTag,
+    DefinedInitialDataOptions,
+    DefinedUseInfiniteQueryResult,
+    DefinedUseQueryResult,
+    InfiniteData,
+    MutationFunction,
+    QueryClient,
+    QueryFunction,
+    QueryKey,
+    UndefinedInitialDataOptions,
+    UseInfiniteQueryOptions,
+    UseInfiniteQueryResult,
+    UseMutationOptions,
+    UseMutationResult,
+    UseQueryOptions,
+    UseQueryResult
 } from '@tanstack/react-query';
 
 import type {
-  ChatCreate,
-  ChatPublic,
-  ChatUpdate,
-  ChatsPublic,
-  HTTPValidationError,
-  MessageCreate,
-  MessagePublic,
-  MessagesPublic,
-  ReadChatsApiV1ChatsGetParams,
-  ReadMessagesApiV1ChatsIdMessagesGetParams
+    ChatCreate,
+    ChatPublic,
+    ChatUpdate,
+    ChatsPublic,
+    HTTPValidationError,
+    MessageCreate,
+    MessagePublic,
+    MessagesPublic,
+    ReadChatsApiV1ChatsGetParams,
+    ReadMessagesApiV1ChatsIdMessagesGetParams
 } from '../model';
 
 import { customInstance } from '.././axios-custom';
-import type { ErrorType , BodyType } from '.././axios-custom';
+import type { ErrorType, BodyType } from '.././axios-custom';
 
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
@@ -54,49 +54,50 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
  */
 export const readChatsApiV1ChatsGet = (
     params?: ReadChatsApiV1ChatsGetParams,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+    options?: SecondParameter<typeof customInstance>, signal?: AbortSignal
 ) => {
 
 
-      return customInstance<ChatsPublic>(
-      {url: `/api/v1/chats/`, method: 'GET',
-        params, signal
-    },
-      options);
-    }
+    return customInstance<ChatsPublic>(
+        {
+            url: `/api/v1/chats/`, method: 'GET',
+            params, signal
+        },
+        options);
+}
 
 
 
 
 export const getReadChatsApiV1ChatsGetInfiniteQueryKey = (params?: ReadChatsApiV1ChatsGetParams,) => {
     return [
-    'infinite', `/api/v1/chats/`, ...(params ? [params] : [])
+        'infinite', `/api/v1/chats/`, ...(params ? [params] : [])
     ] as const;
-    }
+}
 
 export const getReadChatsApiV1ChatsGetQueryKey = (params?: ReadChatsApiV1ChatsGetParams,) => {
     return [
-    `/api/v1/chats/`, ...(params ? [params] : [])
+        `/api/v1/chats/`, ...(params ? [params] : [])
     ] as const;
-    }
+}
 
 
-export const getReadChatsApiV1ChatsGetInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, ReadChatsApiV1ChatsGetParams['page']>, TError = ErrorType<HTTPValidationError>>(params?: ReadChatsApiV1ChatsGetParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError, TData, QueryKey, ReadChatsApiV1ChatsGetParams['page']>>, request?: SecondParameter<typeof customInstance>}
+export const getReadChatsApiV1ChatsGetInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, ReadChatsApiV1ChatsGetParams['page']>, TError = ErrorType<HTTPValidationError>>(params?: ReadChatsApiV1ChatsGetParams, options?: { query?: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError, TData, QueryKey, ReadChatsApiV1ChatsGetParams['page']>>, request?: SecondParameter<typeof customInstance> }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+    const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getReadChatsApiV1ChatsGetInfiniteQueryKey(params);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, QueryKey, ReadChatsApiV1ChatsGetParams['page']> = ({ signal, pageParam }) => readChatsApiV1ChatsGet({...params, 'page': pageParam || params?.['page']}, requestOptions, signal);
+    const queryKey = queryOptions?.queryKey ?? getReadChatsApiV1ChatsGetInfiniteQueryKey(params);
 
 
 
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, QueryKey, ReadChatsApiV1ChatsGetParams['page']> = ({ signal, pageParam }) => readChatsApiV1ChatsGet({ ...params, 'page': pageParam || params?.['page'] }, requestOptions, signal);
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError, TData, QueryKey, ReadChatsApiV1ChatsGetParams['page']> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+
+
+    return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError, TData, QueryKey, ReadChatsApiV1ChatsGetParams['page']> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
 export type ReadChatsApiV1ChatsGetInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>>
@@ -104,43 +105,47 @@ export type ReadChatsApiV1ChatsGetInfiniteQueryError = ErrorType<HTTPValidationE
 
 
 export function useReadChatsApiV1ChatsGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, ReadChatsApiV1ChatsGetParams['page']>, TError = ErrorType<HTTPValidationError>>(
- params: undefined |  ReadChatsApiV1ChatsGetParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError, TData, QueryKey, ReadChatsApiV1ChatsGetParams['page']>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>,
-          TError,
-          Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, QueryKey
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    params: undefined | ReadChatsApiV1ChatsGetParams, options: {
+        query: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError, TData, QueryKey, ReadChatsApiV1ChatsGetParams['page']>> & Pick<
+            DefinedInitialDataOptions<
+                Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>,
+                TError,
+                Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, QueryKey
+            >, 'initialData'
+        >, request?: SecondParameter<typeof customInstance>
+    }
+    , queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useReadChatsApiV1ChatsGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, ReadChatsApiV1ChatsGetParams['page']>, TError = ErrorType<HTTPValidationError>>(
- params?: ReadChatsApiV1ChatsGetParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError, TData, QueryKey, ReadChatsApiV1ChatsGetParams['page']>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>,
-          TError,
-          Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, QueryKey
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    params?: ReadChatsApiV1ChatsGetParams, options?: {
+        query?: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError, TData, QueryKey, ReadChatsApiV1ChatsGetParams['page']>> & Pick<
+            UndefinedInitialDataOptions<
+                Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>,
+                TError,
+                Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, QueryKey
+            >, 'initialData'
+        >, request?: SecondParameter<typeof customInstance>
+    }
+    , queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useReadChatsApiV1ChatsGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, ReadChatsApiV1ChatsGetParams['page']>, TError = ErrorType<HTTPValidationError>>(
- params?: ReadChatsApiV1ChatsGetParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError, TData, QueryKey, ReadChatsApiV1ChatsGetParams['page']>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    params?: ReadChatsApiV1ChatsGetParams, options?: { query?: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError, TData, QueryKey, ReadChatsApiV1ChatsGetParams['page']>>, request?: SecondParameter<typeof customInstance> }
+    , queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Read Chats
  */
 
 export function useReadChatsApiV1ChatsGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, ReadChatsApiV1ChatsGetParams['page']>, TError = ErrorType<HTTPValidationError>>(
- params?: ReadChatsApiV1ChatsGetParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError, TData, QueryKey, ReadChatsApiV1ChatsGetParams['page']>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    params?: ReadChatsApiV1ChatsGetParams, options?: { query?: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError, TData, QueryKey, ReadChatsApiV1ChatsGetParams['page']>>, request?: SecondParameter<typeof customInstance> }
+    , queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getReadChatsApiV1ChatsGetInfiniteQueryOptions(params,options)
+    const queryOptions = getReadChatsApiV1ChatsGetInfiniteQueryOptions(params, options)
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+    const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  return { ...query, queryKey: queryOptions.queryKey };
+    return { ...query, queryKey: queryOptions.queryKey };
 }
 
 
@@ -148,12 +153,12 @@ export function useReadChatsApiV1ChatsGetInfinite<TData = InfiniteData<Awaited<R
 
 
 
-export const getReadChatsApiV1ChatsGetQueryOptions = <TData = Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError = ErrorType<HTTPValidationError>>(params?: ReadChatsApiV1ChatsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getReadChatsApiV1ChatsGetQueryOptions = <TData = Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError = ErrorType<HTTPValidationError>>(params?: ReadChatsApiV1ChatsGetParams, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+    const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getReadChatsApiV1ChatsGetQueryKey(params);
+    const queryKey = queryOptions?.queryKey ?? getReadChatsApiV1ChatsGetQueryKey(params);
 
 
 
@@ -163,7 +168,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
 export type ReadChatsApiV1ChatsGetQueryResult = NonNullable<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>>
@@ -171,43 +176,47 @@ export type ReadChatsApiV1ChatsGetQueryError = ErrorType<HTTPValidationError>
 
 
 export function useReadChatsApiV1ChatsGet<TData = Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError = ErrorType<HTTPValidationError>>(
- params: undefined |  ReadChatsApiV1ChatsGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>,
-          TError,
-          Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    params: undefined | ReadChatsApiV1ChatsGetParams, options: {
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError, TData>> & Pick<
+            DefinedInitialDataOptions<
+                Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>,
+                TError,
+                Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>
+            >, 'initialData'
+        >, request?: SecondParameter<typeof customInstance>
+    }
+    , queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useReadChatsApiV1ChatsGet<TData = Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError = ErrorType<HTTPValidationError>>(
- params?: ReadChatsApiV1ChatsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>,
-          TError,
-          Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    params?: ReadChatsApiV1ChatsGetParams, options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError, TData>> & Pick<
+            UndefinedInitialDataOptions<
+                Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>,
+                TError,
+                Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>
+            >, 'initialData'
+        >, request?: SecondParameter<typeof customInstance>
+    }
+    , queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useReadChatsApiV1ChatsGet<TData = Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError = ErrorType<HTTPValidationError>>(
- params?: ReadChatsApiV1ChatsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    params?: ReadChatsApiV1ChatsGetParams, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
+    , queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Read Chats
  */
 
 export function useReadChatsApiV1ChatsGet<TData = Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError = ErrorType<HTTPValidationError>>(
- params?: ReadChatsApiV1ChatsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    params?: ReadChatsApiV1ChatsGetParams, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof readChatsApiV1ChatsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
+    , queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getReadChatsApiV1ChatsGetQueryOptions(params,options)
+    const queryOptions = getReadChatsApiV1ChatsGetQueryOptions(params, options)
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  return { ...query, queryKey: queryOptions.queryKey };
+    return { ...query, queryKey: queryOptions.queryKey };
 }
 
 
@@ -220,101 +229,104 @@ export function useReadChatsApiV1ChatsGet<TData = Awaited<ReturnType<typeof read
  */
 export const createChatApiV1ChatsPost = (
     chatCreate: BodyType<ChatCreate>,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+    options?: SecondParameter<typeof customInstance>, signal?: AbortSignal
 ) => {
 
 
-      return customInstance<ChatPublic>(
-      {url: `/api/v1/chats/`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: chatCreate, signal
-    },
-      options);
-    }
+    return customInstance<ChatPublic>(
+        {
+            url: `/api/v1/chats/`, method: 'POST',
+            headers: { 'Content-Type': 'application/json', },
+            data: chatCreate, signal
+        },
+        options);
+}
 
 
 
 export const getCreateChatApiV1ChatsPostMutationOptions = <TError = ErrorType<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createChatApiV1ChatsPost>>, TError,{data: BodyType<ChatCreate>}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof createChatApiV1ChatsPost>>, TError,{data: BodyType<ChatCreate>}, TContext> => {
+    TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof createChatApiV1ChatsPost>>, TError, { data: BodyType<ChatCreate> }, TContext>, request?: SecondParameter<typeof customInstance> }
+    ): UseMutationOptions<Awaited<ReturnType<typeof createChatApiV1ChatsPost>>, TError, { data: BodyType<ChatCreate> }, TContext> => {
 
-const mutationKey = ['createChatApiV1ChatsPost'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createChatApiV1ChatsPost>>, {data: BodyType<ChatCreate>}> = (props) => {
-          const {data} = props ?? {};
-
-          return  createChatApiV1ChatsPost(data,requestOptions)
-        }
+    const mutationKey = ['createChatApiV1ChatsPost'];
+    const { mutation: mutationOptions, request: requestOptions } = options ?
+        options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+            options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey, }, request: undefined };
 
 
 
 
+    const mutationFn: MutationFunction<Awaited<ReturnType<typeof createChatApiV1ChatsPost>>, { data: BodyType<ChatCreate> }> = (props) => {
+        const { data } = props ?? {};
 
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CreateChatApiV1ChatsPostMutationResult = NonNullable<Awaited<ReturnType<typeof createChatApiV1ChatsPost>>>
-    export type CreateChatApiV1ChatsPostMutationBody = BodyType<ChatCreate>
-    export type CreateChatApiV1ChatsPostMutationError = ErrorType<HTTPValidationError>
-
-    /**
- * @summary Create Chat
- */
-export const useCreateChatApiV1ChatsPost = <TError = ErrorType<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createChatApiV1ChatsPost>>, TError,{data: BodyType<ChatCreate>}, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof createChatApiV1ChatsPost>>,
-        TError,
-        {data: BodyType<ChatCreate>},
-        TContext
-      > => {
-      return useMutation(getCreateChatApiV1ChatsPostMutationOptions(options), queryClient);
+        return createChatApiV1ChatsPost(data, requestOptions)
     }
-    /**
- * @summary Read Chat
- */
+
+
+
+
+
+
+    return { mutationFn, ...mutationOptions }
+}
+
+export type CreateChatApiV1ChatsPostMutationResult = NonNullable<Awaited<ReturnType<typeof createChatApiV1ChatsPost>>>
+export type CreateChatApiV1ChatsPostMutationBody = BodyType<ChatCreate>
+export type CreateChatApiV1ChatsPostMutationError = ErrorType<HTTPValidationError>
+
+/**
+* @summary Create Chat
+*/
+export const useCreateChatApiV1ChatsPost = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof createChatApiV1ChatsPost>>, TError, { data: BodyType<ChatCreate> }, TContext>, request?: SecondParameter<typeof customInstance> }
+        , queryClient?: QueryClient): UseMutationResult<
+            Awaited<ReturnType<typeof createChatApiV1ChatsPost>>,
+            TError,
+            { data: BodyType<ChatCreate> },
+            TContext
+        > => {
+    return useMutation(getCreateChatApiV1ChatsPostMutationOptions(options), queryClient);
+}
+/**
+* @summary Read Chat
+*/
 export const readChatApiV1ChatsIdGet = (
     id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+    options?: SecondParameter<typeof customInstance>, signal?: AbortSignal
 ) => {
 
 
-      return customInstance<ChatPublic>(
-      {url: `/api/v1/chats/${id}`, method: 'GET', signal
-    },
-      options);
-    }
+    return customInstance<ChatPublic>(
+        {
+            url: `/api/v1/chats/${id}`, method: 'GET', signal
+        },
+        options);
+}
 
 
 
 
 export const getReadChatApiV1ChatsIdGetInfiniteQueryKey = (id: string,) => {
     return [
-    'infinite', `/api/v1/chats/${id}`
+        'infinite', `/api/v1/chats/${id}`
     ] as const;
-    }
+}
 
 export const getReadChatApiV1ChatsIdGetQueryKey = (id: string,) => {
     return [
-    `/api/v1/chats/${id}`
+        `/api/v1/chats/${id}`
     ] as const;
-    }
+}
 
 
-export const getReadChatApiV1ChatsIdGetInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>>, TError = ErrorType<HTTPValidationError>>(id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getReadChatApiV1ChatsIdGetInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>>, TError = ErrorType<HTTPValidationError>>(id: string, options?: { query?: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+    const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getReadChatApiV1ChatsIdGetInfiniteQueryKey(id);
+    const queryKey = queryOptions?.queryKey ?? getReadChatApiV1ChatsIdGetInfiniteQueryKey(id);
 
 
 
@@ -324,7 +336,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+    return { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions } as UseInfiniteQueryOptions<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
 export type ReadChatApiV1ChatsIdGetInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>>
@@ -332,43 +344,47 @@ export type ReadChatApiV1ChatsIdGetInfiniteQueryError = ErrorType<HTTPValidation
 
 
 export function useReadChatApiV1ChatsIdGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>>, TError = ErrorType<HTTPValidationError>>(
- id: string, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>,
-          TError,
-          Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    id: string, options: {
+        query: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError, TData>> & Pick<
+            DefinedInitialDataOptions<
+                Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>,
+                TError,
+                Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>
+            >, 'initialData'
+        >, request?: SecondParameter<typeof customInstance>
+    }
+    , queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useReadChatApiV1ChatsIdGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>>, TError = ErrorType<HTTPValidationError>>(
- id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>,
-          TError,
-          Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    id: string, options?: {
+        query?: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError, TData>> & Pick<
+            UndefinedInitialDataOptions<
+                Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>,
+                TError,
+                Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>
+            >, 'initialData'
+        >, request?: SecondParameter<typeof customInstance>
+    }
+    , queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useReadChatApiV1ChatsIdGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>>, TError = ErrorType<HTTPValidationError>>(
- id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    id: string, options?: { query?: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
+    , queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Read Chat
  */
 
 export function useReadChatApiV1ChatsIdGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>>, TError = ErrorType<HTTPValidationError>>(
- id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    id: string, options?: { query?: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
+    , queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getReadChatApiV1ChatsIdGetInfiniteQueryOptions(id,options)
+    const queryOptions = getReadChatApiV1ChatsIdGetInfiniteQueryOptions(id, options)
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+    const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  return { ...query, queryKey: queryOptions.queryKey };
+    return { ...query, queryKey: queryOptions.queryKey };
 }
 
 
@@ -376,12 +392,12 @@ export function useReadChatApiV1ChatsIdGetInfinite<TData = InfiniteData<Awaited<
 
 
 
-export const getReadChatApiV1ChatsIdGetQueryOptions = <TData = Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError = ErrorType<HTTPValidationError>>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getReadChatApiV1ChatsIdGetQueryOptions = <TData = Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError = ErrorType<HTTPValidationError>>(id: string, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+    const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getReadChatApiV1ChatsIdGetQueryKey(id);
+    const queryKey = queryOptions?.queryKey ?? getReadChatApiV1ChatsIdGetQueryKey(id);
 
 
 
@@ -391,7 +407,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+    return { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
 export type ReadChatApiV1ChatsIdGetQueryResult = NonNullable<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>>
@@ -399,43 +415,47 @@ export type ReadChatApiV1ChatsIdGetQueryError = ErrorType<HTTPValidationError>
 
 
 export function useReadChatApiV1ChatsIdGet<TData = Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError = ErrorType<HTTPValidationError>>(
- id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>,
-          TError,
-          Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    id: string, options: {
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError, TData>> & Pick<
+            DefinedInitialDataOptions<
+                Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>,
+                TError,
+                Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>
+            >, 'initialData'
+        >, request?: SecondParameter<typeof customInstance>
+    }
+    , queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useReadChatApiV1ChatsIdGet<TData = Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError = ErrorType<HTTPValidationError>>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>,
-          TError,
-          Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    id: string, options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError, TData>> & Pick<
+            UndefinedInitialDataOptions<
+                Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>,
+                TError,
+                Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>
+            >, 'initialData'
+        >, request?: SecondParameter<typeof customInstance>
+    }
+    , queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useReadChatApiV1ChatsIdGet<TData = Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError = ErrorType<HTTPValidationError>>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    id: string, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
+    , queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Read Chat
  */
 
 export function useReadChatApiV1ChatsIdGet<TData = Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError = ErrorType<HTTPValidationError>>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    id: string, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof readChatApiV1ChatsIdGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
+    , queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getReadChatApiV1ChatsIdGetQueryOptions(id,options)
+    const queryOptions = getReadChatApiV1ChatsIdGetQueryOptions(id, options)
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  return { ...query, queryKey: queryOptions.queryKey };
+    return { ...query, queryKey: queryOptions.queryKey };
 }
 
 
@@ -449,205 +469,212 @@ export function useReadChatApiV1ChatsIdGet<TData = Awaited<ReturnType<typeof rea
 export const updateChatApiV1ChatsIdPut = (
     id: string,
     chatUpdate: BodyType<ChatUpdate>,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+    options?: SecondParameter<typeof customInstance>, signal?: AbortSignal
 ) => {
 
 
-      return customInstance<ChatPublic>(
-      {url: `/api/v1/chats/${id}`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: chatUpdate, signal
-    },
-      options);
-    }
+    return customInstance<ChatPublic>(
+        {
+            url: `/api/v1/chats/${id}`, method: 'PUT',
+            headers: { 'Content-Type': 'application/json', },
+            data: chatUpdate, signal
+        },
+        options);
+}
 
 
 
 export const getUpdateChatApiV1ChatsIdPutMutationOptions = <TError = ErrorType<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateChatApiV1ChatsIdPut>>, TError,{id: string;data: BodyType<ChatUpdate>}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof updateChatApiV1ChatsIdPut>>, TError,{id: string;data: BodyType<ChatUpdate>}, TContext> => {
+    TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof updateChatApiV1ChatsIdPut>>, TError, { id: string; data: BodyType<ChatUpdate> }, TContext>, request?: SecondParameter<typeof customInstance> }
+    ): UseMutationOptions<Awaited<ReturnType<typeof updateChatApiV1ChatsIdPut>>, TError, { id: string; data: BodyType<ChatUpdate> }, TContext> => {
 
-const mutationKey = ['updateChatApiV1ChatsIdPut'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateChatApiV1ChatsIdPut>>, {id: string;data: BodyType<ChatUpdate>}> = (props) => {
-          const {id,data} = props ?? {};
-
-          return  updateChatApiV1ChatsIdPut(id,data,requestOptions)
-        }
+    const mutationKey = ['updateChatApiV1ChatsIdPut'];
+    const { mutation: mutationOptions, request: requestOptions } = options ?
+        options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+            options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey, }, request: undefined };
 
 
 
 
+    const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateChatApiV1ChatsIdPut>>, { id: string; data: BodyType<ChatUpdate> }> = (props) => {
+        const { id, data } = props ?? {};
 
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type UpdateChatApiV1ChatsIdPutMutationResult = NonNullable<Awaited<ReturnType<typeof updateChatApiV1ChatsIdPut>>>
-    export type UpdateChatApiV1ChatsIdPutMutationBody = BodyType<ChatUpdate>
-    export type UpdateChatApiV1ChatsIdPutMutationError = ErrorType<HTTPValidationError>
-
-    /**
- * @summary Update Chat
- */
-export const useUpdateChatApiV1ChatsIdPut = <TError = ErrorType<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateChatApiV1ChatsIdPut>>, TError,{id: string;data: BodyType<ChatUpdate>}, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof updateChatApiV1ChatsIdPut>>,
-        TError,
-        {id: string;data: BodyType<ChatUpdate>},
-        TContext
-      > => {
-      return useMutation(getUpdateChatApiV1ChatsIdPutMutationOptions(options), queryClient);
+        return updateChatApiV1ChatsIdPut(id, data, requestOptions)
     }
-    /**
- * @summary Delete Chat
- */
+
+
+
+
+
+
+    return { mutationFn, ...mutationOptions }
+}
+
+export type UpdateChatApiV1ChatsIdPutMutationResult = NonNullable<Awaited<ReturnType<typeof updateChatApiV1ChatsIdPut>>>
+export type UpdateChatApiV1ChatsIdPutMutationBody = BodyType<ChatUpdate>
+export type UpdateChatApiV1ChatsIdPutMutationError = ErrorType<HTTPValidationError>
+
+/**
+* @summary Update Chat
+*/
+export const useUpdateChatApiV1ChatsIdPut = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof updateChatApiV1ChatsIdPut>>, TError, { id: string; data: BodyType<ChatUpdate> }, TContext>, request?: SecondParameter<typeof customInstance> }
+        , queryClient?: QueryClient): UseMutationResult<
+            Awaited<ReturnType<typeof updateChatApiV1ChatsIdPut>>,
+            TError,
+            { id: string; data: BodyType<ChatUpdate> },
+            TContext
+        > => {
+    return useMutation(getUpdateChatApiV1ChatsIdPutMutationOptions(options), queryClient);
+}
+/**
+* @summary Delete Chat
+*/
 export const deleteChatApiV1ChatsIdDelete = (
     id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+    options?: SecondParameter<typeof customInstance>, signal?: AbortSignal
 ) => {
 
 
-      return customInstance<unknown>(
-      {url: `/api/v1/chats/${id}`, method: 'DELETE', signal
-    },
-      options);
-    }
+    return customInstance<unknown>(
+        {
+            url: `/api/v1/chats/${id}`, method: 'DELETE', signal
+        },
+        options);
+}
 
 
 
 export const getDeleteChatApiV1ChatsIdDeleteMutationOptions = <TError = ErrorType<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteChatApiV1ChatsIdDelete>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteChatApiV1ChatsIdDelete>>, TError,{id: string}, TContext> => {
+    TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof deleteChatApiV1ChatsIdDelete>>, TError, { id: string }, TContext>, request?: SecondParameter<typeof customInstance> }
+    ): UseMutationOptions<Awaited<ReturnType<typeof deleteChatApiV1ChatsIdDelete>>, TError, { id: string }, TContext> => {
 
-const mutationKey = ['deleteChatApiV1ChatsIdDelete'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteChatApiV1ChatsIdDelete>>, {id: string}> = (props) => {
-          const {id} = props ?? {};
-
-          return  deleteChatApiV1ChatsIdDelete(id,requestOptions)
-        }
+    const mutationKey = ['deleteChatApiV1ChatsIdDelete'];
+    const { mutation: mutationOptions, request: requestOptions } = options ?
+        options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+            options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey, }, request: undefined };
 
 
 
 
+    const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteChatApiV1ChatsIdDelete>>, { id: string }> = (props) => {
+        const { id } = props ?? {};
 
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type DeleteChatApiV1ChatsIdDeleteMutationResult = NonNullable<Awaited<ReturnType<typeof deleteChatApiV1ChatsIdDelete>>>
-
-    export type DeleteChatApiV1ChatsIdDeleteMutationError = ErrorType<HTTPValidationError>
-
-    /**
- * @summary Delete Chat
- */
-export const useDeleteChatApiV1ChatsIdDelete = <TError = ErrorType<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteChatApiV1ChatsIdDelete>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof deleteChatApiV1ChatsIdDelete>>,
-        TError,
-        {id: string},
-        TContext
-      > => {
-      return useMutation(getDeleteChatApiV1ChatsIdDeleteMutationOptions(options), queryClient);
+        return deleteChatApiV1ChatsIdDelete(id, requestOptions)
     }
-    /**
- * @summary Create Message
- */
+
+
+
+
+
+
+    return { mutationFn, ...mutationOptions }
+}
+
+export type DeleteChatApiV1ChatsIdDeleteMutationResult = NonNullable<Awaited<ReturnType<typeof deleteChatApiV1ChatsIdDelete>>>
+
+export type DeleteChatApiV1ChatsIdDeleteMutationError = ErrorType<HTTPValidationError>
+
+/**
+* @summary Delete Chat
+*/
+export const useDeleteChatApiV1ChatsIdDelete = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof deleteChatApiV1ChatsIdDelete>>, TError, { id: string }, TContext>, request?: SecondParameter<typeof customInstance> }
+        , queryClient?: QueryClient): UseMutationResult<
+            Awaited<ReturnType<typeof deleteChatApiV1ChatsIdDelete>>,
+            TError,
+            { id: string },
+            TContext
+        > => {
+    return useMutation(getDeleteChatApiV1ChatsIdDeleteMutationOptions(options), queryClient);
+}
+/**
+* @summary Create Message
+*/
 export const createMessageApiV1ChatsIdPost = (
     id: string,
     messageCreate: BodyType<MessageCreate>,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+    options?: SecondParameter<typeof customInstance>, signal?: AbortSignal
 ) => {
 
 
-      return customInstance<MessagePublic>(
-      {url: `/api/v1/chats/${id}`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: messageCreate, signal
-    },
-      options);
-    }
+    return customInstance<MessagePublic>(
+        {
+            url: `/api/v1/chats/${id}`, method: 'POST',
+            headers: { 'Content-Type': 'application/json', },
+            data: messageCreate, signal
+        },
+        options);
+}
 
 
 
 export const getCreateMessageApiV1ChatsIdPostMutationOptions = <TError = ErrorType<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createMessageApiV1ChatsIdPost>>, TError,{id: string;data: BodyType<MessageCreate>}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof createMessageApiV1ChatsIdPost>>, TError,{id: string;data: BodyType<MessageCreate>}, TContext> => {
+    TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof createMessageApiV1ChatsIdPost>>, TError, { id: string; data: BodyType<MessageCreate> }, TContext>, request?: SecondParameter<typeof customInstance> }
+    ): UseMutationOptions<Awaited<ReturnType<typeof createMessageApiV1ChatsIdPost>>, TError, { id: string; data: BodyType<MessageCreate> }, TContext> => {
 
-const mutationKey = ['createMessageApiV1ChatsIdPost'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createMessageApiV1ChatsIdPost>>, {id: string;data: BodyType<MessageCreate>}> = (props) => {
-          const {id,data} = props ?? {};
-
-          return  createMessageApiV1ChatsIdPost(id,data,requestOptions)
-        }
+    const mutationKey = ['createMessageApiV1ChatsIdPost'];
+    const { mutation: mutationOptions, request: requestOptions } = options ?
+        options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+            options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey, }, request: undefined };
 
 
 
 
+    const mutationFn: MutationFunction<Awaited<ReturnType<typeof createMessageApiV1ChatsIdPost>>, { id: string; data: BodyType<MessageCreate> }> = (props) => {
+        const { id, data } = props ?? {};
 
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CreateMessageApiV1ChatsIdPostMutationResult = NonNullable<Awaited<ReturnType<typeof createMessageApiV1ChatsIdPost>>>
-    export type CreateMessageApiV1ChatsIdPostMutationBody = BodyType<MessageCreate>
-    export type CreateMessageApiV1ChatsIdPostMutationError = ErrorType<HTTPValidationError>
-
-    /**
- * @summary Create Message
- */
-export const useCreateMessageApiV1ChatsIdPost = <TError = ErrorType<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createMessageApiV1ChatsIdPost>>, TError,{id: string;data: BodyType<MessageCreate>}, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof createMessageApiV1ChatsIdPost>>,
-        TError,
-        {id: string;data: BodyType<MessageCreate>},
-        TContext
-      > => {
-      return useMutation(getCreateMessageApiV1ChatsIdPostMutationOptions(options), queryClient);
+        return createMessageApiV1ChatsIdPost(id, data, requestOptions)
     }
-    /**
- * @summary Read Messages
- */
+
+
+
+
+
+
+    return { mutationFn, ...mutationOptions }
+}
+
+export type CreateMessageApiV1ChatsIdPostMutationResult = NonNullable<Awaited<ReturnType<typeof createMessageApiV1ChatsIdPost>>>
+export type CreateMessageApiV1ChatsIdPostMutationBody = BodyType<MessageCreate>
+export type CreateMessageApiV1ChatsIdPostMutationError = ErrorType<HTTPValidationError>
+
+/**
+* @summary Create Message
+*/
+export const useCreateMessageApiV1ChatsIdPost = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof createMessageApiV1ChatsIdPost>>, TError, { id: string; data: BodyType<MessageCreate> }, TContext>, request?: SecondParameter<typeof customInstance> }
+        , queryClient?: QueryClient): UseMutationResult<
+            Awaited<ReturnType<typeof createMessageApiV1ChatsIdPost>>,
+            TError,
+            { id: string; data: BodyType<MessageCreate> },
+            TContext
+        > => {
+    return useMutation(getCreateMessageApiV1ChatsIdPostMutationOptions(options), queryClient);
+}
+/**
+* @summary Read Messages
+*/
 export const readMessagesApiV1ChatsIdMessagesGet = (
     id: string,
     params?: ReadMessagesApiV1ChatsIdMessagesGetParams,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+    options?: SecondParameter<typeof customInstance>, signal?: AbortSignal
 ) => {
 
 
-      return customInstance<MessagesPublic>(
-      {url: `/api/v1/chats/${id}/messages`, method: 'GET',
-        params, signal
-    },
-      options);
-    }
+    return customInstance<MessagesPublic>(
+        {
+            url: `/api/v1/chats/${id}/messages`, method: 'GET',
+            params, signal
+        },
+        options);
+}
 
 
 
@@ -655,35 +682,35 @@ export const readMessagesApiV1ChatsIdMessagesGet = (
 export const getReadMessagesApiV1ChatsIdMessagesGetInfiniteQueryKey = (id: string,
     params?: ReadMessagesApiV1ChatsIdMessagesGetParams,) => {
     return [
-    'infinite', `/api/v1/chats/${id}/messages`, ...(params ? [params] : [])
+        'infinite', `/api/v1/chats/${id}/messages`, ...(params ? [params] : [])
     ] as const;
-    }
+}
 
 export const getReadMessagesApiV1ChatsIdMessagesGetQueryKey = (id: string,
     params?: ReadMessagesApiV1ChatsIdMessagesGetParams,) => {
     return [
-    `/api/v1/chats/${id}/messages`, ...(params ? [params] : [])
+        `/api/v1/chats/${id}/messages`, ...(params ? [params] : [])
     ] as const;
-    }
+}
 
 
 export const getReadMessagesApiV1ChatsIdMessagesGetInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, ReadMessagesApiV1ChatsIdMessagesGetParams['page']>, TError = ErrorType<HTTPValidationError>>(id: string,
-    params?: ReadMessagesApiV1ChatsIdMessagesGetParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError, TData, QueryKey, ReadMessagesApiV1ChatsIdMessagesGetParams['page']>>, request?: SecondParameter<typeof customInstance>}
+    params?: ReadMessagesApiV1ChatsIdMessagesGetParams, options?: { query?: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError, TData, QueryKey, ReadMessagesApiV1ChatsIdMessagesGetParams['page']>>, request?: SecondParameter<typeof customInstance> }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+    const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getReadMessagesApiV1ChatsIdMessagesGetInfiniteQueryKey(id,params);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, QueryKey, ReadMessagesApiV1ChatsIdMessagesGetParams['page']> = ({ signal, pageParam }) => readMessagesApiV1ChatsIdMessagesGet(id,{...params, 'page': pageParam || params?.['page']}, requestOptions, signal);
+    const queryKey = queryOptions?.queryKey ?? getReadMessagesApiV1ChatsIdMessagesGetInfiniteQueryKey(id, params);
 
 
 
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, QueryKey, ReadMessagesApiV1ChatsIdMessagesGetParams['page']> = ({ signal, pageParam }) => readMessagesApiV1ChatsIdMessagesGet(id, { ...params, 'page': pageParam || params?.['page'] }, requestOptions, signal);
 
 
-   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError, TData, QueryKey, ReadMessagesApiV1ChatsIdMessagesGetParams['page']> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+
+
+    return { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions } as UseInfiniteQueryOptions<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError, TData, QueryKey, ReadMessagesApiV1ChatsIdMessagesGetParams['page']> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
 export type ReadMessagesApiV1ChatsIdMessagesGetInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>>
@@ -691,47 +718,51 @@ export type ReadMessagesApiV1ChatsIdMessagesGetInfiniteQueryError = ErrorType<HT
 
 
 export function useReadMessagesApiV1ChatsIdMessagesGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, ReadMessagesApiV1ChatsIdMessagesGetParams['page']>, TError = ErrorType<HTTPValidationError>>(
- id: string,
-    params: undefined |  ReadMessagesApiV1ChatsIdMessagesGetParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError, TData, QueryKey, ReadMessagesApiV1ChatsIdMessagesGetParams['page']>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>,
-          TError,
-          Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, QueryKey
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    id: string,
+    params: undefined | ReadMessagesApiV1ChatsIdMessagesGetParams, options: {
+        query: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError, TData, QueryKey, ReadMessagesApiV1ChatsIdMessagesGetParams['page']>> & Pick<
+            DefinedInitialDataOptions<
+                Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>,
+                TError,
+                Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, QueryKey
+            >, 'initialData'
+        >, request?: SecondParameter<typeof customInstance>
+    }
+    , queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useReadMessagesApiV1ChatsIdMessagesGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, ReadMessagesApiV1ChatsIdMessagesGetParams['page']>, TError = ErrorType<HTTPValidationError>>(
- id: string,
-    params?: ReadMessagesApiV1ChatsIdMessagesGetParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError, TData, QueryKey, ReadMessagesApiV1ChatsIdMessagesGetParams['page']>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>,
-          TError,
-          Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, QueryKey
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    id: string,
+    params?: ReadMessagesApiV1ChatsIdMessagesGetParams, options?: {
+        query?: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError, TData, QueryKey, ReadMessagesApiV1ChatsIdMessagesGetParams['page']>> & Pick<
+            UndefinedInitialDataOptions<
+                Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>,
+                TError,
+                Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, QueryKey
+            >, 'initialData'
+        >, request?: SecondParameter<typeof customInstance>
+    }
+    , queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useReadMessagesApiV1ChatsIdMessagesGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, ReadMessagesApiV1ChatsIdMessagesGetParams['page']>, TError = ErrorType<HTTPValidationError>>(
- id: string,
-    params?: ReadMessagesApiV1ChatsIdMessagesGetParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError, TData, QueryKey, ReadMessagesApiV1ChatsIdMessagesGetParams['page']>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    id: string,
+    params?: ReadMessagesApiV1ChatsIdMessagesGetParams, options?: { query?: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError, TData, QueryKey, ReadMessagesApiV1ChatsIdMessagesGetParams['page']>>, request?: SecondParameter<typeof customInstance> }
+    , queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Read Messages
  */
 
 export function useReadMessagesApiV1ChatsIdMessagesGetInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, ReadMessagesApiV1ChatsIdMessagesGetParams['page']>, TError = ErrorType<HTTPValidationError>>(
- id: string,
-    params?: ReadMessagesApiV1ChatsIdMessagesGetParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError, TData, QueryKey, ReadMessagesApiV1ChatsIdMessagesGetParams['page']>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    id: string,
+    params?: ReadMessagesApiV1ChatsIdMessagesGetParams, options?: { query?: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError, TData, QueryKey, ReadMessagesApiV1ChatsIdMessagesGetParams['page']>>, request?: SecondParameter<typeof customInstance> }
+    , queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getReadMessagesApiV1ChatsIdMessagesGetInfiniteQueryOptions(id,params,options)
+    const queryOptions = getReadMessagesApiV1ChatsIdMessagesGetInfiniteQueryOptions(id, params, options)
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+    const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  return { ...query, queryKey: queryOptions.queryKey };
+    return { ...query, queryKey: queryOptions.queryKey };
 }
 
 
@@ -740,22 +771,22 @@ export function useReadMessagesApiV1ChatsIdMessagesGetInfinite<TData = InfiniteD
 
 
 export const getReadMessagesApiV1ChatsIdMessagesGetQueryOptions = <TData = Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError = ErrorType<HTTPValidationError>>(id: string,
-    params?: ReadMessagesApiV1ChatsIdMessagesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+    params?: ReadMessagesApiV1ChatsIdMessagesGetParams, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+    const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getReadMessagesApiV1ChatsIdMessagesGetQueryKey(id,params);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>> = ({ signal }) => readMessagesApiV1ChatsIdMessagesGet(id,params, requestOptions, signal);
+    const queryKey = queryOptions?.queryKey ?? getReadMessagesApiV1ChatsIdMessagesGetQueryKey(id, params);
 
 
 
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>> = ({ signal }) => readMessagesApiV1ChatsIdMessagesGet(id, params, requestOptions, signal);
 
 
-   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+
+
+    return { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
 export type ReadMessagesApiV1ChatsIdMessagesGetQueryResult = NonNullable<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>>
@@ -763,47 +794,51 @@ export type ReadMessagesApiV1ChatsIdMessagesGetQueryError = ErrorType<HTTPValida
 
 
 export function useReadMessagesApiV1ChatsIdMessagesGet<TData = Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError = ErrorType<HTTPValidationError>>(
- id: string,
-    params: undefined |  ReadMessagesApiV1ChatsIdMessagesGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>,
-          TError,
-          Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    id: string,
+    params: undefined | ReadMessagesApiV1ChatsIdMessagesGetParams, options: {
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError, TData>> & Pick<
+            DefinedInitialDataOptions<
+                Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>,
+                TError,
+                Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>
+            >, 'initialData'
+        >, request?: SecondParameter<typeof customInstance>
+    }
+    , queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useReadMessagesApiV1ChatsIdMessagesGet<TData = Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError = ErrorType<HTTPValidationError>>(
- id: string,
-    params?: ReadMessagesApiV1ChatsIdMessagesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>,
-          TError,
-          Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    id: string,
+    params?: ReadMessagesApiV1ChatsIdMessagesGetParams, options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError, TData>> & Pick<
+            UndefinedInitialDataOptions<
+                Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>,
+                TError,
+                Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>
+            >, 'initialData'
+        >, request?: SecondParameter<typeof customInstance>
+    }
+    , queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useReadMessagesApiV1ChatsIdMessagesGet<TData = Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError = ErrorType<HTTPValidationError>>(
- id: string,
-    params?: ReadMessagesApiV1ChatsIdMessagesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    id: string,
+    params?: ReadMessagesApiV1ChatsIdMessagesGetParams, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
+    , queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Read Messages
  */
 
 export function useReadMessagesApiV1ChatsIdMessagesGet<TData = Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError = ErrorType<HTTPValidationError>>(
- id: string,
-    params?: ReadMessagesApiV1ChatsIdMessagesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    id: string,
+    params?: ReadMessagesApiV1ChatsIdMessagesGetParams, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof readMessagesApiV1ChatsIdMessagesGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
+    , queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getReadMessagesApiV1ChatsIdMessagesGetQueryOptions(id,params,options)
+    const queryOptions = getReadMessagesApiV1ChatsIdMessagesGetQueryOptions(id, params, options)
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  return { ...query, queryKey: queryOptions.queryKey };
+    return { ...query, queryKey: queryOptions.queryKey };
 }
 
 

@@ -34,7 +34,17 @@ services:
       - fuet-network
     depends_on:
       - db
-
+      - rabbitmq
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: fuet-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - fuet-network
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
   db:
     image: postgres:15-alpine
     container_name: fuet-db
@@ -52,7 +62,7 @@ services:
 
 volumes:
   postgres_data:
-  pgadmin_data:
+  rabbitmq_data:
 
 networks:
   fuet-network:

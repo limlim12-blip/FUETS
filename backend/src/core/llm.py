@@ -1,5 +1,6 @@
 from langchain_google_genai import ChatGoogleGenerativeAI
 from pydantic import BaseModel, Field
+import glob
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
 from langchain_core.runnables import (
     RunnableParallel,

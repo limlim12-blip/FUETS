@@ -6,7 +6,7 @@ from src.core.config import config
 # from src.models.schema import Professor, Course, Review
 
 DATABASE_URL = config.DB_URL
-engine = create_engine(DATABASE_URL, echo=True, pool_pre_ping=True)
+engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 
 
 def init_db():

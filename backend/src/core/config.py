@@ -1,6 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy import create_engine
-import psycopg
 import secrets
 from pathlib import Path
 
@@ -35,6 +34,8 @@ class Config(BaseSettings):
     R2_SECRET_KEY: str = ""
     R2_TOKEN: str = ""
     GOOGLE_API_KEY: str = ""
+    ENVIRONMENT: str = ""
+    RABBITMQ_URL: str = "amqp://guest:guest@rabbitmq:5672/"
 
     @property
     def DB_URL(self) -> str:
